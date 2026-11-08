@@ -163,3 +163,20 @@ changes about 10 pixels near the top of the sidebar. Re-runs are clean.
 Not yet covered: the OS settings were emulated through Firefox's native prefs, not by
 toggling Windows itself (that would change the host system). Performance was measured on a
 high-end GPU only.
+
+### M3a address bar and toolbar: 2026-11-08
+
+| Check | Result |
+|---|---|
+| Native restoration, 9 layouts (now including address bar and toolbar areas) | **0 differing pixels** in every layout |
+| Native restoration with the address bar **open**, multiple and single toolbar | **0 differing pixels** |
+| Open bar: glass panel over page text (real capture, dark and light) | Page text fully blurred; light mode picks up the workspace tint |
+| `urlbar.dim-page` | Page pixel (28,27,34) → (20,19,25) in dark mode (−28%). Changes only the page area. Master off: 0 pixels |
+| `toolbar.logo-menu-button` | Changes only the 14×14 icon area, in single- and multi-toolbar layouts. Master off: 0 pixels (apart from the known favicon noise) |
+| Other features and master overrides | Unchanged from M2: pass |
+
+Findings fixed during M3a:
+- The menu button icon sits inside a badge stack, so the logo selector targets any
+  descendant icon, and the icon needs an explicit size once its image is removed.
+- Focusing the window closes the address bar popup. `capture.sh` now runs a setup step
+  after focusing.

@@ -61,6 +61,20 @@ Those options keep their values and apply again when the area is turned back on.
 |---|---|---|---|
 | `artemis.essentials.style` | on · off | on | Artemis tiles for essential tabs. Zen's own "favicon background" option is respected |
 
+## Address bar
+
+| Setting | Values | Default | What it does |
+|---|---|---|---|
+| `artemis.urlbar.style` | on · off | on | Artemis address bar: a quiet field when closed, and a glass panel with Artemis result rows when open. Area switch for the address bar options |
+| `artemis.urlbar.dim-page` | on · off | on | Subtly dims the page while the floating address bar is open |
+
+## Toolbar
+
+| Setting | Values | Default | What it does |
+|---|---|---|---|
+| `artemis.toolbar.style` | on · off | on | Artemis radius and hover for toolbar and sidebar buttons. Area switch for the toolbar options |
+| `artemis.toolbar.logo-menu-button` | on · off | on | Shows the Artemis logo on the main menu button, in the toolbar's text colour |
+
 ## Motion
 
 | Setting | Values | Default | What it does |

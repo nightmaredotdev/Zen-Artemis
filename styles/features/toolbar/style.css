@@ -1,0 +1,9 @@
+/* artemis.toolbar.style: Artemis toolbar and sidebar buttons (area master for toolbar.*). */
+
+@media -moz-pref("artemis.toolbar.style") {
+  :is(#nav-bar, #zen-sidebar-top-buttons, #zen-sidebar-foot-buttons) .toolbarbutton-1 {
+    --toolbarbutton-border-radius: var(--artemis-radius-inner) !important;
+    --toolbarbutton-hover-background: var(--artemis-hover) !important;
+    --toolbarbutton-active-background: var(--artemis-pressed) !important;
+  }
+}

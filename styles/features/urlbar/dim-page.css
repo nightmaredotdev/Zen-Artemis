@@ -1,0 +1,12 @@
+/* artemis.urlbar.dim-page: subtly dim the page behind the open floating address bar. */
+
+@media -moz-pref("artemis.urlbar.style") and -moz-pref("artemis.urlbar.dim-page") {
+  #browser:has(#urlbar[breakout-extend][zen-floating-urlbar="true"]) #tabbrowser-tabpanels > .browserSidebarContainer.deck-selected::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.28));
+    pointer-events: none;
+  }
+}

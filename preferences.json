@@ -356,6 +356,44 @@
   },
   {
     "type": "separator",
+    "label": "Address bar"
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.urlbar.style",
+    "label": "Artemis address bar",
+    "description": "Artemis styling of the address bar and its results panel. Off restores Zen's address bar, including the options below.",
+    "defaultValue": true
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.urlbar.dim-page",
+    "label": "Dim page behind address bar",
+    "description": "Subtly dim the page while the floating address bar is open.",
+    "defaultValue": true,
+    "master": "artemis.urlbar.style"
+  },
+  {
+    "type": "separator",
+    "label": "Toolbar"
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.toolbar.style",
+    "label": "Artemis toolbar buttons",
+    "description": "Artemis radius and hover for toolbar and sidebar buttons. Off restores Zen's buttons, including the options below.",
+    "defaultValue": true
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.toolbar.logo-menu-button",
+    "label": "Artemis logo menu button",
+    "description": "Show the Artemis logo on the main menu button.",
+    "defaultValue": true,
+    "master": "artemis.toolbar.style"
+  },
+  {
+    "type": "separator",
     "label": "Motion"
   },
   {

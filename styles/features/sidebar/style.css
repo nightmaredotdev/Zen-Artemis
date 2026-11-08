@@ -31,14 +31,6 @@
     clip-path: var(--artemis-backdrop-clip);
   }
 
-  /* Sidebar buttons: consistent radius and quiet hover. */
-  #navigator-toolbox :is(#zen-sidebar-top-buttons, #zen-sidebar-foot-buttons)
-    .toolbarbutton-1:not(#zen-workspaces-button *) {
-    --toolbarbutton-border-radius: var(--artemis-radius-inner) !important;
-    --toolbarbutton-hover-background: var(--artemis-hover) !important;
-    --toolbarbutton-active-background: var(--artemis-pressed) !important;
-  }
-
   /* "New tab" row in the tab list. */
   #navigator-toolbox #tabs-newtab-button,
   #navigator-toolbox #vertical-tabs-newtab-button {

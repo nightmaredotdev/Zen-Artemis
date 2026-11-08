@@ -15,4 +15,6 @@ All notable changes to Artemis are documented here. Artemis uses
 - Tab styling, tab height, tab shape, active-tab highlight, tab separators and folder
   indent guide.
 - Essentials tiles.
+- Address bar styling with a glass results panel, and a subtle page dim while it is open.
+- Toolbar button styling and the Artemis logo on the main menu button.
 - Layout matrix, native-restoration, feature-independence and performance test scripts.

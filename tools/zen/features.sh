@@ -20,6 +20,7 @@ FEATURES=(
   "artemis.tabs.active-highlight|artemis.tabs.style|true|false"
   "artemis.tabs.separators|artemis.tabs.style|false|true"
   "artemis.folders.indent-guide|artemis.tabs.style|true|false"
+  "artemis.toolbar.logo-menu-button|artemis.toolbar.style|true|false"
 )
 echo "== 1. single-feature changes (master on)"
 for f in "${FEATURES[@]}"; do

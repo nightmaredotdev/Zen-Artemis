@@ -9,8 +9,10 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 OUT="$1"; FILTER="${2:-}"
 mkdir -p "$OUT"
 Z="$HERE/zrun.sh"; C="$HERE/checks"; PNG="$HERE/png.py"
-MASTERS_OFF='"artemis.window.frame":false,"artemis.sidebar.style":false,"artemis.tabs.style":false,"artemis.essentials.style":false'
-MASTERS_ON='"artemis.window.frame":null,"artemis.sidebar.style":null,"artemis.tabs.style":null,"artemis.essentials.style":null'
+# Every area switch / standalone feature. Keep in sync with preferences.json
+# (check.py has no runtime knowledge; tools/zen/masters.py prints the list).
+MASTERS_OFF=$(python3 "$HERE/masters.py" off)
+MASTERS_ON=$(python3 "$HERE/masters.py" on)
 # name | layout json (without braces)
 CELLS=(
   "compact-collapsed-dark|\"compact\":true,\"expanded\":false,\"scheme\":2,\"singleToolbar\":false"

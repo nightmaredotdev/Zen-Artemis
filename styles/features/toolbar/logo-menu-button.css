@@ -1,0 +1,14 @@
+/* artemis.toolbar.logo-menu-button: the Artemis logo on the main menu button.
+ * The canonical logo is used as a mask so it takes the toolbar's text colour. */
+
+@media -moz-pref("artemis.toolbar.style") and -moz-pref("artemis.toolbar.logo-menu-button") {
+  #PanelUI-menu-button .toolbarbutton-icon {
+    list-style-image: none !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
+    background-color: currentColor !important;
+    mask: url("../../../assets/artemis.svg") center / 16px 16px no-repeat;
+    mask-origin: content-box;
+    mask-clip: content-box;
+  }
+}

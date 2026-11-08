@@ -1,0 +1,44 @@
+/* artemis.urlbar.style: Artemis address bar and results panel (area master for urlbar.*). */
+
+@media -moz-pref("artemis.urlbar.style") {
+  /* Closed bar: a quiet field with a hairline edge. */
+  #urlbar:not([breakout-extend]) > .urlbar-background {
+    background-color: light-dark(rgb(0 0 0 / 0.045), rgb(255 255 255 / 0.06)) !important;
+    border-radius: var(--artemis-radius) !important;
+    box-shadow: inset 0 0 0 1px var(--artemis-hairline) !important;
+  }
+
+  #urlbar:not([breakout-extend]):hover > .urlbar-background {
+    background-color: light-dark(rgb(0 0 0 / 0.07), rgb(255 255 255 / 0.09)) !important;
+  }
+
+  /* Open bar and results: a glass panel. */
+  #urlbar[breakout-extend] > .urlbar-background {
+    background-color: var(--artemis-glass-panel-bg) !important;
+    backdrop-filter: var(--artemis-glass-filter) !important;
+    border-radius: calc(var(--artemis-radius-outer) + 2px) !important;
+    outline: 1px solid var(--artemis-hairline) !important;
+    outline-offset: -1px !important;
+    box-shadow:
+      0 2px 8px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.3)),
+      0 28px 90px -16px light-dark(rgb(0 0 0 / 0.28), rgb(0 0 0 / 0.65)) !important;
+  }
+
+  #urlbar[breakout-extend] .urlbarView-row {
+    border-radius: var(--artemis-radius) !important;
+  }
+
+  #urlbar[breakout-extend] .urlbarView-row:not([selected]):hover {
+    background-color: var(--artemis-hover) !important;
+  }
+
+  #urlbar[breakout-extend] .urlbarView-row[selected] {
+    background-color: light-dark(rgb(0 0 0 / 0.06), rgb(255 255 255 / 0.09)) !important;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--artemis-accent-ui) 28%, transparent) !important;
+  }
+
+  /* Let the glass blur the page while the bar is open (see --artemis-backdrop-clip). */
+  #browser:has(#urlbar[breakout-extend]) #tabbrowser-tabpanels browser {
+    clip-path: var(--artemis-backdrop-clip);
+  }
+}
