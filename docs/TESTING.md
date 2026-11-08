@@ -206,3 +206,19 @@ verified**, and the matrix no longer contains a horizontal cell.
 
 Also noted: Marionette force-quit skips the pref save, so `tools/zen/quit.mjs` now calls
 `savePrefFile` first.
+
+### M4 motion (partial): 2026-11-08
+
+| Check | Result |
+|---|---|
+| `motion.hover` | Artemis: 120 ms fades of background, shadow, opacity and filter on tabs, folder rows, buttons, results and workspace icons. Zen: native (`all 0s` on tabs; Zen's own 0.1 s/0.2 s on workspace icons). Off: `none` |
+| `motion.popups` (app menu sampled two frames after opening) | Artemis: opacity 0.36, rise −7.7 px, scale 0.98, 0.2 s. Zen: opacity 0.00, −34.7 px of Firefox's −70 px slide, 0.18 s. Off: opacity 1, no transform, 0 s |
+| Intensity scales only the Artemis state | Gentle: 102 ms / −3.6 px. Standard: 120 ms / −7.7 px. Lively: 138 ms / −12.9 px |
+| System reduced motion (emulated) | Artemis rules step aside. Hover is native; the panel appears without motion |
+| `zen` state = no Artemis at all (computed transitions of tab, workspace icon and panel) | **Identical** |
+
+Horizontal tabs (A13) investigated: Zen does not offer them (see DECISIONS.md M4 entry).
+They remain release blocker B1.
+
+Performance figures in this log are from the development machine only (AMD Radeon RX 9060
+XT, 144 Hz). Mid-range hardware is **untested**.

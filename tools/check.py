@@ -341,7 +341,9 @@ FORBIDDEN_CSS = [
     (re.compile(r"@layer"), "@layer (see ARCHITECTURE §9.3)"),
 ]
 ANIMATED_PROP_RE = re.compile(r"transition(-property)?\s*:\s*([^;]+);")
-OK_ANIMATED = {"transform", "opacity", "none", "all 0s", "translate", "scale", "rotate"}
+# Colour fades are allowed for small controls (ARCHITECTURE 9.6).
+OK_ANIMATED = {"transform", "opacity", "none", "all 0s", "translate", "scale", "rotate",
+               "background-color", "box-shadow", "color", "filter"}
 
 
 def check_css_hygiene() -> None:

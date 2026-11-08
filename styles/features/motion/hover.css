@@ -1,0 +1,30 @@
+/* artemis.motion.hover: hover feedback transitions (artemis / zen / off).
+ * Colour fades on small controls only; intensity scales the duration. */
+
+@media -moz-pref("artemis.motion.hover", "artemis") {
+  @media (prefers-reduced-motion: no-preference) {
+    #tabbrowser-tabs .tabbrowser-tab > .tab-stack > .tab-background,
+    #tabbrowser-tabs zen-folder > .tab-group-label-container,
+    :is(#nav-bar, #zen-sidebar-top-buttons, #zen-sidebar-foot-buttons) .toolbarbutton-1 > .toolbarbutton-icon,
+    :is(#nav-bar, #zen-sidebar-top-buttons, #zen-sidebar-foot-buttons) .toolbarbutton-1 > .toolbarbutton-badge-stack,
+    #urlbar .urlbarView-row,
+    #zen-workspaces-button toolbarbutton {
+      transition:
+        background-color var(--artemis-duration-fast) var(--artemis-ease-standard),
+        box-shadow var(--artemis-duration-fast) var(--artemis-ease-standard),
+        opacity var(--artemis-duration-fast) var(--artemis-ease-standard),
+        filter var(--artemis-duration-fast) var(--artemis-ease-standard) !important;
+    }
+  }
+}
+
+@media -moz-pref("artemis.motion.hover", "off") {
+  #tabbrowser-tabs .tabbrowser-tab > .tab-stack > .tab-background,
+  #tabbrowser-tabs zen-folder > .tab-group-label-container,
+  :is(#nav-bar, #zen-sidebar-top-buttons, #zen-sidebar-foot-buttons) .toolbarbutton-1 > .toolbarbutton-icon,
+  :is(#nav-bar, #zen-sidebar-top-buttons, #zen-sidebar-foot-buttons) .toolbarbutton-1 > .toolbarbutton-badge-stack,
+  #urlbar .urlbarView-row,
+  #zen-workspaces-button toolbarbutton {
+    transition: none !important;
+  }
+}

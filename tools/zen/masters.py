@@ -19,6 +19,9 @@ for name, e in props.items():
         masters.add(name)
     if name.endswith(".switcher"):
         masters.add(name)
+    # Three-state animations: "zen" restores the native animation.
+    if name.startswith("artemis.motion.") and e["type"] == "dropdown" and "zen" in [o["value"] for o in e["options"]]:
+        masters.add(name)
 off = sys.argv[1] == "off"
 out = {}
 for m in sorted(masters):

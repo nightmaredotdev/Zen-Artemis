@@ -1,0 +1,27 @@
+/* artemis.motion.popups: how panels open (artemis / zen / off).
+ * Targets exactly what Firefox animates: arrow panels and .animatable-menupopup. */
+
+@media -moz-pref("artemis.motion.popups", "artemis") {
+  @media (prefers-reduced-motion: no-preference) {
+    :is(.animatable-menupopup, panel[type="arrow"]):not([animate="false"]) {
+      transition-duration: var(--artemis-duration-base) !important;
+      transition-timing-function: var(--artemis-ease-enter) !important;
+    }
+
+    @media (-moz-panel-animations) {
+      :is(.animatable-menupopup, panel[type="arrow"]):not([animate="false"], [animate="open"]) {
+        transform: translateY(calc(-2 * var(--artemis-travel))) scale(var(--artemis-scale-from)) !important;
+      }
+
+      :is(.animatable-menupopup, panel[type="arrow"])[side="bottom"]:not([animate="false"], [animate="open"]) {
+        transform: translateY(calc(2 * var(--artemis-travel))) scale(var(--artemis-scale-from)) !important;
+      }
+    }
+  }
+}
+
+@media -moz-pref("artemis.motion.popups", "off") {
+  :is(.animatable-menupopup, panel[type="arrow"]) {
+    transition: none !important;
+  }
+}

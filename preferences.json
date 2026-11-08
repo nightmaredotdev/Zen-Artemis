@@ -473,5 +473,49 @@
         "label": "Lively"
       }
     ]
+  },
+  {
+    "type": "dropdown",
+    "property": "artemis.motion.hover",
+    "label": "Hover feedback",
+    "description": "Smooth highlight changes on tabs, buttons, results and workspace icons.",
+    "defaultValue": "artemis",
+    "placeholder": false,
+    "options": [
+      {
+        "value": "artemis",
+        "label": "Artemis"
+      },
+      {
+        "value": "zen",
+        "label": "Zen default"
+      },
+      {
+        "value": "off",
+        "label": "Off"
+      }
+    ]
+  },
+  {
+    "type": "dropdown",
+    "property": "artemis.motion.popups",
+    "label": "Menus and panels",
+    "description": "How panels such as the main menu open. Plain context menus have no native animation on Windows.",
+    "defaultValue": "artemis",
+    "placeholder": false,
+    "options": [
+      {
+        "value": "artemis",
+        "label": "Artemis"
+      },
+      {
+        "value": "zen",
+        "label": "Zen default"
+      },
+      {
+        "value": "off",
+        "label": "Off"
+      }
+    ]
   }
 ]

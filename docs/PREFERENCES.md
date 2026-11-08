@@ -99,5 +99,7 @@ Those options keep their values and apply again when the area is turned back on.
 | Setting | Values | Default | What it does |
 |---|---|---|---|
 | `artemis.motion.intensity` | Gentle · Standard · Lively | Standard | Speed and travel of animations set to Artemis. It never turns animations on or off |
+| `artemis.motion.hover` | Artemis · Zen default · Off | Artemis | Hover feedback on tabs, folder rows, toolbar buttons, address bar results and workspace icons. Artemis: smooth colour fades. Off: changes are instant |
+| `artemis.motion.popups` | Artemis · Zen default · Off | Artemis | How panels such as the main menu open. Artemis: a short rise and fade. Off: panels appear instantly. Plain context menus have no native animation on Windows |
 
 With the system "reduce motion" setting on, Artemis animations become short fades.

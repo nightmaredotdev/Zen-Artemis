@@ -9,6 +9,40 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-08: M4 findings and proposals (approval needed)
+
+**Horizontal tabs (release blocker B1).** Zen's official FAQ
+(docs.zen-browser.app/faq): "Zen Browser will not support horizontal tabs in the near
+future." Zen 1.24.1b's settings write only `zen.view.sidebar-expanded` and
+`zen.view.use-single-toolbar` (Single toolbar / Multiple toolbars / Collapsed);
+`zen.tabs.vertical` is read but never set, and setting it does not give a working
+horizontal layout. **Proposal:** replace the requirement "vertical and horizontal tabs"
+with "every layout Zen offers: Single toolbar, Multiple toolbars and Collapsed, each with
+left and right sidebar and compact on/off". All of these are already in the test matrix.
+Revisit if Zen ever ships horizontal tabs. Until the owner decides, this stays a release
+blocker.
+
+**JS-driven animations (release blocker B3).** `motion.sidebar`, `motion.tabs`,
+`motion.folders` and `motion.workspaces` cannot meet the three-state rule cleanly (A11).
+Options:
+1. **(Recommended)** Drop these four from v1.0. Zen keeps its own animations, and its own
+   hidden prefs remain available to users. v1.0 motion is then `intensity`, `hover` and
+   `popups` (all three-state, implemented and tested). Artemis-only animations for
+   Artemis's own surfaces (for example the floating find bar and address bar panel
+   appearing, with `artemis`/`off` states) could be proposed separately.
+2. Patch Zen's animation calls from a JS module (wrapping `gZenUIManager.motion.animate`
+   for identified elements). This is fragile across Zen updates and touches private
+   behaviour. Not recommended.
+3. Have Artemis settings write Zen's own animation prefs. This duplicates Zen
+   functionality and breaks the rule that Artemis writes only `artemis.*` prefs. Not
+   recommended.
+
+**Implemented within scope:** `motion.hover` and `motion.popups` (artemis / zen / off),
+with `motion.intensity` scaling only the Artemis state. Small-control colour fades are
+allowed in addition to transform/opacity (ARCHITECTURE 9.6).
+
+---
+
 ## 2026-11-08: M2 implementation decisions (within approved scope)
 
 - **`parts.css` (author origin).** Gecko ignores `::part()` in user sheets (F33), so

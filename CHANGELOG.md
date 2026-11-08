@@ -19,4 +19,5 @@ All notable changes to Artemis are documented here. Artemis uses
 - Toolbar button styling and the Artemis logo on the main menu button.
 - Workspace switcher styles (minimal, dots), Artemis menus and panels, a floating find bar,
   and media controls styling.
+- Motion: hover feedback and panel opening, each Artemis / Zen / Off, scaled by intensity.
 - Layout matrix, native-restoration, feature-independence and performance test scripts.

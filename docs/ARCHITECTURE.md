@@ -151,9 +151,9 @@ M2. Details are in [`TESTING.md`](TESTING.md).
 | A8 | A `.uc.js` whose `include` matches `about:preferences` runs in the page that hosts Sine's settings dialog. | Settings enhancer (§7) | Sine's plain settings list only; document the limitation |
 | A9 | **User-branch** pref changes re-evaluate `-moz-pref()` live (Zen's live settings suggest yes). | Live settings | JS bridge mirrors prefs to root attributes |
 | A10 | Zen supports Marionette (`-marionette`) for scripted test runs (chrome-context screenshots, setting prefs). | Automated layout-matrix runs (§16.3) | Manual matrix only |
-| A11 | Zen animates each area natively that Artemis offers a `zen` motion state for (hover, popups, compact sidebar, tab open/close, folders, workspaces). | Three-state motion settings (§10) | Offer `artemis`/`off` only where Zen has no native animation |
+| A11 | Zen animates each area natively that Artemis offers a `zen` motion state for. **Result (M4):** hover feedback (CSS transitions) and panels (Firefox's `[animate]` transition on arrow panels and `.animatable-menupopup`) are CSS-driven and support all three states. The compact sidebar, tab open/close, folders and workspace switching are **JavaScript-driven** (Zen's `motion` library / Web Animations). CSS cannot replace or disable them, folder timing is a private field, and Zen exposes only its own hidden prefs (`zen.view.compact.animate-sidebar`, `zen.workspaces.switch-animation-duration`). | Three-state motion settings (§10) | Release blocker B3: owner decision on those four settings |
 | A12 | Glass on the sidebar plus open popups adds no noticeable frame-time cost on mid-range hardware. | Glass defaults | Lower default blur; limit blur to floating surfaces |
-| A13 | Horizontal tabs can be enabled in the test profile for testing. In M3 `zen.tabs.vertical=false` did not change Zen 1.24.1b's layout, even after a restart. | Horizontal-tab compatibility (required by the owner) | Find how Zen's settings UI switches layouts; until then horizontal tabs are **untested** |
+| A13 | Horizontal tabs can be enabled for testing. **Result (M4): Zen does not offer horizontal tabs.** Its FAQ says they "will not be supported in the near future". Its layout settings write only `zen.view.sidebar-expanded` and `zen.view.use-single-toolbar` (Single / Multiple / Collapsed). `zen.tabs.vertical` is never set by Zen code, and setting it does not produce a working horizontal layout. | Horizontal-tab compatibility (owner requirement) | Release blocker B1: owner decision needed. Not simulated in CSS |
 
 ---
 
@@ -510,8 +510,9 @@ toolbars, dark.
 
 ### 9.6 Performance
 
-- Only `transform` and `opacity` are animated. No animated `filter`, size or margin on
-  large areas.
+- Large surfaces animate only `transform` and `opacity`. Small controls (tabs, buttons,
+  rows, workspace icons) may also fade `background-color`, `box-shadow`, `color` and
+  `filter` for hover feedback. No animated size or margin.
 - Blur is limited to bounded surfaces. There is no full-page blur: `urlbar.dim-page` dims
   the page instead.
 - Glass costs are measured in M1 (A12). Defaults are lowered if the cost is noticeable.
