@@ -9,6 +9,29 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-08: MIT licence adopted
+
+**Approved** by the owner. The logo was refined in SVG Vector Lab
+(<https://svgvectorlab.com/>). Its Terms of Use (effective August 9, 2026,
+<https://svgvectorlab.com/terms>) leave users their rights in their artwork and state that
+local processing transfers no ownership. They put no restriction on exported files. The
+owner checked them, and Claude re-read them on 2026-11-08. Exact quotations are in
+`CREDITS.md`.
+
+- `LICENSE`: standard MIT text, `Copyright (c) 2026 nightmare`. It covers the repository
+  including the logo, to the extent of the rights held.
+- No claim is made about copyright in the AI-generated portions of the logo.
+- Intended policy: unrestricted reuse, modification, redistribution and commercial use.
+- `theme.json` declares `"license": "MIT"`.
+- Release blocker B2 is resolved.
+
+**Commit identity.** From this commit on, commits use the GitHub noreply address
+(`354072430+nightmaredotdev@users.noreply.github.com`) at the owner's request. Earlier
+commits carry the owner's personal address. They are already published, and rewriting them
+would need a force-push, which is not allowed, so they are left unchanged.
+
+---
+
 ## 2026-11-08: M5 implementation decisions (within approved scope)
 
 - **Schema stamping.** `artemis.internal.schema` is written on the first user change (not

@@ -7,6 +7,7 @@ All notable changes to Artemis are documented here. Artemis uses
 ## [Unreleased]
 
 ### Added
+- MIT License for the repository, including the logo (provenance in CREDITS.md).
 - Project scaffold: manifest, settings schema, design and motion tokens, default seeding,
   window bootstrap and static checks.
 - Isolated test-profile tooling (Marionette client and verification checks).

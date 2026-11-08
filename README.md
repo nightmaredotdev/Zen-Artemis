@@ -48,4 +48,6 @@ licence.
 
 ## Licence
 
-The licence will be added before the first release.
+Artemis, including its logo, is released under the [MIT License](LICENSE): you may use,
+modify, fork, redistribute and sell it. The logo's provenance is recorded in
+[CREDITS.md](CREDITS.md).
