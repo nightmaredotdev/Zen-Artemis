@@ -1,0 +1,133 @@
+[
+  {
+    "type": "separator",
+    "label": "Appearance"
+  },
+  {
+    "type": "dropdown",
+    "property": "artemis.appearance.accent",
+    "label": "Accent color",
+    "description": "Follow Zen's accent color, or choose your own.",
+    "defaultValue": "zen",
+    "placeholder": false,
+    "options": [
+      { "value": "zen", "label": "Zen accent" },
+      { "value": "custom", "label": "Custom" }
+    ]
+  },
+  {
+    "type": "string",
+    "property": "artemis.appearance.accent-color",
+    "label": "Custom accent",
+    "description": "Any CSS color, e.g. #7c8aff or rgb(124 138 255).",
+    "defaultValue": "#7c8aff",
+    "placeholder": "#7c8aff",
+    "pattern": "^(#[0-9a-fA-F]{3,8}|(rgb|rgba|hsl|hsla|oklch|oklab|lch|lab)\\([0-9a-zA-Z.%,/ +-]{1,60}\\)|[a-zA-Z]{3,24})$",
+    "conditions": [{ "if": { "property": "artemis.appearance.accent", "value": "custom" } }]
+  },
+  {
+    "type": "dropdown",
+    "property": "artemis.appearance.transparency",
+    "label": "Surface transparency",
+    "description": "How much shows through Artemis's glass surfaces. Solid makes them opaque.",
+    "defaultValue": "medium",
+    "placeholder": false,
+    "options": [
+      { "value": "solid", "label": "Solid" },
+      { "value": "low", "label": "Low" },
+      { "value": "medium", "label": "Medium" },
+      { "value": "high", "label": "High" },
+      { "value": "custom", "label": "Custom" }
+    ]
+  },
+  {
+    "type": "string",
+    "property": "artemis.appearance.transparency-custom",
+    "label": "Custom surface opacity",
+    "description": "Surface opacity as a percentage, e.g. 72%. Lower is more transparent.",
+    "defaultValue": "72%",
+    "placeholder": "72%",
+    "pattern": "^(100|[1-9]?[0-9])(\\.[0-9]+)?%$",
+    "conditions": [{ "if": { "property": "artemis.appearance.transparency", "value": "custom" } }]
+  },
+  {
+    "type": "dropdown",
+    "property": "artemis.appearance.blur",
+    "label": "Glass blur",
+    "description": "Blur strength behind Artemis's glass surfaces.",
+    "defaultValue": "medium",
+    "placeholder": false,
+    "options": [
+      { "value": "none", "label": "None" },
+      { "value": "light", "label": "Light" },
+      { "value": "medium", "label": "Medium" },
+      { "value": "strong", "label": "Strong" },
+      { "value": "custom", "label": "Custom" }
+    ]
+  },
+  {
+    "type": "string",
+    "property": "artemis.appearance.blur-custom",
+    "label": "Custom blur",
+    "description": "Blur radius in pixels, e.g. 18px.",
+    "defaultValue": "18px",
+    "placeholder": "18px",
+    "pattern": "^([0-9]|[1-5][0-9]|6[0-4])(\\.[0-9]+)?px$",
+    "conditions": [{ "if": { "property": "artemis.appearance.blur", "value": "custom" } }]
+  },
+  {
+    "type": "dropdown",
+    "property": "artemis.appearance.radius",
+    "label": "Corner radius",
+    "description": "One radius scale for every rounded Artemis element.",
+    "defaultValue": "medium",
+    "placeholder": false,
+    "options": [
+      { "value": "zen", "label": "Zen default" },
+      { "value": "small", "label": "Small" },
+      { "value": "medium", "label": "Medium" },
+      { "value": "large", "label": "Large" },
+      { "value": "custom", "label": "Custom" }
+    ]
+  },
+  {
+    "type": "string",
+    "property": "artemis.appearance.radius-custom",
+    "label": "Custom radius",
+    "description": "Corner radius in pixels, e.g. 10px.",
+    "defaultValue": "10px",
+    "placeholder": "10px",
+    "pattern": "^([0-9]|[1-2][0-9]|3[0-2])(\\.[0-9]+)?px$",
+    "conditions": [{ "if": { "property": "artemis.appearance.radius", "value": "custom" } }]
+  },
+  {
+    "type": "dropdown",
+    "property": "artemis.appearance.spacing",
+    "label": "Spacing",
+    "description": "Padding and gaps inside Artemis-styled elements.",
+    "defaultValue": "balanced",
+    "placeholder": false,
+    "options": [
+      { "value": "tight", "label": "Tight" },
+      { "value": "balanced", "label": "Balanced" },
+      { "value": "relaxed", "label": "Relaxed" }
+    ]
+  },
+  {
+    "type": "separator",
+    "label": "Motion"
+  },
+  {
+    "type": "dropdown",
+    "property": "artemis.motion.intensity",
+    "label": "Animation intensity",
+    "description": "Speed and travel of animations set to Artemis. Never turns animations on or off.",
+    "defaultValue": "standard",
+    "placeholder": false,
+    "options": [
+      { "value": "gentle", "label": "Gentle" },
+      { "value": "standard", "label": "Standard" },
+      { "value": "lively", "label": "Lively" }
+    ]
+  }
+]

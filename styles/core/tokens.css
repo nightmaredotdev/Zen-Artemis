@@ -1,0 +1,193 @@
+/* Artemis design tokens.
+ *
+ * Custom properties only: this file has no visible effect on its own.
+ * Features read these tokens; tokens never test feature prefs.
+ *
+ * Custom values (string prefs) arrive two ways:
+ *   --artemis-live-*            set by the window bridge (live, validated)
+ *   --artemis-appearance-*      set by Sine from the string pref (chrome only)
+ * Both are registered with @property so an invalid value falls back to a
+ * safe initial value instead of breaking layout.
+ */
+
+/* ---- Validation of custom values ------------------------------------- */
+
+@property --artemis-appearance-accent-color {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #7c8aff;
+}
+
+@property --artemis-appearance-transparency-custom {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 72%;
+}
+
+@property --artemis-appearance-blur-custom {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 18px;
+}
+
+@property --artemis-appearance-radius-custom {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 10px;
+}
+
+@property --artemis-accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #7c8aff;
+}
+
+@property --artemis-glass-opacity {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 72%;
+}
+
+@property --artemis-glass-blur {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 18px;
+}
+
+@property --artemis-radius {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 10px;
+}
+
+/* ---- Base values (also the result when a pref is unset) ---------------- */
+
+:root {
+  /* Colour */
+  --artemis-accent: var(--zen-primary-color, #7c8aff);
+  --artemis-surface-base: light-dark(rgb(249 249 251), rgb(27 27 31));
+  --artemis-surface-raised: light-dark(rgb(255 255 255), rgb(38 38 44));
+  --artemis-hairline: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.08));
+  --artemis-hover: light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.06));
+  --artemis-pressed: light-dark(rgb(0 0 0 / 0.09), rgb(255 255 255 / 0.1));
+  --artemis-text-muted: light-dark(rgb(0 0 0 / 0.55), rgb(255 255 255 / 0.55));
+  --artemis-selected: color-mix(in srgb, var(--artemis-accent) 14%, transparent);
+  --artemis-shadow-floating:
+    0 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.3)),
+    0 8px 28px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.45));
+
+  /* Glass */
+  --artemis-glass-opacity: 72%;
+  --artemis-glass-blur: 18px;
+  --artemis-glass-bg: color-mix(
+    in srgb,
+    var(--artemis-surface-base) var(--artemis-glass-opacity),
+    transparent
+  );
+  --artemis-glass-raised-bg: color-mix(
+    in srgb,
+    var(--artemis-surface-raised) var(--artemis-glass-opacity),
+    transparent
+  );
+  --artemis-glass-filter: blur(var(--artemis-glass-blur)) saturate(140%);
+
+  /* Shape */
+  --artemis-radius: 10px;
+  --artemis-radius-inner: max(2px, calc(var(--artemis-radius) - 4px));
+  --artemis-radius-outer: calc(var(--artemis-radius) + 4px);
+
+  /* Spacing: 4px scale multiplied by the spacing step */
+  --artemis-space-factor: 1;
+  --artemis-space-1: calc(4px * var(--artemis-space-factor));
+  --artemis-space-2: calc(8px * var(--artemis-space-factor));
+  --artemis-space-3: calc(12px * var(--artemis-space-factor));
+  --artemis-space-4: calc(16px * var(--artemis-space-factor));
+}
+
+/* ---- Accent ------------------------------------------------------------ */
+
+@media -moz-pref("artemis.appearance.accent", "custom") {
+  :root {
+    --artemis-accent: var(--artemis-live-accent-color, var(--artemis-appearance-accent-color));
+  }
+}
+
+/* ---- Transparency (surface opacity) ------------------------------------ */
+
+@media -moz-pref("artemis.appearance.transparency", "solid") {
+  :root { --artemis-glass-opacity: 100%; }
+}
+@media -moz-pref("artemis.appearance.transparency", "low") {
+  :root { --artemis-glass-opacity: 86%; }
+}
+@media -moz-pref("artemis.appearance.transparency", "medium") {
+  :root { --artemis-glass-opacity: 72%; }
+}
+@media -moz-pref("artemis.appearance.transparency", "high") {
+  :root { --artemis-glass-opacity: 56%; }
+}
+@media -moz-pref("artemis.appearance.transparency", "custom") {
+  :root {
+    --artemis-glass-opacity: var(
+      --artemis-live-transparency-custom,
+      var(--artemis-appearance-transparency-custom)
+    );
+  }
+}
+
+/* ---- Blur -------------------------------------------------------------- */
+
+@media -moz-pref("artemis.appearance.blur", "none") {
+  :root { --artemis-glass-blur: 0px; }
+}
+@media -moz-pref("artemis.appearance.blur", "light") {
+  :root { --artemis-glass-blur: 8px; }
+}
+@media -moz-pref("artemis.appearance.blur", "medium") {
+  :root { --artemis-glass-blur: 18px; }
+}
+@media -moz-pref("artemis.appearance.blur", "strong") {
+  :root { --artemis-glass-blur: 32px; }
+}
+@media -moz-pref("artemis.appearance.blur", "custom") {
+  :root {
+    --artemis-glass-blur: var(--artemis-live-blur-custom, var(--artemis-appearance-blur-custom));
+  }
+}
+
+/* System preference: no translucency */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --artemis-glass-opacity: 100%;
+    --artemis-glass-blur: 0px;
+  }
+}
+
+/* ---- Radius ------------------------------------------------------------ */
+
+@media -moz-pref("artemis.appearance.radius", "zen") {
+  :root { --artemis-radius: var(--zen-border-radius, 10px); }
+}
+@media -moz-pref("artemis.appearance.radius", "small") {
+  :root { --artemis-radius: 6px; }
+}
+@media -moz-pref("artemis.appearance.radius", "medium") {
+  :root { --artemis-radius: 10px; }
+}
+@media -moz-pref("artemis.appearance.radius", "large") {
+  :root { --artemis-radius: 14px; }
+}
+@media -moz-pref("artemis.appearance.radius", "custom") {
+  :root {
+    --artemis-radius: var(--artemis-live-radius-custom, var(--artemis-appearance-radius-custom));
+  }
+}
+
+/* ---- Spacing ----------------------------------------------------------- */
+
+@media -moz-pref("artemis.appearance.spacing", "tight") {
+  :root { --artemis-space-factor: 0.75; }
+}
+@media -moz-pref("artemis.appearance.spacing", "relaxed") {
+  :root { --artemis-space-factor: 1.25; }
+}

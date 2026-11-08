@@ -1,2 +1,51 @@
 # Zen-Artemis
+
 A minimalist, customizable theme for **Zen Browser**. Designed to bring a clean, cohesive aesthetic to the browser while keeping the interface elegant, functional, and distraction-free.
+
+> **Status:** in development. Artemis is not released yet and cannot be installed.
+> The first release will be announced on the
+> [Releases](https://github.com/nightmaredotdev/Zen-Artemis/releases) page.
+
+## What Artemis is
+
+- **One cohesive look:** glass surfaces, refined layering, smooth motion, and
+  consistent spacing and corner radii across the browser.
+- **Feature-level settings:** each setting controls one recognizable thing, such as tab
+  shape, the active-tab highlight, or a single animation. Settings stay independent of
+  each other.
+- **Always reversible:** every Artemis feature has a setting that restores Zen's native
+  appearance or behaviour.
+- **Settings live in Sine:** open Artemis's settings from Sine's mod list. Changes apply
+  immediately.
+
+## Compatibility
+
+- Built for the latest Zen Browser release, through [Sine](https://github.com/CosmoCreeper/Sine).
+- Tested on **Windows**. Linux and macOS are kept in mind but are not tested yet.
+- Works with the sidebar expanded or collapsed, with compact mode on or off, with the
+  sidebar on the left or right, and with vertical or horizontal tabs.
+
+The Zen and Sine versions each release was tested with are listed in its release notes.
+
+## Installation
+
+Not available yet. Once released, Artemis can be installed from Sine's marketplace.
+
+Installing from GitHub instead requires Sine's *Allow unsafe JS* setting, because Artemis
+uses a small script for defaults, settings and backups. Without it the theme still works,
+but every feature starts in Zen's native state until you switch it on.
+
+## Repository
+
+This is the official Artemis repository, maintained by nightmare. External contributions
+and pull requests are not reviewed. You are welcome to fork Artemis and modify it under its
+licence.
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Settings reference](docs/PREFERENCES.md)
+- [Credits](CREDITS.md)
+- [Changelog](CHANGELOG.md)
+
+## Licence
+
+The licence will be added before the first release.

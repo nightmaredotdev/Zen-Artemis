@@ -1,0 +1,45 @@
+/* Artemis motion tokens.
+ *
+ * Custom properties only. Intensity scales animations that are set to
+ * "artemis"; it never turns an animation on or off. Each animation's own
+ * setting decides artemis / zen / off.
+ */
+
+:root {
+  --artemis-duration-factor: 1;
+  --artemis-distance-factor: 1;
+
+  --artemis-duration-fast: calc(120ms * var(--artemis-duration-factor));
+  --artemis-duration-base: calc(200ms * var(--artemis-duration-factor));
+  --artemis-duration-slow: calc(320ms * var(--artemis-duration-factor));
+
+  --artemis-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --artemis-ease-enter: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --artemis-ease-exit: cubic-bezier(0.3, 0, 0.8, 0.15);
+
+  /* Base travel distance for enter/exit movement, scaled by intensity */
+  --artemis-travel: calc(6px * var(--artemis-distance-factor));
+  --artemis-scale-from: calc(1 - 0.03 * var(--artemis-distance-factor));
+}
+
+@media -moz-pref("artemis.motion.intensity", "gentle") {
+  :root {
+    --artemis-duration-factor: 0.85;
+    --artemis-distance-factor: 0.5;
+  }
+}
+
+@media -moz-pref("artemis.motion.intensity", "lively") {
+  :root {
+    --artemis-duration-factor: 1.15;
+    --artemis-distance-factor: 1.6;
+  }
+}
+
+/* System reduced motion: Artemis animations become short fades. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --artemis-distance-factor: 0;
+    --artemis-duration-factor: 0.6;
+  }
+}

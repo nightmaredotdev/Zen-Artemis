@@ -1,0 +1,35 @@
+{
+  "id": "Artemis",
+  "name": "Artemis",
+  "description": "A refined, glassy theme for Zen Browser with independently configurable features.",
+  "author": "nightmare",
+  "version": "0.1.0",
+  "homepage": "https://github.com/nightmaredotdev/Zen-Artemis",
+  "readme": "https://raw.githubusercontent.com/nightmaredotdev/Zen-Artemis/main/README.md",
+  "style": {
+    "chrome": "chrome.css",
+    "content": "content.css"
+  },
+  "preferences": "preferences.json",
+  "scripts": {
+    "scripts/artemis.sys.mjs": {},
+    "artemis.uc.js": {
+      "include": [
+        "chrome://browser/content/browser.xhtml"
+      ]
+    }
+  },
+  "tags": [
+    "chrome",
+    "content",
+    "minimal",
+    "glass"
+  ],
+  "fork": [
+    "zen"
+  ],
+  "ai": "yes",
+  "createdAt": "2026-11-08",
+  "updatedAt": "2026-11-08T00:00:00Z",
+  "supportsUnload": true
+}

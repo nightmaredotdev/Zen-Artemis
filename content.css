@@ -1,0 +1,5 @@
+/* Artemis: content entry point. Ordered imports only; no rules here.
+ *
+ * Intentionally empty until v1.2. Internal-page styling will be explicitly
+ * scoped to browser-owned pages so that website content is never touched.
+ */
