@@ -6,24 +6,44 @@ All notable changes to Artemis are documented here. Artemis uses
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-08
+
+First release.
+
 ### Added
-- MIT License for the repository, including the logo (provenance in CREDITS.md).
-- Project scaffold: manifest, settings schema, design and motion tokens, default seeding,
-  window bootstrap and static checks.
-- Isolated test-profile tooling (Marionette client and verification checks).
-- Window frame and edge-to-edge page.
-- Sidebar styling with a glass floating compact sidebar, and hidden tab-list scrollbar.
-- Tab styling, tab height, tab shape, active-tab highlight, tab separators and folder
-  indent guide.
-- Essentials tiles.
-- Address bar styling with a glass results panel, and a subtle page dim while it is open.
-- Toolbar button styling and the Artemis logo on the main menu button.
-- Workspace switcher styles (minimal, dots), Artemis menus and panels, a floating find bar,
-  and media controls styling.
-- Motion: hover feedback and panel opening, each Artemis / Zen / Off, scaled by intensity.
-- Settings enhancements inside Sine: collapsible sections, search, descriptions,
-  per-setting reset, reset all, backup restore and "Take the tour".
-- Automatic backups before reset and restore, and settings migration groundwork.
-- First-launch tour with live controls; skippable and reopenable.
-- Live custom values (accent, transparency, blur, radius) from any source.
-- Layout matrix, native-restoration, feature-independence and performance test scripts.
+- **Look:** glass surfaces with adjustable accent (Zen's or custom), surface transparency,
+  glass blur, corner radius and spacing, each with named steps and validated custom values.
+- **Window:** Artemis page frame and an optional edge-to-edge page (off, compact mode only,
+  always).
+- **Sidebar:** glass floating compact sidebar tinted with the workspace colour, and a hidden
+  tab-list scrollbar.
+- **Tabs:** Artemis tab styling with tab height, tab shape, active-tab highlight, tab
+  separators and a folder indent guide; essentials tiles.
+- **Address bar:** a quiet closed field, a glass results panel and a subtle page dim while
+  it is open.
+- **Toolbar:** Artemis button styling and the Artemis logo on the main menu button.
+- **Workspaces:** minimal and dots switcher styles.
+- **Menus and popups:** Artemis menus, context menus and panels, and a floating find bar.
+- **Media:** Artemis media controls card.
+- **Motion:** hover feedback and panel opening, each Artemis / Zen / Off, with an intensity
+  setting that scales only Artemis animations.
+- **Settings inside Sine:** collapsible sections, search, descriptions, per-setting reset,
+  reset all, backup restore and "Take the tour".
+- **Safety:** every area has a switch that restores Zen's native look for the whole area
+  while keeping your choices; automatic backups before reset and restore; settings
+  migration groundwork.
+- **First-launch tour** with live controls; skippable and reopenable.
+- MIT License, including the logo (provenance in CREDITS.md).
+
+### Notes
+- Tested on Windows with Zen 1.24.1b and Sine 2.3.4.1c, in every layout Zen offers
+  (Single toolbar, Multiple toolbars, Collapsed), compact on/off, sidebar left/right,
+  light and dark. Linux and macOS are untested.
+- Zen does not offer horizontal tabs, so Artemis does not support them.
+- Menus and panels use solid Artemis surfaces: they are separate system windows, so glass
+  cannot blur the page behind them.
+- Artemis follows Windows' transparency and animation settings.
+- Performance was measured on one machine only (AMD Radeon RX 9060 XT, 144 Hz).
+
+[Unreleased]: https://github.com/nightmaredotdev/Zen-Artemis/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/nightmaredotdev/Zen-Artemis/releases/tag/v1.0.0
