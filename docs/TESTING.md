@@ -145,7 +145,7 @@ normal tabs, a colourful test page and an animated test page) is set up by
 
 | Check | Result |
 |---|---|
-| Native restoration (all area switches off vs. Artemis sheets removed), 9 layouts: compact/full × collapsed/expanded, light, right side, single toolbar, horizontal tabs | **0 differing pixels** in every layout |
+| Native restoration (all area switches off vs. Artemis sheets removed), 8 layouts: compact/full × collapsed/expanded, light, right side, single toolbar | **0 differing pixels** in every layout. (A ninth "horizontal tabs" cell was later found to be invalid: Zen never actually switched to horizontal tabs. See M3b.) |
 | Artemis vs. pure Zen (sanity: the test can fail) | 1.6–6.8% of pixels differ, as intended |
 | Single-feature changes stay in their own region | Pass: tab features change only the sidebar; edge-to-edge changes the page frame |
 | Master off: toggling each feature changes nothing | **0 pixels** for all 7 features |
@@ -168,7 +168,7 @@ high-end GPU only.
 
 | Check | Result |
 |---|---|
-| Native restoration, 9 layouts (now including address bar and toolbar areas) | **0 differing pixels** in every layout |
+| Native restoration, 8 valid layouts (now including address bar and toolbar areas) | **0 differing pixels** in every layout |
 | Native restoration with the address bar **open**, multiple and single toolbar | **0 differing pixels** |
 | Open bar: glass panel over page text (real capture, dark and light) | Page text fully blurred; light mode picks up the workspace tint |
 | `urlbar.dim-page` | Page pixel (28,27,34) → (20,19,25) in dark mode (−28%). Changes only the page area. Master off: 0 pixels |
@@ -180,3 +180,29 @@ Findings fixed during M3a:
   descendant icon, and the icon needs an explicit size once its image is removed.
 - Focusing the window closes the address bar popup. `capture.sh` now runs a setup step
   after focusing.
+
+### M3b popups, find bar, workspaces, media: 2026-11-08
+
+Additional test setup (`checks/setup-media-spaces.js`): three workspaces, and a tab playing
+a generated 10 s tone that is muted after playback starts. Firefox only offers media
+controls for media of 3 s or longer, and only for audible playback, so the tab is unmuted
+briefly at start.
+
+| Check | Result |
+|---|---|
+| Native restoration, 8 layouts (all 9 areas, media card visible) | **0 differing pixels** (apart from the known favicon noise) |
+| Native restoration with a menu, the app menu and the find bar open (real captures for popups) | **0 differing pixels** for all three |
+| `workspaces.switcher` | Zen / Minimal / Dots render distinctly. `zen` is part of the all-native check |
+| `popups.findbar` | Floating glass card. The page height is unchanged when it opens (no reflow); the backdrop clip is only active while it is open. Master off: 0 pixels |
+| Find bar width | `auto` and `max-content` collapse to 16 px (flexible children), so it uses an explicit `min(880px, 100% − 24px)` that fits every option |
+| `media.controls` | Artemis tile replaces Zen's black card |
+| Popup appearance | Differences from Zen are subtle on Windows, because menus get native window rounding. Popups use an opaque raised surface: glass cannot blur the page behind a separate OS window |
+
+**Horizontal tabs: untested.** With `zen.tabs.vertical=false` (saved, after a full
+restart), `#tabbrowser-tabs` reports `orient="horizontal"`, but Zen 1.24.1b still draws the
+vertical sidebar in the test profile. Horizontal mode probably needs additional steps that
+Zen's settings UI performs. Until that is understood, horizontal-tab compatibility is **not
+verified**, and the matrix no longer contains a horizontal cell.
+
+Also noted: Marionette force-quit skips the pref save, so `tools/zen/quit.mjs` now calls
+`savePrefFile` first.

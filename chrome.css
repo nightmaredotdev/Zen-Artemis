@@ -23,3 +23,10 @@
 
 @import url("styles/features/toolbar/style.css");
 @import url("styles/features/toolbar/logo-menu-button.css");
+
+@import url("styles/features/workspaces/switcher.css");
+
+@import url("styles/features/popups/style.css");
+@import url("styles/features/popups/findbar.css");
+
+@import url("styles/features/media/controls.css");

@@ -17,4 +17,6 @@ All notable changes to Artemis are documented here. Artemis uses
 - Essentials tiles.
 - Address bar styling with a glass results panel, and a subtle page dim while it is open.
 - Toolbar button styling and the Artemis logo on the main menu button.
+- Workspace switcher styles (minimal, dots), Artemis menus and panels, a floating find bar,
+  and media controls styling.
 - Layout matrix, native-restoration, feature-independence and performance test scripts.

@@ -1,0 +1,27 @@
+/* artemis.popups.findbar: the find bar as a floating glass card over the page. */
+
+@media -moz-pref("artemis.popups.style") and -moz-pref("artemis.popups.findbar") {
+  #tabbrowser-tabpanels .browserContainer:has(> findbar) {
+    position: relative;
+  }
+
+  #tabbrowser-tabpanels .browserContainer > findbar {
+    position: absolute !important;
+    inset-inline-end: 12px;
+    bottom: 12px;
+    z-index: 2;
+    /* Wide enough for every find option; never wider than the page. */
+    width: min(880px, calc(100% - 24px)) !important;
+    padding-inline: var(--artemis-space-2) !important;
+    border: none !important;
+    border-radius: var(--artemis-radius-outer) !important;
+    background: var(--artemis-glass-panel-bg) !important;
+    backdrop-filter: var(--artemis-glass-filter) !important;
+    box-shadow: 0 0 0 1px var(--artemis-hairline), var(--artemis-shadow-floating) !important;
+  }
+
+  /* Let the glass blur the page while the find bar is open. */
+  #tabbrowser-tabpanels .browserContainer:has(> findbar:not([hidden])) browser {
+    clip-path: var(--artemis-backdrop-clip);
+  }
+}

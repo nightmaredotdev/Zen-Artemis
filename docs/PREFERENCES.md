@@ -75,6 +75,25 @@ Those options keep their values and apply again when the area is turned back on.
 | `artemis.toolbar.style` | on · off | on | Artemis radius and hover for toolbar and sidebar buttons. Area switch for the toolbar options |
 | `artemis.toolbar.logo-menu-button` | on · off | on | Shows the Artemis logo on the main menu button, in the toolbar's text colour |
 
+## Workspaces
+
+| Setting | Values | Default | What it does |
+|---|---|---|---|
+| `artemis.workspaces.switcher` | Zen default · Minimal · Dots | Minimal | Minimal: monochrome icons, the active space highlighted with the accent. Dots: one dot per space (the active one longer), icons appear on hover |
+
+## Menus and popups
+
+| Setting | Values | Default | What it does |
+|---|---|---|---|
+| `artemis.popups.style` | on · off | on | Artemis menus, context menus and panels: raised surface, hairline edge, Artemis radius and hover. Area switch for the popup options |
+| `artemis.popups.findbar` | on · off | on | Shows the find bar as a floating glass card at the bottom right of the page |
+
+## Media
+
+| Setting | Values | Default | What it does |
+|---|---|---|---|
+| `artemis.media.controls` | on · off | on | Artemis styling of the media controls card in the sidebar |
+
 ## Motion
 
 | Setting | Values | Default | What it does |

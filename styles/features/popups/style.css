@@ -1,0 +1,22 @@
+/* artemis.popups.style: Artemis menus, context menus and panels (area master for popups.*).
+ * Popups are separate OS widgets, so glass blur of the page is not possible;
+ * they use a raised Artemis surface instead. */
+
+@media -moz-pref("artemis.popups.style") {
+  menupopup,
+  panel {
+    --panel-background: light-dark(rgb(252 252 253), rgb(33 33 38)) !important;
+    --panel-background-color: light-dark(rgb(252 252 253), rgb(33 33 38)) !important;
+    --arrowpanel-background: light-dark(rgb(252 252 253), rgb(33 33 38)) !important;
+    --panel-border-color: var(--artemis-hairline) !important;
+    --arrowpanel-border-color: var(--artemis-hairline) !important;
+    --panel-border-radius: var(--artemis-radius-outer) !important;
+    --arrowpanel-border-radius: var(--artemis-radius-outer) !important;
+    --menuitem-border-radius: var(--artemis-radius-inner) !important;
+    --arrowpanel-menuitem-border-radius: var(--artemis-radius-inner) !important;
+    --menuitem-hover-background-color: var(--artemis-hover) !important;
+    --panel-item-hover-bgcolor: var(--artemis-hover) !important;
+    --panel-item-active-bgcolor: var(--artemis-pressed) !important;
+    --panel-shadow: 0 8px 28px light-dark(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.5)) !important;
+  }
+}

@@ -394,6 +394,62 @@
   },
   {
     "type": "separator",
+    "label": "Workspaces"
+  },
+  {
+    "type": "dropdown",
+    "property": "artemis.workspaces.switcher",
+    "label": "Workspace switcher",
+    "description": "Minimal: monochrome icons with the active space highlighted. Dots: one dot per space, icons on hover.",
+    "defaultValue": "minimal",
+    "placeholder": false,
+    "options": [
+      {
+        "value": "zen",
+        "label": "Zen default"
+      },
+      {
+        "value": "minimal",
+        "label": "Minimal"
+      },
+      {
+        "value": "dots",
+        "label": "Dots"
+      }
+    ]
+  },
+  {
+    "type": "separator",
+    "label": "Menus and popups"
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.popups.style",
+    "label": "Artemis menus and panels",
+    "description": "Artemis styling of menus, context menus and panels. Off restores Zen's popups, including the options below.",
+    "defaultValue": true
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.popups.findbar",
+    "label": "Floating find bar",
+    "description": "Show the find bar as a floating card over the page instead of a strip.",
+    "defaultValue": true,
+    "master": "artemis.popups.style"
+  },
+  {
+    "type": "separator",
+    "label": "Media"
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.media.controls",
+    "label": "Artemis media controls",
+    "description": "Artemis styling of the media controls card in the sidebar.",
+    "defaultValue": true
+  },
+  {
+    "type": "separator",
     "label": "Motion"
   },
   {

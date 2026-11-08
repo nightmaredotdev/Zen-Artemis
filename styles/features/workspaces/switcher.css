@@ -1,0 +1,55 @@
+/* artemis.workspaces.switcher: workspace switcher style (zen = native). */
+
+@media -moz-pref("artemis.workspaces.switcher", "minimal") {
+  #zen-workspaces-button toolbarbutton {
+    border-radius: var(--artemis-radius-inner) !important;
+  }
+
+  #zen-workspaces-button toolbarbutton:not([active="true"], [dragged="true"]) {
+    filter: grayscale(1) !important;
+    opacity: 0.5 !important;
+  }
+
+  #zen-workspaces-button toolbarbutton:not([active="true"]):hover {
+    opacity: 0.9 !important;
+    background-color: var(--artemis-hover) !important;
+  }
+
+  #zen-workspaces-button toolbarbutton[active="true"] {
+    background-color: color-mix(in srgb, var(--artemis-accent-ui) 16%, transparent) !important;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--artemis-accent-ui) 30%, transparent) !important;
+  }
+}
+
+@media -moz-pref("artemis.workspaces.switcher", "dots") {
+  #zen-workspaces-button toolbarbutton {
+    background: transparent !important;
+  }
+
+  #zen-workspaces-button toolbarbutton .zen-workspace-icon {
+    opacity: 0;
+  }
+
+  #zen-workspaces-button toolbarbutton::before {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: light-dark(rgb(0 0 0 / 0.3), rgb(255 255 255 / 0.32));
+  }
+
+  #zen-workspaces-button toolbarbutton[active="true"]::before {
+    width: 16px;
+    background: var(--artemis-accent-ui);
+  }
+
+  /* Hovering the switcher reveals the icons. */
+  #zen-workspaces-button:hover toolbarbutton .zen-workspace-icon {
+    opacity: 1;
+  }
+
+  #zen-workspaces-button:hover toolbarbutton::before {
+    opacity: 0;
+  }
+}
