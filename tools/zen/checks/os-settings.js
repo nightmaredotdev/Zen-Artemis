@@ -4,6 +4,11 @@
 const win = Services.wm.getMostRecentWindow("navigator:browser");
 const doc = win.document;
 const sleep = ms => new Promise(r => win.setTimeout(r, ms));
+// The glass panel being measured is the compact floating sidebar, so the check
+// switches to compact mode itself and restores the previous mode afterwards.
+const cm = win.gZenCompactModeManager;
+const wasCompact = cm.preference;
+if (!wasCompact) { cm.preference = true; await sleep(1500); }
 doc.getElementById("navigator-toolbox").setAttribute("zen-has-hover", "true");
 const bg = doc.getElementById("zen-toolbar-background");
 const read = () => {
@@ -29,4 +34,5 @@ for (const [name, v] of [["effects-on", 0], ["effects-off", 1], ["follow-os", nu
 // Leave the test profile in its designed state.
 Services.prefs.setIntPref("ui.prefersReducedTransparency", 0);
 Services.prefs.setIntPref("ui.prefersReducedMotion", 0);
+if (!wasCompact) cm.preference = false;
 return out;

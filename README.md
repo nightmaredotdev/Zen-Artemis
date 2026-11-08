@@ -21,9 +21,11 @@ A minimalist, customizable theme for **Zen Browser**. Designed to bring a clean,
 ## Compatibility
 
 - Built for the latest Zen Browser release, through [Sine](https://github.com/CosmoCreeper/Sine).
-- Tested on **Windows**. Linux and macOS are kept in mind but are not tested yet.
-- Works with the sidebar expanded or collapsed, with compact mode on or off, with the
-  sidebar on the left or right, and with vertical or horizontal tabs.
+- Tested on **Windows** with Zen 1.24.1b and Sine 2.3.4.1c. Linux and macOS are kept in
+  mind but are not tested yet.
+- Tested with every layout Zen offers (Single toolbar, Multiple toolbars and Collapsed),
+  with compact mode on or off, the sidebar on the left or right, in light and dark.
+  Zen does not offer horizontal tabs, so Artemis does not support them.
 
 The Zen and Sine versions each release was tested with are listed in its release notes.
 

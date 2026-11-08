@@ -69,7 +69,7 @@ MOZ_REMOTE_ALLOW_SYSTEM_ACCESS=1 WSLENV=MOZ_REMOTE_ALLOW_SYSTEM_ACCESS \
 |---|---|
 | `tools/zen/launch.sh` | Start the test browser (test profile only) |
 | `tools/zen/zrun.sh <check.js> [shot.png] [args-json]` | Run a chrome-context check script |
-| `tools/zen/capture.sh <out.png>` | Real screen capture of the test window (includes backdrop blur) |
+| `tools/zen/capture.sh <out.png>` | Real screen capture of the test window (includes backdrop blur). **Focuses the test window**, so it refuses to run unless `ARTEMIS_ALLOW_FOCUS=1` is set, and it aborts without capturing if the foreground window is not `zen.exe`. Use only when the owner's desktop is free |
 | `tools/zen/matrix.sh <dir>` | Layout matrix with native-restoration diffs |
 | `tools/zen/features.sh <dir>` | Feature independence, master override and value preservation |
 | `tools/zen/gpu-sample.sh [s]` | Average 3D GPU utilisation of the zen.exe processes |
@@ -78,6 +78,9 @@ MOZ_REMOTE_ALLOW_SYSTEM_ACCESS=1 WSLENV=MOZ_REMOTE_ALLOW_SYSTEM_ACCESS \
 | `checks/layout.js` | Set Zen layout / scheme / OS-effect emulation / prefs |
 | `checks/os-settings.js` | Artemis response to OS transparency and motion settings |
 | `checks/scrollbar.js`, `checks/frame-timing.js`, `checks/gpu-scenario.js` | Targeted measurements |
+| `checks/toggle-mod.js` | Disable or enable Artemis through Sine's own toggle and report what remains |
+| `checks/prompt.js` | Click Reset all / Restore and answer the real confirmation dialog (opens a dialog: free desktop only) |
+| `checks/multiwindow.js` | Second window: instances, live sync, native restoration, closing (opens a window: free desktop only) |
 
 ### Scripted checks (Marionette)
 
@@ -246,3 +249,28 @@ XT, 144 Hz). Mid-range hardware is **untested**.
 Not tested by clicking: the Reset-all and Restore buttons' confirmation prompts are modal,
 and the test driver cannot dismiss them. The same code paths were exercised through the
 functions the buttons call.
+
+### Final integration, part 1: 2026-11-08
+
+Run without focusing the test window or opening new ones, because the owner was using the
+computer. (One real screen capture in this session captured another application instead of
+the test window. It was deleted immediately, and `capture.sh` now refuses to run without
+explicit permission, then checks the foreground window before capturing.)
+
+| Check | Result |
+|---|---|
+| **Revised layout matrix**: Single toolbar, Multiple toolbars, Collapsed (set exactly as Zen's settings do) × compact on/off × left/right in dark, plus each layout × compact on/off in light: 18 cells | **0 differing pixels** in all 18 (all areas off vs. Artemis removed) |
+| Matrix sanity | Cells are genuinely different layouts (17–44% of pixels differ between layouts/sides/modes); Artemis-on differs from Zen in every cell checked (3–18%) |
+| Disable Artemis via Sine's own toggle | Combined sheet no longer imports Artemis; no window instance, live variables, tour or enhancer additions; `parts.css` removed. Window **pixel-identical** to pure Zen |
+| Re-enable via Sine's toggle | Restored live without restart (instance, live variables, enhancer, scrollbar rule) |
+| Feature independence and master overrides | Unchanged: each feature affects only its region; with masters off, every feature toggle changes 0 pixels; values preserved |
+| OS transparency and animation (emulated) | Effects on: glass 72% (panel 84.6%), blur 18 px, backdrop clip. Effects off and follow-OS (host has both off): opaque, no blur, no clip, motion distance 0. `os-settings.js` now switches to compact mode itself (an earlier run from non-compact mode measured a non-glass panel) |
+| Motion states, intensity, reduced motion, `zen` = native | Unchanged from M4 |
+
+**Pending (need a free desktop; not claimed as verified):**
+- Reset-all and Restore confirmation prompts answered through the real dialog (`checks/prompt.js`).
+- Multiple windows (`checks/multiwindow.js`).
+- Settings and backups surviving a restart (re-run on the final commit; passed at M5).
+- Real-capture visual review of glass in light mode, plus a fresh performance run on an idle
+  GPU.
+- The `capture.sh` foreground-window guard itself.
