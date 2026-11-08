@@ -26,6 +26,11 @@ A minimalist, customizable theme for **Zen Browser**. Designed to bring a clean,
 - Tested with every layout Zen offers (Single toolbar, Multiple toolbars and Collapsed),
   with compact mode on or off, the sidebar on the left or right, in light and dark.
   Zen does not offer horizontal tabs, so Artemis does not support them.
+- Performance has been measured on one machine only (AMD Radeon RX 9060 XT, 144 Hz
+  display): no dropped frames, and the glass sidebar over an animated page added about
+  0.7 percentage points of GPU use. Other hardware has not been tested.
+- Artemis follows Windows' transparency and animation settings: with those effects off,
+  surfaces are solid and motion is reduced.
 
 The Zen and Sine versions each release was tested with are listed in its release notes.
 

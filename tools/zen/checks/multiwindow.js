@@ -1,4 +1,4 @@
-// Status: written 2026-11-08, NOT YET RUN (needs a free desktop: opens a window).
+// Status: ran successfully 2026-11-08 (needs a free desktop: opens a window).
 // Multiple windows: opens a second browser window and checks Artemis instances,
 // live setting sync across windows, native restoration (computed styles) in the
 // second window, and clean closing. ARGS.mastersOff: JSON object of master prefs.

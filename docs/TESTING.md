@@ -79,8 +79,8 @@ MOZ_REMOTE_ALLOW_SYSTEM_ACCESS=1 WSLENV=MOZ_REMOTE_ALLOW_SYSTEM_ACCESS \
 | `checks/os-settings.js` | Artemis response to OS transparency and motion settings |
 | `checks/scrollbar.js`, `checks/frame-timing.js`, `checks/gpu-scenario.js` | Targeted measurements |
 | `checks/toggle-mod.js` | Disable or enable Artemis through Sine's own toggle and report what remains |
-| `checks/prompt.js` | Click Reset all / Restore and answer the real confirmation dialog (opens a dialog: free desktop only) |
-| `checks/multiwindow.js` | Second window: instances, live sync, native restoration, closing (opens a window: free desktop only) |
+| `prompt-ui.mjs <resetAll\|restore> <accept\|dismiss>` | Clicks Reset all / Restore and answers the real confirmation dialog through WebDriver alert commands (opens a dialog: free desktop only). Supersedes `checks/prompt.js`, which Marionette's default prompt handling defeats |
+| `checks/multiwindow.js` | Second window: instances, live sync, native restoration, closing (opens a window: free desktop only). Ran successfully on 2026-11-08 |
 
 ### Scripted checks (Marionette)
 
@@ -248,7 +248,8 @@ XT, 144 Hz). Mid-range hardware is **untested**.
 
 Not tested by clicking: the Reset-all and Restore buttons' confirmation prompts are modal,
 and the test driver cannot dismiss them. The same code paths were exercised through the
-functions the buttons call.
+functions the buttons call. (Later tested through the real dialogs: see "Final integration,
+part 2".)
 
 ### Final integration, part 1: 2026-11-08
 
@@ -267,10 +268,30 @@ explicit permission, then checks the foreground window before capturing.)
 | OS transparency and animation (emulated) | Effects on: glass 72% (panel 84.6%), blur 18 px, backdrop clip. Effects off and follow-OS (host has both off): opaque, no blur, no clip, motion distance 0. `os-settings.js` now switches to compact mode itself (an earlier run from non-compact mode measured a non-glass panel) |
 | Motion states, intensity, reduced motion, `zen` = native | Unchanged from M4 |
 
-**Pending (need a free desktop; not claimed as verified):**
-- Reset-all and Restore confirmation prompts answered through the real dialog (`checks/prompt.js`).
+**Pending at the time (need a free desktop; all completed in part 2 below):**
+- Reset-all and Restore confirmation prompts answered through the real dialog.
 - Multiple windows (`checks/multiwindow.js`).
 - Settings and backups surviving a restart (re-run on the final commit; passed at M5).
 - Real-capture visual review of glass in light mode, plus a fresh performance run on an idle
   GPU.
 - The `capture.sh` foreground-window guard itself.
+
+### Final integration, part 2: 2026-11-08 (owner's desktop free)
+
+Run in one session with the owner's confirmation that the computer was free. Only the
+isolated `ZenArtemisTest` profile was used. No other application was interacted with or
+captured. Windows settings and the real Zen profile were untouched.
+
+| Check | Result |
+|---|---|
+| **Capture safeguard** | Tightened before testing: `capture.sh` now requires the foreground window to belong to the test browser's **exact process id** (reported by the browser itself), and the browser to report the `ZenArtemisTest` profile. Abort path, with the expected pid deliberately wrong: aborted, "nothing captured", **no file written**. Without `ARTEMIS_ALLOW_FOCUS=1`: refused, no file. Normal path: foreground pid verified, and only the test window was captured (image checked) |
+| **Reset all through the real dialog** | Dialog text correct. Cancel: nothing changed. OK: `before-reset-all` backup written first, then both user values cleared |
+| **Restore through the real dialog** | Dialog text correct. Cancel: nothing changed. OK: `before-restore` backup written first, then both values restored |
+| How the dialogs were answered | Marionette treats them as WebDriver user prompts. A first attempt was auto-dismissed by Marionette's default prompt handling, so it does not count. The valid run (`tools/zen/prompt-ui.mjs`) used one session with `unhandledPromptBehavior: "ignore"` and answered with WebDriver's alert commands |
+| **Multiple windows** | Second window has its own instance (2 modules); no tour in either window; a setting change reaches both windows live (999px pill in both, then back); the second window's computed styles with all areas off are **identical** to pure Zen; closing it leaves the first window's instance intact |
+| **Persistence across restart** (runtime code at `7182749`) | User value and all backups survived; value applied live after restart; 31 defaults re-seeded; migration 1 → 1 with nothing unresolved; tour did not reopen. Restoring the oldest backup after the restart applied 3 values, with a new backup taken first |
+| **Light-mode glass** (guarded real captures) | Floating compact sidebar and open address bar: page text behind both is fully blurred, panels are readable, workspace tint visible. No issues found |
+| **Performance, GPU idle** (system-wide 3D 0.5% before the run) | Zen idle on a static page: 0.2%. Animated page: native 3.2% / 3.3% (sidebar hidden / shown); Artemis 3.2% / **4.0%** (the glass sidebar costs about +0.7 points). Frame timing while showing and hiding the compact sidebar 8 times at 144 Hz: native p99 6.9 ms, max 6.9 ms; Artemis p99 6.9 ms, max 9.0 ms; no frame over 25 ms in either |
+
+All measurements are from the development machine only (AMD Radeon RX 9060 XT, 144 Hz).
+Mid-range hardware remains **untested**.
