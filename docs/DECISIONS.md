@@ -9,6 +9,17 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-08: v1.0.1 released as a bug-fix-only patch (owner)
+
+**Approved** by the owner: v1.0.1 contains only the post-release fixes below. The owner
+confirmed the fixes in their own testing. Improvements the owner noticed are kept out of
+this release and will be evaluated separately. Released under the release workflow after the
+full checklist, including a real-capture visual review run with the owner's confirmation
+that the desktop was free (TESTING.md "v1.0.1 release run"). No settings were added,
+renamed or migrated (schema stays 1). v1.0.0, its tag and its release are unchanged.
+
+---
+
 ## 2026-11-08: Post-release fixes for v1.0.0 owner reports
 
 Bug fixes within the approved scope:

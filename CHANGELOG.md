@@ -6,6 +6,10 @@ All notable changes to Artemis are documented here. Artemis uses
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-08
+
+Bug-fix release. No new features or settings; existing settings are kept as they are.
+
 ### Fixed
 - **Transparency had no effect when Windows "Transparency effects" were off.** The system
   setting silently overrode Artemis's own transparency and blur, making the compact
@@ -23,6 +27,11 @@ All notable changes to Artemis are documented here. Artemis uses
 - **Custom-value fields showed even when their dropdown wasn't set to Custom.** They are
   now hidden on opening unless the dropdown is already on Custom, appear and disappear
   immediately when you switch, and keep the value you entered.
+
+### Notes
+- Tested on Windows with Zen 1.24.1b and Sine 2.3.4.1c, like 1.0.0.
+- With Windows "Transparency effects" off, Artemis's default transparency and blur still
+  follow Windows (opaque). Choose a transparency or blur in Artemis to override it.
 
 ## [1.0.0] - 2026-11-08
 
@@ -63,5 +72,6 @@ First release.
 - Artemis follows Windows' transparency and animation settings.
 - Performance was measured on one machine only (AMD Radeon RX 9060 XT, 144 Hz).
 
-[Unreleased]: https://github.com/nightmaredotdev/Zen-Artemis/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/nightmaredotdev/Zen-Artemis/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/nightmaredotdev/Zen-Artemis/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/nightmaredotdev/Zen-Artemis/releases/tag/v1.0.0

@@ -17,6 +17,17 @@ Everything here must be resolved before `1.0.0` is merged to `main`. Items move 
 | B8 | `theme.json` version and `updatedAt`, CHANGELOG entry, `check.py --release` | **Done** in `917c38f` | ARCHITECTURE 15.1 |
 | B9 | **Publication prerequisites.** (a) The repository is not publicly visible: the anonymous GitHub API returns "Not Found". A private repo cannot be installed from Sine, and contradicts the agreed public repository. (b) No API credential for `nightmaredotdev` is available to create the GitHub Release: Windows `gh` is logged in as `jlblarod`, which cannot see the repo. SSH pushes work as `nightmaredotdev`. | **Resolved 2026-11-08 (owner):** repository made public (verified anonymously), and GitHub CLI authenticated and active as `nightmaredotdev` (admin) | — |
 
+## v1.0.1 (bug-fix release, 2026-11-08)
+
+| # | Item | Status | Reference |
+|---|---|---|---|
+| P1 | Scope: only the five post-release fixes; no features, visual improvements or refactors | **Done**: `dev` since `v1.0.0` contains only `09fd83c`, `151aed3` and the release commit | DECISIONS.md |
+| P2 | Each fix has a regression check that fails on 1.0.0 and passes now | **Done** | TESTING.md "Post-release fixes", "Custom-value field visibility" |
+| P3 | Full matrix, native restoration, independence, OS settings, motion, runtime, multiple windows, Sine disable/enable, fresh install, without JS | **Done**: all pass | TESTING.md "v1.0.1 release run" |
+| P4 | Existing preferences preserved (no schema change, restart, reset/restore) | **Done** | TESTING.md "v1.0.1 release run" |
+| P5 | Real-capture visual review of the glass and a performance sample (owner's desktop free) | **Done**: pass; performance in line with 1.0.0 | TESTING.md "v1.0.1 release run" |
+| P6 | `theme.json` version and `updatedAt`, `scripts/version.mjs`, CHANGELOG entry, `check.py --release` | **Done** in the release commit | CHANGELOG.md |
+
 ## Known limitations to state in the release notes
 
 - Popups use opaque Artemis surfaces: they are separate Windows windows, so glass cannot

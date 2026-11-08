@@ -346,7 +346,7 @@ works live.
 
 Not yet verified: a real-capture visual review of the fixed glass (blurred, workspace-tinted
 sidebar and address bar). Marionette screenshots do not show blur, and real captures need
-the owner's desktop to be free.
+the owner's desktop to be free. (Done and passed: see "v1.0.1 release run".)
 
 ### Custom-value field visibility: 2026-11-08
 
@@ -361,3 +361,35 @@ the owner's desktop to be free.
 | After a full Sine rebuild | Still correct (0 failures) |
 | Accordion, settings page, runtime re-entrancy | Pass |
 | Browser-window regressions | Not re-run: the change affects only Artemis's settings dialog in `about:preferences` |
+
+### v1.0.1 release run: 2026-11-08 (release candidate `151aed3` plus version metadata)
+
+Zen 1.24.1b, Sine 2.3.4.1c, Windows. Automated checks ran **headless** in the isolated
+test profile. The visual review and performance sample ran afterwards in a visible test
+window, with the owner's confirmation that the desktop was free. Every capture verified the
+test browser's process id in the foreground first, and no other application was captured.
+
+| Check | Result |
+|---|---|
+| `check.py --release`, `git diff --check` | 0 errors, 0 warnings |
+| Fix 1: explicit opacity/blur beat Windows transparency (`transparency.js`) | Custom 10%: alpha 0.10 and blur 18 px on the compact sidebar and the open address bar with OS effects on, off and follow-OS. Defaults: 84.6% with effects on; opaque, no blur with effects off |
+| Fix 2: custom opacity exact | 10% gives alpha 0.10 (no readability boost) |
+| Fix 3: compact sidebar keeps workspace colours (`sidebar-tint.sh`) | Delta 0 against Zen in dark and light, for explicit solid and OS default |
+| Fix 4: accordion (`accordion.js`) | 22/22 clicks toggle only the clicked section |
+| Fix 5: custom-value fields (`custom-fields.js`) | 0 failures from defaults, from transparency and radius preset to Custom, and after a full Sine rebuild |
+| Layout matrix (18 cells), native restoration | **0 differing pixels** in all 18 |
+| Feature independence, master overrides, value preservation | Pass (master off: every feature toggle 0 px; values identical after master off/on) |
+| OS transparency and animation defaults | Unchanged from 1.0.0 (effects on: 72%, blur, clip; off/follow-OS: opaque, no blur, no clip, no motion distance) |
+| Motion | Unchanged from 1.0.0 (hover 120/102/138 ms, Zen, off; popups Artemis/Zen/off; reduced motion steps aside) |
+| Runtime edge cases, runtime state, settings page | Pass (validation, live bridge, migration, re-entrancy; 11 sections, 31 descriptions, only Artemis's dialog enhanced) |
+| Multiple windows | Instances, live sync, native restoration in the second window, clean close: pass |
+| Sine disable / re-enable and full rebuild | Disabled: no instance, no sheet import, no live variables, no enhanced dialog. Re-enabled and rebuilt live |
+| Fresh install | 31 defaults seeded, tour auto-opened, no user values; `prefs.js` has **no** Artemis lines after start and quit |
+| Existing preferences (a 1.0.0-style configuration: custom 10% opacity, custom accent, pill tabs, sidebar area off, hover motion off) | Survive restart unchanged; migration 1 → 1 with nothing unresolved; Reset all (real dialog) clears them, and Restore brings back exactly the same 7 values |
+| Without JS (`sine.allow-unsafe-js` off via the test `user.js`, restored afterwards) | No instance, no Artemis prefs defined, no tour; window **pixel-identical** to pure Zen |
+| **Visual review (real captures)**, backdrop page under the floating compact sidebar and the open address bar | Custom 10%, dark and light: clearly see-through, blurred, tinted by the workspace. Defaults, dark and light: frosted and readable. Owner's setup (OS effects off, custom 10%): see-through and blurred. OS effects off, defaults: opaque in Zen's own colour |
+| Performance (visible window, 144 Hz, owner's own Zen also running) | GPU 3D, animated page: native 3.9% / 3.7%, Artemis 4.0% / 4.4% (sidebar hidden / shown); frame timing over 8 show/hide cycles: p99 6.9 ms, max 6.9 ms, no frame over 25 ms, native and Artemis alike. In line with 1.0.0 |
+
+Test-procedure note: `checks/runtime-state.js` imports Artemis's core module, which seeds
+the defaults. In a without-JS run, take screenshots and check prefs **before** running it,
+or Artemis's CSS switches on and the comparison with pure Zen is invalid.
