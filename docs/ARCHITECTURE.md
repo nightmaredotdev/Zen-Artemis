@@ -153,6 +153,7 @@ M2. Details are in [`TESTING.md`](TESTING.md).
 | A10 | Zen supports Marionette (`-marionette`) for scripted test runs (chrome-context screenshots, setting prefs). | Automated layout-matrix runs (§16.3) | Manual matrix only |
 | A11 | Zen animates each area natively that Artemis offers a `zen` motion state for (hover, popups, compact sidebar, tab open/close, folders, workspaces). | Three-state motion settings (§10) | Offer `artemis`/`off` only where Zen has no native animation |
 | A12 | Glass on the sidebar plus open popups adds no noticeable frame-time cost on mid-range hardware. | Glass defaults | Lower default blur; limit blur to floating surfaces |
+| A13 | Horizontal tabs can be enabled in the test profile for testing. In M3 `zen.tabs.vertical=false` did not change Zen 1.24.1b's layout, even after a restart. | Horizontal-tab compatibility (required by the owner) | Find how Zen's settings UI switches layouts; until then horizontal tabs are **untested** |
 
 ---
 
