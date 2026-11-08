@@ -14,8 +14,8 @@ Everything here must be resolved before `1.0.0` is merged to `main`. Items move 
 | B5 | Full layout matrix, native restoration, feature independence and OS-setting checks pass on the release commit | **Done**: all pass on release candidate `917c38f` (headless) and in the desktop session (part 2) | TESTING.md "v1.0.0 release run" |
 | B6 | Fresh-install check (`prefs.js` has no `artemis.` lines) and without-JS check | **Done**: both pass on release candidate `917c38f` | TESTING.md "v1.0.0 release run" |
 | B7 | README: tested Zen/Sine versions, platforms ("tested on Windows"), performance statement limited to measured hardware | Done on `dev` (2026-11-08) | README.md |
-| B8 | `theme.json` version and `updatedAt`, CHANGELOG entry, `check.py --release` | **Done** in `917c38f`. Remaining publication steps (merge to `main`, tag `v1.0.0`, GitHub release) are on hold: see B9 | ARCHITECTURE 15.1 |
-| B9 | **Publication prerequisites.** (a) The repository is not publicly visible: the anonymous GitHub API returns "Not Found". A private repo cannot be installed from Sine, and contradicts the agreed public repository. (b) No API credential for `nightmaredotdev` is available to create the GitHub Release: Windows `gh` is logged in as `jlblarod`, which cannot see the repo. SSH pushes work as `nightmaredotdev`. | **Open: needs the owner** | — |
+| B8 | `theme.json` version and `updatedAt`, CHANGELOG entry, `check.py --release` | **Done** in `917c38f` | ARCHITECTURE 15.1 |
+| B9 | **Publication prerequisites.** (a) The repository is not publicly visible: the anonymous GitHub API returns "Not Found". A private repo cannot be installed from Sine, and contradicts the agreed public repository. (b) No API credential for `nightmaredotdev` is available to create the GitHub Release: Windows `gh` is logged in as `jlblarod`, which cannot see the repo. SSH pushes work as `nightmaredotdev`. | **Resolved 2026-11-08 (owner):** repository made public (verified anonymously), and GitHub CLI authenticated and active as `nightmaredotdev` (admin) | — |
 
 ## Known limitations to state in the release notes
 
