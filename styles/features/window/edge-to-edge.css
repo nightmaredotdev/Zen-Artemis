@@ -1,0 +1,23 @@
+/* artemis.window.edge-to-edge: remove the gap and rounding around the page. */
+
+@media -moz-pref("artemis.window.frame") and -moz-pref("artemis.window.edge-to-edge", "always") {
+  :root:not([inDOMFullscreen="true"]) {
+    --zen-element-separation: 0px !important;
+  }
+
+  #tabbrowser-tabpanels > .browserSidebarContainer {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}
+
+@media -moz-pref("artemis.window.frame") and -moz-pref("artemis.window.edge-to-edge", "compact") {
+  :root[zen-compact-mode="true"]:not([inDOMFullscreen="true"]) {
+    --zen-element-separation: 0px !important;
+  }
+
+  :root[zen-compact-mode="true"] #tabbrowser-tabpanels > .browserSidebarContainer {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}

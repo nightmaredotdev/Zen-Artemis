@@ -10,3 +10,9 @@ All notable changes to Artemis are documented here. Artemis uses
 - Project scaffold: manifest, settings schema, design and motion tokens, default seeding,
   window bootstrap and static checks.
 - Isolated test-profile tooling (Marionette client and verification checks).
+- Window frame and edge-to-edge page.
+- Sidebar styling with a glass floating compact sidebar, and hidden tab-list scrollbar.
+- Tab styling, tab height, tab shape, active-tab highlight, tab separators and folder
+  indent guide.
+- Essentials tiles.
+- Layout matrix, native-restoration, feature-independence and performance test scripts.

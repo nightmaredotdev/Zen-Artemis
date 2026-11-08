@@ -1,0 +1,13 @@
+/* artemis.tabs.active-highlight: accent tint and outline on the selected tab. */
+
+@media -moz-pref("artemis.tabs.style") and -moz-pref("artemis.tabs.active-highlight") {
+  #tabbrowser-tabs .tabbrowser-tab:not([zen-essential], .tabbrowser-tab .tabbrowser-tab):is([selected], [visuallyselected]) > .tab-stack > .tab-background {
+    background-image: linear-gradient(
+      color-mix(in srgb, var(--artemis-accent-ui) 12%, transparent),
+      color-mix(in srgb, var(--artemis-accent-ui) 12%, transparent)
+    ) !important;
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--artemis-accent-ui) 34%, transparent),
+      var(--artemis-tab-selected-shadow) !important;
+  }
+}

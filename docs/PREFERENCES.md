@@ -24,6 +24,43 @@ These settings shape everything Artemis styles. They never turn a feature on or 
 The system "reduce transparency" setting makes glass surfaces opaque regardless of these
 values.
 
+## Area switches
+
+Each browser area has one switch for Artemis's styling of that area. Turning it off
+restores Zen's native look for the whole area, including every option listed under it.
+Those options keep their values and apply again when the area is turned back on.
+
+## Window
+
+| Setting | Values | Default | What it does |
+|---|---|---|---|
+| `artemis.window.frame` | on · off | on | Artemis page frame: consistent corner radius, a hairline edge and soft depth around the page. Area switch for the window options |
+| `artemis.window.edge-to-edge` | Off · Only in compact mode · Always | Off | Removes the gap and rounding around the page |
+
+## Sidebar
+
+| Setting | Values | Default | What it does |
+|---|---|---|---|
+| `artemis.sidebar.style` | on · off | on | Artemis sidebar: the floating compact sidebar becomes a glass panel, and sidebar buttons get Artemis hover and radius. Area switch for the sidebar options |
+| `artemis.sidebar.hide-scrollbar` | on · off | on | Hides the tab list scrollbar. Scrolling still works |
+
+## Tabs
+
+| Setting | Values | Default | What it does |
+|---|---|---|---|
+| `artemis.tabs.style` | on · off | on | Artemis tab surfaces, hover, multi-select and close button, and folder rows. Area switch for the tab and folder options |
+| `artemis.tabs.height` | Zen default · Compact · Regular · Tall | Regular | Tab height in the tab list (30, 36 or 42 px) |
+| `artemis.tabs.shape` | Zen default · Rounded · Square · Pill | Rounded | Corner shape of tabs and folder rows. Rounded follows the corner radius setting |
+| `artemis.tabs.active-highlight` | on · off | on | A subtle accent tint and outline on the selected tab |
+| `artemis.tabs.separators` | on · off | off | Thin lines between tabs, hidden next to the selected or hovered tab |
+| `artemis.folders.indent-guide` | on · off | on | A thin line beside the tabs of an open folder (expanded sidebar only) |
+
+## Essentials
+
+| Setting | Values | Default | What it does |
+|---|---|---|---|
+| `artemis.essentials.style` | on · off | on | Artemis tiles for essential tabs. Zen's own "favicon background" option is respected |
+
 ## Motion
 
 | Setting | Values | Default | What it does |

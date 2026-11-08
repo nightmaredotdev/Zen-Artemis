@@ -1,0 +1,22 @@
+/* artemis.tabs.height: height of tabs in the tab list. */
+
+@media -moz-pref("artemis.tabs.style") and -moz-pref("artemis.tabs.height", "compact") {
+  #tabbrowser-tabs,
+  #tabbrowser-tabs .tabbrowser-tab:not([zen-essential]) {
+    --tab-min-height: 30px !important;
+  }
+}
+
+@media -moz-pref("artemis.tabs.style") and -moz-pref("artemis.tabs.height", "regular") {
+  #tabbrowser-tabs,
+  #tabbrowser-tabs .tabbrowser-tab:not([zen-essential]) {
+    --tab-min-height: 36px !important;
+  }
+}
+
+@media -moz-pref("artemis.tabs.style") and -moz-pref("artemis.tabs.height", "tall") {
+  #tabbrowser-tabs,
+  #tabbrowser-tabs .tabbrowser-tab:not([zen-essential]) {
+    --tab-min-height: 42px !important;
+  }
+}

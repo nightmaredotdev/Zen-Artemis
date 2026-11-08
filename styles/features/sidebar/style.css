@@ -1,0 +1,54 @@
+/* artemis.sidebar.style: Artemis sidebar (area master for sidebar.*). */
+
+@media -moz-pref("artemis.sidebar.style") {
+  /* Floating compact sidebar and its space previews: Artemis glass panel. */
+  :root[zen-compact-mode="true"] #navigator-toolbox .zen-toolbar-background {
+    background: var(--artemis-glass-panel-bg) !important;
+    backdrop-filter: var(--artemis-glass-filter) !important;
+    box-shadow: var(--artemis-shadow-floating) !important;
+    outline: 1px solid var(--artemis-hairline);
+    outline-offset: -1px;
+
+    &,
+    &::before,
+    &::after {
+      border-radius: var(--artemis-radius-outer) !important;
+    }
+
+    /* Zen paints its theme colour on opaque pseudo-layers that would hide the
+       glass. The theme colour is mixed into the glass tint instead. */
+    &::before,
+    &::after {
+      opacity: 0 !important;
+      outline: none !important;
+    }
+  }
+
+  /* Let the glass blur the page while the floating sidebar is shown or
+     animating (see --artemis-backdrop-clip). */
+  :root[zen-compact-mode="true"] #browser:has(> #navigator-toolbox:is([zen-has-hover], [zen-user-show], [zen-has-implicit-hover])) #tabbrowser-tabpanels browser,
+  :root[zen-compact-mode="true"][zen-compact-animating] #tabbrowser-tabpanels browser {
+    clip-path: var(--artemis-backdrop-clip);
+  }
+
+  /* Sidebar buttons: consistent radius and quiet hover. */
+  #navigator-toolbox :is(#zen-sidebar-top-buttons, #zen-sidebar-foot-buttons)
+    .toolbarbutton-1:not(#zen-workspaces-button *) {
+    --toolbarbutton-border-radius: var(--artemis-radius-inner) !important;
+    --toolbarbutton-hover-background: var(--artemis-hover) !important;
+    --toolbarbutton-active-background: var(--artemis-pressed) !important;
+  }
+
+  /* "New tab" row in the tab list. */
+  #navigator-toolbox #tabs-newtab-button,
+  #navigator-toolbox #vertical-tabs-newtab-button {
+    border-radius: var(--artemis-radius) !important;
+    color: var(--artemis-text-muted) !important;
+  }
+
+  #navigator-toolbox #tabs-newtab-button:hover,
+  #navigator-toolbox #vertical-tabs-newtab-button:hover {
+    background: var(--artemis-hover) !important;
+    color: inherit !important;
+  }
+}

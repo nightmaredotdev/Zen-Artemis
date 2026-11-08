@@ -1,0 +1,50 @@
+/* artemis.tabs.style: Artemis tabs and folder rows (area master for tabs.* and folders.*). */
+
+@media -moz-pref("artemis.tabs.style") {
+  #tabbrowser-tabs {
+    --artemis-tab-hover-bg: var(--artemis-hover);
+    --artemis-tab-selected-bg: light-dark(rgb(255 255 255 / 0.8), rgb(255 255 255 / 0.11));
+    --artemis-tab-selected-shadow:
+      0 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.28)),
+      0 0 0 0.5px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.2));
+  }
+
+  #tabbrowser-tabs .tabbrowser-tab:not([zen-essential], .tabbrowser-tab .tabbrowser-tab) {
+    & > .tab-stack > .tab-background {
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+
+    &:hover > .tab-stack > .tab-background {
+      background-color: var(--artemis-tab-hover-bg) !important;
+    }
+
+    &:is([selected], [visuallyselected]) > .tab-stack > .tab-background {
+      background-color: var(--artemis-tab-selected-bg) !important;
+      box-shadow: inset 0 0 0 1px var(--artemis-hairline), var(--artemis-tab-selected-shadow) !important;
+    }
+
+    &[multiselected="true"]:not([selected]) > .tab-stack > .tab-background {
+      background-color: var(--artemis-selected) !important;
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--artemis-accent-ui) 30%, transparent) !important;
+    }
+
+    /* Unselected labels sit back slightly. */
+    &:not([selected]) .tab-label-container {
+      opacity: 0.86;
+    }
+
+    & .tab-close-button {
+      border-radius: var(--artemis-radius-inner) !important;
+    }
+
+    & .tab-close-button:hover {
+      background-color: var(--artemis-hover) !important;
+    }
+  }
+
+  /* Folder header rows behave like tabs. */
+  #tabbrowser-tabs zen-folder > .tab-group-label-container:hover {
+    background-color: var(--artemis-tab-hover-bg) !important;
+  }
+}

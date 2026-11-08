@@ -1,0 +1,22 @@
+/* artemis.tabs.separators: thin lines between tabs. */
+
+@media -moz-pref("artemis.tabs.style") and -moz-pref("artemis.tabs.separators") {
+  #tabbrowser-tabs .tabbrowser-tab:not([zen-essential], .tabbrowser-tab .tabbrowser-tab) > .tab-stack > .tab-content::after {
+    content: "";
+    position: absolute;
+    inset-inline: 14px;
+    bottom: -0.5px;
+    height: 1px;
+    background: var(--artemis-hairline);
+    pointer-events: none;
+  }
+
+  /* No line touching the selected or hovered tab, or after the last tab. */
+  #tabbrowser-tabs .tabbrowser-tab:is([selected], :hover, :has(+ .tabbrowser-tab:is([selected], :hover)), :last-of-type) > .tab-stack > .tab-content::after {
+    display: none;
+  }
+
+  :root:not([zen-sidebar-expanded="true"]) #tabbrowser-tabs .tabbrowser-tab > .tab-stack > .tab-content::after {
+    inset-inline: 30%;
+  }
+}

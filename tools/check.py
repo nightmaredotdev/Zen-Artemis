@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Artemis static checks. Python standard library only.
 
-Usage: python3 tools/check.py [--release]
+Usage: python3 tools/check.py [--release] [-v]
 
 Exit code 0 when there are no errors. Warnings never fail the run.
 --release adds release-only checks (CHANGELOG matches theme.json version).
@@ -26,6 +26,7 @@ NODE_CANDIDATES = ["node", "/mnt/c/Program Files/nodejs/node.exe"]
 
 errors: list[str] = []
 warnings: list[str] = []
+info: list[str] = []
 
 
 def err(msg: str) -> None:
@@ -222,7 +223,7 @@ def check_imports() -> None:
             imported.add(resolved)
             walk(resolved, seen)
 
-    for entry in ("chrome.css", "content.css"):
+    for entry in ("chrome.css", "content.css", "parts.css"):
         p = ROOT / entry
         if not p.exists():
             err(f"{entry}: missing")
@@ -233,10 +234,23 @@ def check_imports() -> None:
         walk(p.resolve(), set())
 
     for css in files("*.css"):
-        if css.name in {"chrome.css", "content.css"} and css.parent == ROOT:
+        if css.name in {"chrome.css", "content.css", "parts.css"} and css.parent == ROOT:
             continue
         if css.resolve() not in imported:
             err(f"{rel(css)}: not imported by any entry file")
+    parts = ROOT / "parts.css"
+    uc = ROOT / "artemis.uc.js"
+    if parts.exists() and uc.exists() and "parts.css" not in uc.read_text(encoding="utf-8"):
+        err("parts.css: not loaded by artemis.uc.js")
+    for css in files("*.parts.css"):
+        if css.resolve() not in imported or not any(
+                t.endswith(css.name) for t in IMPORT_RE.findall(parts.read_text(encoding="utf-8"))):
+            err(f"{rel(css)}: .parts.css files must be imported from parts.css only")
+    for css in files("*.css"):
+        if css.name.endswith(".parts.css"):
+            continue
+        if "::part(" in strip_css_comments(css.read_text(encoding="utf-8")):
+            err(f"{rel(css)}: ::part() is ignored in user sheets; move it to a .parts.css file")
     for p in files("*"):
         if p.suffix in {".css", ".js", ".mjs", ".json", ".svg"} and p.name != p.name.lower():
             err(f"{rel(p)}: filenames must be lowercase")
@@ -268,7 +282,8 @@ def check_gating(prefs: dict[str, dict]) -> None:
     for css in sorted(features.rglob("*.css")):
         text = strip_css_comments(css.read_text(encoding="utf-8"))
         area = css.parent.name
-        own = f"artemis.{area}.{css.stem}"
+        stem = css.name.removesuffix(".parts.css").removesuffix(".css")
+        own = f"artemis.{area}.{stem}"
         # Files may declare their pref explicitly: /* @pref artemis.x.y */
         decl = re.search(r"@pref\s+(artemis\.[a-z0-9.-]+)", css.read_text(encoding="utf-8"))
         if decl:
@@ -347,7 +362,7 @@ def check_css_hygiene() -> None:
                     warn(f"{rel(css)}: transition on {prop!r} (prefer transform/opacity)")
         count = text.count("!important")
         if count:
-            warnings.append(f"{rel(css)}: {count} !important (informational)")
+            info.append(f"{rel(css)}: {count} !important")
 
 
 # --------------------------------------------------------------------------- 6
@@ -488,6 +503,9 @@ def main() -> int:
     check_migrations()
     check_manifest(release)
 
+    if "-v" in sys.argv or "--verbose" in sys.argv:
+        for i in info:
+            print(f"info:    {i}")
     for w in warnings:
         print(f"warning: {w}")
     for e in errors:

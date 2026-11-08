@@ -1,0 +1,10 @@
+/* artemis.sidebar.hide-scrollbar: shadow-tree part (author origin, see parts.css). */
+
+@media -moz-pref("artemis.sidebar.style") and -moz-pref("artemis.sidebar.hide-scrollbar") {
+  #navigator-toolbox #tabbrowser-tabs .workspace-arrowscrollbox[overflowing]::part(scrollbox),
+  #navigator-toolbox #tabbrowser-tabs .workspace-arrowscrollbox::part(scrollbox),
+  #navigator-toolbox #tabbrowser-arrowscrollbox::part(scrollbox),
+  #navigator-toolbox #pinned-tabs-container::part(scrollbox) {
+    scrollbar-width: none !important;
+  }
+}

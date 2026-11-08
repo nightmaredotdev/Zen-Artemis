@@ -1,0 +1,17 @@
+/* artemis.window.frame: Artemis page frame (area master for window.*). */
+
+@media -moz-pref("artemis.window.frame") {
+  /* The page card: consistent radius, hairline edge, soft depth. */
+  #tabbrowser-tabpanels > .browserSidebarContainer {
+    border-radius: var(--artemis-radius-outer) !important;
+    box-shadow:
+      0 0 0 1px var(--artemis-hairline),
+      0 2px 6px light-dark(rgb(0 0 0 / 0.05), rgb(0 0 0 / 0.22)),
+      0 10px 30px light-dark(rgb(0 0 0 / 0.07), rgb(0 0 0 / 0.28)) !important;
+  }
+
+  /* Split view panes share the same card treatment. */
+  #tabbrowser-tabpanels[zen-split-view] > .browserSidebarContainer {
+    border-radius: var(--artemis-radius) !important;
+  }
+}

@@ -63,6 +63,22 @@ MOZ_REMOTE_ALLOW_SYSTEM_ACCESS=1 WSLENV=MOZ_REMOTE_ALLOW_SYSTEM_ACCESS \
 - `-marionette` and `MOZ_REMOTE_ALLOW_SYSTEM_ACCESS=1` are needed only for scripted runs,
   and Marionette listens on localhost only. For manual testing, leave both out.
 
+### Tooling overview
+
+| Tool | Purpose |
+|---|---|
+| `tools/zen/launch.sh` | Start the test browser (test profile only) |
+| `tools/zen/zrun.sh <check.js> [shot.png] [args-json]` | Run a chrome-context check script |
+| `tools/zen/capture.sh <out.png>` | Real screen capture of the test window (includes backdrop blur) |
+| `tools/zen/matrix.sh <dir>` | Layout matrix with native-restoration diffs |
+| `tools/zen/features.sh <dir>` | Feature independence, master override and value preservation |
+| `tools/zen/gpu-sample.sh [s]` | Average 3D GPU utilisation of the zen.exe processes |
+| `tools/zen/png.py` | Crop, side-by-side and pixel diff of screenshots |
+| `checks/setup-session.js` | Realistic tabs: essentials, pinned, folder, normal tabs |
+| `checks/layout.js` | Set Zen layout / scheme / OS-effect emulation / prefs |
+| `checks/os-settings.js` | Artemis response to OS transparency and motion settings |
+| `checks/scrollbar.js`, `checks/frame-timing.js`, `checks/gpu-scenario.js` | Targeted measurements |
+
 ### Scripted checks (Marionette)
 
 `tools/zen/` contains a minimal Marionette client that uses Node.js built-ins only. It runs
@@ -120,3 +136,30 @@ Other observations:
   reduced-transparency` and `prefers-reduced-motion`), so glass is opaque and motion is
   reduced there unless the system setting, or Firefox's native `ui.prefersReduced*` prefs,
   say otherwise.
+
+### M2 sidebar, tabs, window: 2026-11-08
+
+Environment: as for M1. A realistic session (2 essentials, folder with tabs, pinned and
+normal tabs, a colourful test page and an animated test page) is set up by
+`checks/setup-session.js`.
+
+| Check | Result |
+|---|---|
+| Native restoration (all area switches off vs. Artemis sheets removed), 9 layouts: compact/full × collapsed/expanded, light, right side, single toolbar, horizontal tabs | **0 differing pixels** in every layout |
+| Artemis vs. pure Zen (sanity: the test can fail) | 1.6–6.8% of pixels differ, as intended |
+| Single-feature changes stay in their own region | Pass: tab features change only the sidebar; edge-to-edge changes the page frame |
+| Master off: toggling each feature changes nothing | **0 pixels** for all 7 features |
+| Feature values preserved across master off/on | Pass |
+| Live updates | All checks above ran without reload or restart |
+| Hide scrollbar (overflowing list, 30 extra tabs) | 12 px scrollbar → 0 px, live. Needed `parts.css` (F33) |
+| Glass over the page (real screen capture) | Blurred and tinted. Page text is not readable through the panel (84% panel opacity) |
+| OS effects on / off / follow the real OS (emulated with `ui.prefersReduced*`) | On: glass 72%/84%, blur 18 px, backdrop clip active. Off and follow-OS (host has both off): opaque, no backdrop filter, no clip, motion distance 0 |
+| Frame timing while showing/hiding the compact sidebar, 3 clip strategies | 144 Hz, p99 6.9 ms, no frames over 25 ms in any strategy |
+| GPU 3D utilisation, animated page, sidebar shown/hidden × clip on/off | 3.7–4.3%, clip adds at most +0.6 points |
+
+Known screenshot noise: `about:robots`' animated favicon in the essentials occasionally
+changes about 10 pixels near the top of the sidebar. Re-runs are clean.
+
+Not yet covered: the OS settings were emulated through Firefox's native prefs, not by
+toggling Windows itself (that would change the host system). Performance was measured on a
+high-end GPU only.

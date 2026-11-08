@@ -1,0 +1,22 @@
+/* artemis.tabs.shape: corner shape of tabs and folder rows. */
+
+@media -moz-pref("artemis.tabs.style") and -moz-pref("artemis.tabs.shape", "rounded") {
+  #tabbrowser-tabs .tabbrowser-tab:not([zen-essential], .tabbrowser-tab .tabbrowser-tab) > .tab-stack > .tab-background,
+  #tabbrowser-tabs zen-folder > .tab-group-label-container {
+    border-radius: var(--artemis-radius) !important;
+  }
+}
+
+@media -moz-pref("artemis.tabs.style") and -moz-pref("artemis.tabs.shape", "square") {
+  #tabbrowser-tabs .tabbrowser-tab:not([zen-essential], .tabbrowser-tab .tabbrowser-tab) > .tab-stack > .tab-background,
+  #tabbrowser-tabs zen-folder > .tab-group-label-container {
+    border-radius: 3px !important;
+  }
+}
+
+@media -moz-pref("artemis.tabs.style") and -moz-pref("artemis.tabs.shape", "pill") {
+  #tabbrowser-tabs .tabbrowser-tab:not([zen-essential], .tabbrowser-tab .tabbrowser-tab) > .tab-stack > .tab-background,
+  #tabbrowser-tabs zen-folder > .tab-group-label-container {
+    border-radius: 999px !important;
+  }
+}

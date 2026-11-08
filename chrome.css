@@ -2,3 +2,18 @@
 
 @import url("styles/core/tokens.css");
 @import url("styles/core/motion.css");
+
+@import url("styles/features/window/frame.css");
+@import url("styles/features/window/edge-to-edge.css");
+
+@import url("styles/features/sidebar/style.css");
+@import url("styles/features/sidebar/hide-scrollbar.css");
+
+@import url("styles/features/tabs/style.css");
+@import url("styles/features/tabs/height.css");
+@import url("styles/features/tabs/shape.css");
+@import url("styles/features/tabs/active-highlight.css");
+@import url("styles/features/tabs/separators.css");
+@import url("styles/features/folders/indent-guide.css");
+
+@import url("styles/features/essentials/style.css");

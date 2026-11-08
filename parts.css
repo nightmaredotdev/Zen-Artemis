@@ -1,0 +1,6 @@
+/* Artemis: author-origin entry point, loaded by artemis.uc.js into browser
+ * windows. Gecko ignores ::part() rules in user sheets (Sine's origin), so
+ * the few rules that style inside shadow trees live here.
+ * Ordered imports only; no rules here. */
+
+@import url("styles/features/sidebar/hide-scrollbar.parts.css");

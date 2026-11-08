@@ -9,6 +9,27 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-08: M2 implementation decisions (within approved scope)
+
+- **`parts.css` (author origin).** Gecko ignores `::part()` in user sheets (F33), so
+  shadow-tree rules live in `*.parts.css`, loaded per window by `artemis.uc.js` and removed
+  on teardown. It uses the same pref gates. `check.py` forbids `::part()` in user-origin
+  files.
+- **Backdrop clip.** A polygon `clip-path` is applied to page `<browser>` elements only
+  while the compact sidebar is shown or animating, so its glass can blur the page (F34).
+  It is disabled when blur is `none` or the OS requests reduced transparency. Measured cost:
+  no dropped frames and +0.4 points of GPU. It is never applied permanently, to keep
+  OS-compositor video overlays and laptop power savings.
+- **Panel opacity.** Large text panels (the floating sidebar) derive a higher opacity from
+  the user's transparency step (72% → 84% at medium) so page text never competes with
+  panel text. Small surfaces use the step directly.
+- **Theme tint.** The floating sidebar's glass is tinted 16% with Zen's workspace colour.
+  Zen's opaque theme pseudo-layers are hidden there because they would cover the glass.
+- **Readable accent.** `--artemis-accent-ui` lifts Zen's accent toward the text colour for
+  UI marks, because Zen's default accent is nearly black in dark mode.
+
+---
+
 ## 2026-11-08: Revision 2 approved; scaffold and M1 verification
 
 **Approved** by the owner (all eight revision-2 decisions), with these clarifications:

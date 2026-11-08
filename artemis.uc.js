@@ -27,6 +27,15 @@
 
   const modules = [];
 
+  // Author-origin sheet for ::part() rules (ignored by Gecko in user sheets).
+  const PARTS_URI = Services.io.newURI("chrome://sine/content/Artemis/parts.css");
+  const windowUtils = window.windowUtils;
+  try {
+    windowUtils.loadSheet(PARTS_URI, windowUtils.AUTHOR_SHEET);
+  } catch (err) {
+    console.warn("[Artemis] Failed to load parts.css:", err);
+  }
+
   const instance = {
     loadedAt: Date.now(),
     modules,
@@ -38,6 +47,9 @@
           console.warn("[Artemis] Module teardown failed:", err);
         }
       }
+      try {
+        windowUtils.removeSheet(PARTS_URI, windowUtils.AUTHOR_SHEET);
+      } catch {}
       if (window.Artemis === instance) delete window.Artemis;
     },
   };

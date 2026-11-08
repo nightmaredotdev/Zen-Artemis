@@ -126,6 +126,8 @@ Sources: the installed Sine source (`chrome/JS`, 2.3.4.1c), Zen 1.24.1b's `omni.
 | F30 | Zen's tab orientation is the pref `zen.tabs.vertical` (default `true`), read with `-moz-pref()`. There is no root attribute for it. The right-side sidebar is `zen.tabs.vertical.right-side` plus the `zen-right-side` attribute. | `firefox.js`, `vertical-tabs.css`, `ZenCompactMode.mjs` |
 | F31 | The store's `ai` field is **not documented** in the store repo, its issue form, its website, the old Sine wiki or `sineorg/docs`. Values in use: `yes` (12 entries), `partial` (4), `no` (4), absent (52). The only code that reads it is the maintainers' `scripts/slop-detector.sh`, which labels them "No AI", "Partial AI", "Doomed AI slop" (`yes`) and "Do not specify". `license` is also undocumented and set by 1 of 72 entries. Both are copied from the author's `theme.json` unchanged. | `sineorg/store` |
 | F32 | The version of Anthropic's Consumer Terms reviewed (effective Oct 8, 2025, served as the EEA/Switzerland version) says: "we assign to you all our right, title, and interest (if any) in Outputs." The same version restricts using the Services "for any commercial or business purposes" and does not say how that applies to Outputs. | anthropic.com/legal/consumer-terms |
+| F33 | **Gecko ignores `::part()` rules in user-origin (and agent) sheets.** Only author sheets apply them. Sine loads mod CSS as a user sheet, so Artemis rules that style inside shadow trees (e.g. the tab list's scroller) live in `parts.css`. `artemis.uc.js` loads it per window with `windowUtils.loadSheet(…, AUTHOR_SHEET)` and removes it on teardown. Without JS, those rules simply do not apply. | M2 test: the same rule from user / author / agent sheets |
+| F34 | **Chrome `backdrop-filter` does not blur page content by default.** With WebRender's native compositor, the page `<browser>` can be composited by the OS, outside the tree backdrop-filter samples. A non-trivial `clip-path` on the `<browser>` keeps it sampleable (`inset(0)` is optimised away; a polygon works). Artemis applies it only while a glass surface floats over the page. Measured on the test machine (RX 9060 XT, 144 Hz): no dropped frames, GPU 3D utilisation +0.4 points with an animated page. | M2 screen captures, `frame-timing.js`, `gpu-sample.sh` |
 
 ### 3.2 Assumptions to verify
 
@@ -1008,7 +1010,8 @@ under these conditions:
 Artemis/
 ├─ theme.json                 Manifest (§18)
 ├─ preferences.json           Every user setting; Sine's UI and Artemis's schema source
-├─ chrome.css / content.css   Ordered @import lists only
+├─ chrome.css / content.css   Ordered @import lists only (user origin, via Sine)
+├─ parts.css                  Ordered @import list of *.parts.css (author origin, loaded by artemis.uc.js; F33)
 ├─ artemis.uc.js              Browser-window bootstrap (§8.2)
 ├─ artemis-settings.uc.js     Settings enhancer entry (§7.2)
 ├─ scripts/

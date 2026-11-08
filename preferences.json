@@ -11,8 +11,14 @@
     "defaultValue": "zen",
     "placeholder": false,
     "options": [
-      { "value": "zen", "label": "Zen accent" },
-      { "value": "custom", "label": "Custom" }
+      {
+        "value": "zen",
+        "label": "Zen accent"
+      },
+      {
+        "value": "custom",
+        "label": "Custom"
+      }
     ]
   },
   {
@@ -23,7 +29,14 @@
     "defaultValue": "#7c8aff",
     "placeholder": "#7c8aff",
     "pattern": "^(#[0-9a-fA-F]{3,8}|(rgb|rgba|hsl|hsla|oklch|oklab|lch|lab)\\([0-9a-zA-Z.%,/ +-]{1,60}\\)|[a-zA-Z]{3,24})$",
-    "conditions": [{ "if": { "property": "artemis.appearance.accent", "value": "custom" } }]
+    "conditions": [
+      {
+        "if": {
+          "property": "artemis.appearance.accent",
+          "value": "custom"
+        }
+      }
+    ]
   },
   {
     "type": "dropdown",
@@ -33,11 +46,26 @@
     "defaultValue": "medium",
     "placeholder": false,
     "options": [
-      { "value": "solid", "label": "Solid" },
-      { "value": "low", "label": "Low" },
-      { "value": "medium", "label": "Medium" },
-      { "value": "high", "label": "High" },
-      { "value": "custom", "label": "Custom" }
+      {
+        "value": "solid",
+        "label": "Solid"
+      },
+      {
+        "value": "low",
+        "label": "Low"
+      },
+      {
+        "value": "medium",
+        "label": "Medium"
+      },
+      {
+        "value": "high",
+        "label": "High"
+      },
+      {
+        "value": "custom",
+        "label": "Custom"
+      }
     ]
   },
   {
@@ -48,7 +76,14 @@
     "defaultValue": "72%",
     "placeholder": "72%",
     "pattern": "^(100|[1-9]?[0-9])(\\.[0-9]+)?%$",
-    "conditions": [{ "if": { "property": "artemis.appearance.transparency", "value": "custom" } }]
+    "conditions": [
+      {
+        "if": {
+          "property": "artemis.appearance.transparency",
+          "value": "custom"
+        }
+      }
+    ]
   },
   {
     "type": "dropdown",
@@ -58,11 +93,26 @@
     "defaultValue": "medium",
     "placeholder": false,
     "options": [
-      { "value": "none", "label": "None" },
-      { "value": "light", "label": "Light" },
-      { "value": "medium", "label": "Medium" },
-      { "value": "strong", "label": "Strong" },
-      { "value": "custom", "label": "Custom" }
+      {
+        "value": "none",
+        "label": "None"
+      },
+      {
+        "value": "light",
+        "label": "Light"
+      },
+      {
+        "value": "medium",
+        "label": "Medium"
+      },
+      {
+        "value": "strong",
+        "label": "Strong"
+      },
+      {
+        "value": "custom",
+        "label": "Custom"
+      }
     ]
   },
   {
@@ -73,7 +123,14 @@
     "defaultValue": "18px",
     "placeholder": "18px",
     "pattern": "^([0-9]|[1-5][0-9]|6[0-4])(\\.[0-9]+)?px$",
-    "conditions": [{ "if": { "property": "artemis.appearance.blur", "value": "custom" } }]
+    "conditions": [
+      {
+        "if": {
+          "property": "artemis.appearance.blur",
+          "value": "custom"
+        }
+      }
+    ]
   },
   {
     "type": "dropdown",
@@ -83,11 +140,26 @@
     "defaultValue": "medium",
     "placeholder": false,
     "options": [
-      { "value": "zen", "label": "Zen default" },
-      { "value": "small", "label": "Small" },
-      { "value": "medium", "label": "Medium" },
-      { "value": "large", "label": "Large" },
-      { "value": "custom", "label": "Custom" }
+      {
+        "value": "zen",
+        "label": "Zen default"
+      },
+      {
+        "value": "small",
+        "label": "Small"
+      },
+      {
+        "value": "medium",
+        "label": "Medium"
+      },
+      {
+        "value": "large",
+        "label": "Large"
+      },
+      {
+        "value": "custom",
+        "label": "Custom"
+      }
     ]
   },
   {
@@ -98,7 +170,14 @@
     "defaultValue": "10px",
     "placeholder": "10px",
     "pattern": "^([0-9]|[1-2][0-9]|3[0-2])(\\.[0-9]+)?px$",
-    "conditions": [{ "if": { "property": "artemis.appearance.radius", "value": "custom" } }]
+    "conditions": [
+      {
+        "if": {
+          "property": "artemis.appearance.radius",
+          "value": "custom"
+        }
+      }
+    ]
   },
   {
     "type": "dropdown",
@@ -108,10 +187,172 @@
     "defaultValue": "balanced",
     "placeholder": false,
     "options": [
-      { "value": "tight", "label": "Tight" },
-      { "value": "balanced", "label": "Balanced" },
-      { "value": "relaxed", "label": "Relaxed" }
+      {
+        "value": "tight",
+        "label": "Tight"
+      },
+      {
+        "value": "balanced",
+        "label": "Balanced"
+      },
+      {
+        "value": "relaxed",
+        "label": "Relaxed"
+      }
     ]
+  },
+  {
+    "type": "separator",
+    "label": "Window"
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.window.frame",
+    "label": "Artemis window frame",
+    "description": "Artemis styling of the page frame. Off restores Zen's frame, including the options below.",
+    "defaultValue": true
+  },
+  {
+    "type": "dropdown",
+    "property": "artemis.window.edge-to-edge",
+    "label": "Edge-to-edge page",
+    "description": "Remove the gap and rounding around the page.",
+    "defaultValue": "off",
+    "placeholder": false,
+    "options": [
+      {
+        "value": "off",
+        "label": "Off"
+      },
+      {
+        "value": "compact",
+        "label": "Only in compact mode"
+      },
+      {
+        "value": "always",
+        "label": "Always"
+      }
+    ],
+    "master": "artemis.window.frame"
+  },
+  {
+    "type": "separator",
+    "label": "Sidebar"
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.sidebar.style",
+    "label": "Artemis sidebar",
+    "description": "Artemis styling of the sidebar, including the floating compact sidebar. Off restores Zen's sidebar, including the options below.",
+    "defaultValue": true
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.sidebar.hide-scrollbar",
+    "label": "Hide sidebar scrollbar",
+    "description": "Hide the scrollbar in the tab list. Scrolling still works.",
+    "defaultValue": true,
+    "master": "artemis.sidebar.style"
+  },
+  {
+    "type": "separator",
+    "label": "Tabs"
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.tabs.style",
+    "label": "Artemis tabs",
+    "description": "Artemis styling of tabs and folders. Off restores Zen's tabs, including the options below.",
+    "defaultValue": true
+  },
+  {
+    "type": "dropdown",
+    "property": "artemis.tabs.height",
+    "label": "Tab height",
+    "description": "Height of tabs in the tab list.",
+    "defaultValue": "regular",
+    "placeholder": false,
+    "options": [
+      {
+        "value": "zen",
+        "label": "Zen default"
+      },
+      {
+        "value": "compact",
+        "label": "Compact"
+      },
+      {
+        "value": "regular",
+        "label": "Regular"
+      },
+      {
+        "value": "tall",
+        "label": "Tall"
+      }
+    ],
+    "master": "artemis.tabs.style"
+  },
+  {
+    "type": "dropdown",
+    "property": "artemis.tabs.shape",
+    "label": "Tab shape",
+    "description": "Corner shape of tabs. Rounded follows the corner radius setting.",
+    "defaultValue": "rounded",
+    "placeholder": false,
+    "options": [
+      {
+        "value": "zen",
+        "label": "Zen default"
+      },
+      {
+        "value": "rounded",
+        "label": "Rounded"
+      },
+      {
+        "value": "square",
+        "label": "Square"
+      },
+      {
+        "value": "pill",
+        "label": "Pill"
+      }
+    ],
+    "master": "artemis.tabs.style"
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.tabs.active-highlight",
+    "label": "Active tab highlight",
+    "description": "A subtle accent tint and outline on the selected tab.",
+    "defaultValue": true,
+    "master": "artemis.tabs.style"
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.tabs.separators",
+    "label": "Tab separators",
+    "description": "Thin lines between tabs.",
+    "defaultValue": false,
+    "master": "artemis.tabs.style"
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.folders.indent-guide",
+    "label": "Folder indent guide",
+    "description": "A thin line marking the tabs inside an open folder.",
+    "defaultValue": true,
+    "master": "artemis.tabs.style"
+  },
+  {
+    "type": "separator",
+    "label": "Essentials"
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.essentials.style",
+    "label": "Artemis essentials",
+    "description": "Artemis tile styling for essential tabs. Zen's favicon background option is respected.",
+    "defaultValue": true
   },
   {
     "type": "separator",
@@ -125,9 +366,18 @@
     "defaultValue": "standard",
     "placeholder": false,
     "options": [
-      { "value": "gentle", "label": "Gentle" },
-      { "value": "standard", "label": "Standard" },
-      { "value": "lively", "label": "Lively" }
+      {
+        "value": "gentle",
+        "label": "Gentle"
+      },
+      {
+        "value": "standard",
+        "label": "Standard"
+      },
+      {
+        "value": "lively",
+        "label": "Lively"
+      }
     ]
   }
 ]

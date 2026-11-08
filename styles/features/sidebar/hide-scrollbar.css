@@ -1,0 +1,11 @@
+/* artemis.sidebar.hide-scrollbar: hide the tab list scrollbar (scrolling still works).
+ * The scroller inside arrowscrollbox shadow trees is styled from
+ * hide-scrollbar.parts.css (author origin, loaded by artemis.uc.js), because
+ * Gecko ignores ::part() in user sheets. */
+
+@media -moz-pref("artemis.sidebar.style") and -moz-pref("artemis.sidebar.hide-scrollbar") {
+  #navigator-toolbox #zen-essentials,
+  #navigator-toolbox #zen-tabs-wrapper {
+    scrollbar-width: none !important;
+  }
+}
