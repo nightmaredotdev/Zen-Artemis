@@ -95,7 +95,11 @@ export function attachEnhancer(window, core) {
         move(node, wrapper, header); // keep Sine's separator, hidden by CSS
         section = { wrapper, body, header, separator: node, id: node.id };
         sections.push(section);
-        header.addEventListener("click", () => setCollapsed(section.id, !collapsedSections.has(section.id)));
+        // Capture this section's id: `section` is reassigned on every loop
+        // iteration, so referring to it at click time would always target the
+        // last section (v1.0.0 bug).
+        const sectionId = node.id;
+        header.addEventListener("click", () => setCollapsed(sectionId, !collapsedSections.has(sectionId)));
         continue;
       }
       if (section) move(node, section.body);

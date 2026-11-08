@@ -78,6 +78,9 @@ MOZ_REMOTE_ALLOW_SYSTEM_ACCESS=1 WSLENV=MOZ_REMOTE_ALLOW_SYSTEM_ACCESS \
 | `checks/layout.js` | Set Zen layout / scheme / OS-effect emulation / prefs |
 | `checks/os-settings.js` | Artemis response to OS transparency and motion settings |
 | `checks/scrollbar.js`, `checks/frame-timing.js`, `checks/gpu-scenario.js` | Targeted measurements |
+| `checks/transparency.js` | Regression (v1.0.0): glass opacity/blur of the compact sidebar and open address bar under OS effects on/off/follow-OS, for an explicit custom opacity (default ARGS) or defaults (`{"prefs":{}}`) |
+| `checks/accordion.js` | Regression (v1.0.0): each settings section header toggles only its own section (every header clicked twice) |
+| `sidebar-tint.sh <dir>` | Regression (v1.0.0): at full glass opacity the compact sidebar background pixel equals Zen's own, explicit solid and OS default, dark and light |
 | `checks/toggle-mod.js` | Disable or enable Artemis through Sine's own toggle and report what remains |
 | `prompt-ui.mjs <resetAll\|restore> <accept\|dismiss>` | Clicks Reset all / Restore and answers the real confirmation dialog through WebDriver alert commands (opens a dialog: free desktop only). Supersedes `checks/prompt.js`, which Marionette's default prompt handling defeats |
 | `checks/multiwindow.js` | Second window: instances, live sync, native restoration, closing (opens a window: free desktop only). Ran successfully on 2026-11-08 |
@@ -319,3 +322,27 @@ real captures and measurements ("Final integration, part 2").
 | Multiple windows | Instances, live sync, native restoration in second window, clean close: pass |
 | Disable / re-enable via Sine | Disabled: identical to pure Zen; re-enabled live |
 | Restart persistence | Value and backups survive; restore after restart works; tour does not reopen |
+
+### Post-release fixes for owner-reported v1.0.0 issues: 2026-11-08
+
+Reproduced with the owner's real settings (read-only from the real profile:
+`transparency = custom`, `transparency-custom = 10%`; Windows *Transparency effects* off),
+in the isolated test profile, headless.
+
+| Issue | Reproduction on v1.0.0 | Root cause | After the fix |
+|---|---|---|---|
+| Opacity 10% has no effect; sidebar and address bar opaque | Follow-OS / effects-off: token forced to 100%, alpha 1, no blur (`transparency.js`) | `tokens.css` forced 100% opacity and no blur under `prefers-reduced-transparency`, overriding explicit Artemis choices | Explicit choice: alpha **0.10** and blur 18 px on both surfaces in all three OS states. Defaults still follow the OS (opaque when effects are off, 84.6% when on). Also works in a second window, and clears in both windows |
+| Custom 10% shown as 50.5% (effects on) | Panel boost applied to custom values | Readability boost not limited to the named steps | Custom value exact (0.10) |
+| Compact sidebar much darker than expected | Background pixel vs Zen: dark (26,26,30) vs (23,23,26), light (225,222,239) vs (240,240,244), even with the neutral default theme (`sidebar-tint.sh` fails on v1.0.0 CSS) | Zen's workspace-gradient layers were hidden and replaced by a near-black neutral surface | Glass tinted by Zen's own gradient layers at the glass opacity. At full opacity, **identical** to Zen (delta 0) in dark and light, explicit solid and OS default |
+| Accordion toggles the last section | `accordion.js` on v1.0.0 code: **20 of 22** clicks toggled *Motion* | Click handlers closed over a loop variable reassigned per section | 22/22 clicks toggle only the clicked section, with correct `aria-expanded` |
+
+Regression run on the fixed code (headless): 18-cell native-restoration matrix 0 pixels
+(one cell showed the known favicon flicker and was clean on re-run); feature independence
+and master overrides pass; values preserved; OS-setting defaults unchanged; motion
+unchanged; runtime edge cases pass; multiple windows pass; disabling Artemis via Sine is
+pixel-identical to pure Zen and also removes `[artemis-explicit-glass]`; re-enabling
+works live.
+
+Not yet verified: a real-capture visual review of the fixed glass (blurred, workspace-tinted
+sidebar and address bar). Marionette screenshots do not show blur, and real captures need
+the owner's desktop to be free.

@@ -9,6 +9,33 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-08: Post-release fixes for v1.0.0 owner reports
+
+Bug fixes within the approved scope:
+
+- **Explicit glass choices beat the OS default.** The OS "reduce transparency" setting now
+  changes only Artemis's *defaults*. While transparency or blur has a user value, the
+  window bridge sets `[artemis-explicit-glass]` and `tokens.css` keeps the user's glass.
+  This refines the earlier "respect OS settings" rule: the owner's report showed an
+  explicit 10% opacity silently overridden by Windows' *Transparency effects: off*, and the
+  owner asked that Artemis's own opacity not be confused with the Windows setting. Without
+  JS, or without an explicit choice, the OS is still respected.
+- **Custom opacity is exact.** The panel readability boost (M2) applies to named steps only.
+- **Compact sidebar tint.** The glass now uses Zen's workspace gradient layers, scaled by
+  the glass opacity and keeping Zen's crossfade, instead of hiding them behind a neutral
+  dark surface (the M2 "theme tint" decision is superseded).
+- **Settings accordion.** Each section header captures its own section (closure bug).
+
+**Noted for the owner (no action taken):** Sine installs the public release into
+`sine-mods/Artemis`, which is this repository's folder (mod id = folder name). The owner's
+real Zen therefore loads whatever is in the working tree, including unreleased `dev` work.
+A Sine auto-update (`no-updates: false`) could overwrite tracked files with `main`'s
+content. The repository's history is safe, but uncommitted work could be lost. Possible
+mitigations (owner's choice): set `no-updates` for Artemis in the real profile while
+developing, or develop from a separate clone and install there only through Sine.
+
+---
+
 ## 2026-11-08: Release workflow clarified (owner)
 
 **Approved** by the owner. Routine release steps need no extra manual testing or approval

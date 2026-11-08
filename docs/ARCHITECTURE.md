@@ -469,10 +469,22 @@ tokens → motion → features by area.
   `backdrop-filter: blur()` (A5) and a hairline border for definition. `solid` / `none`
   give opaque, unblurred surfaces. Glass surfaces must be elements inside the normal window
   tree. Backdrop blur does not apply to elements appended directly to the root (M1).
-- **System settings:** the OS "reduce transparency" setting makes glass opaque, and
-  "reduce motion" turns Artemis animations into short fades. This follows Zen's own
-  behaviour (Zen's acrylic surfaces honour reduced transparency). The owner's development
-  machine has both settings on (see TESTING.md).
+- **System settings:** the OS "reduce transparency" setting makes Artemis's *default*
+  glass opaque and unblurred, following Zen's own behaviour. An explicit Artemis choice of
+  transparency or blur takes precedence. The window bridge sets `[artemis-explicit-glass]`
+  on the root while any of those prefs has a user value, because CSS cannot tell a user
+  value from a default. Without JS the OS is always respected (fixed after v1.0.0, where the
+  OS setting silently overrode an explicit 10% opacity). "Reduce motion" makes Artemis
+  animations step aside (§10). The owner's development machine has both system settings
+  on (see TESTING.md).
+- **Panel opacity:** the named transparency steps give large text panels a readability
+  boost (`--artemis-glass-panel-opacity`, e.g. 72% → 84.6%). A custom opacity is applied
+  exactly on every surface.
+- **Compact sidebar tint:** the floating sidebar's glass is tinted by Zen's own workspace
+  gradient layers (`.zen-toolbar-background::before/::after`), scaled by the glass opacity
+  and keeping Zen's crossfade (`--zen-background-opacity`). At 100% opacity the surface is
+  exactly Zen's. (v1.0.0 hid those layers and painted a near-black neutral surface, which
+  looked much darker than the workspace.)
 - **Shape:** `--artemis-radius` plus derived inner and outer radii, following Zen's
   squircle setting when it is enabled.
 - **Spacing:** a 4px-based scale multiplied by the `appearance.spacing` step.

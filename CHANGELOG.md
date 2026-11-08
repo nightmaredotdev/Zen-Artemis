@@ -6,6 +6,21 @@ All notable changes to Artemis are documented here. Artemis uses
 
 ## [Unreleased]
 
+### Fixed
+- **Transparency had no effect when Windows "Transparency effects" were off.** The system
+  setting silently overrode Artemis's own transparency and blur, making the compact
+  sidebar and address bar fully opaque even with opacity set to 10%. The system setting
+  now only changes Artemis's defaults; a transparency or blur you choose in Artemis takes
+  precedence.
+- **A custom opacity is now applied exactly.** Previously, large panels raised it for
+  readability (10% became 50.5%); that boost now applies to the named steps only.
+- **The compact sidebar was much darker than the workspace.** Artemis hid Zen's workspace
+  gradient and painted a near-black surface. The glass is now tinted by the workspace's own
+  gradient, so at full opacity it matches Zen exactly.
+- **Settings sections collapsed the wrong section.** Clicking any section header in
+  Artemis's settings toggled the last section (Motion). Each section now opens and closes
+  on its own.
+
 ## [1.0.0] - 2026-11-08
 
 First release.

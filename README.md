@@ -29,8 +29,9 @@ A minimalist, customizable theme for **Zen Browser**. Designed to bring a clean,
 - Performance has been measured on one machine only (AMD Radeon RX 9060 XT, 144 Hz
   display): no dropped frames, and the glass sidebar over an animated page added about
   0.7 percentage points of GPU use. Other hardware has not been tested.
-- Artemis follows Windows' transparency and animation settings: with those effects off,
-  surfaces are solid and motion is reduced.
+- Artemis follows Windows' transparency and animation settings by default: with those
+  effects off, surfaces are solid and motion is reduced. A transparency or blur you choose
+  in Artemis's settings takes precedence over the Windows transparency setting.
 
 The Zen and Sine versions each release was tested with are listed in its release notes.
 

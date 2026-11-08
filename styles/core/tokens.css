@@ -93,8 +93,9 @@
     transparent
   );
   /* Large, text-heavy panels (the floating sidebar) stay more opaque than small
-     surfaces at every transparency step, so page text never competes with
-     panel text: medium 72% -> 84%, high 56% -> 76%, solid stays 100%. */
+     surfaces at every named transparency step, so page text never competes
+     with panel text: medium 72% -> 84%, high 56% -> 76%, solid stays 100%.
+     A custom opacity is applied exactly instead (see the custom block below). */
   --artemis-glass-panel-opacity: calc(
     var(--artemis-glass-opacity) + (100% - var(--artemis-glass-opacity)) * 0.45
   );
@@ -153,6 +154,9 @@
       --artemis-live-transparency-custom,
       var(--artemis-appearance-transparency-custom)
     );
+    /* An explicit number is honoured as typed on every surface; the panel
+       readability boost applies to the named steps only. */
+    --artemis-glass-panel-opacity: var(--artemis-glass-opacity);
   }
 }
 
@@ -180,10 +184,14 @@
   }
 }
 
-/* System preference: no translucency */
+/* System preference: no translucency. This sets the default only: when the
+   user has explicitly chosen a glass transparency or blur in Artemis, the
+   window bridge marks the root with [artemis-explicit-glass] and that explicit
+   choice wins. Without JS the attribute is absent, so the OS is respected. */
 @media (prefers-reduced-transparency: reduce) {
-  :root {
+  :root:not([artemis-explicit-glass]) {
     --artemis-glass-opacity: 100%;
+    --artemis-glass-panel-opacity: 100%;
     --artemis-glass-blur: 0px;
     --artemis-glass-filter: none;
     --artemis-backdrop-clip: none;

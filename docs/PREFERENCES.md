@@ -21,8 +21,11 @@ These settings shape everything Artemis styles. They never turn a feature on or 
 | `artemis.appearance.radius-custom` | `0px`–`32px` | `10px` | Custom corner radius |
 | `artemis.appearance.spacing` | Tight · Balanced · Relaxed | Balanced | Padding and gaps inside Artemis-styled elements |
 
-The system "reduce transparency" setting makes glass surfaces opaque regardless of these
-values.
+If the system's "reduce transparency" setting is on (on Windows: *Transparency effects*
+off), Artemis's **default** glass becomes opaque and unblurred. Once you choose a
+transparency or blur in Artemis yourself, your choice is used instead of the system
+setting. A custom opacity is applied exactly as typed. The named steps keep large text
+panels, such as the floating sidebar, a little more opaque for readability.
 
 ## Area switches
 

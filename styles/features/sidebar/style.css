@@ -1,9 +1,16 @@
 /* artemis.sidebar.style: Artemis sidebar (area master for sidebar.*). */
 
 @media -moz-pref("artemis.sidebar.style") {
-  /* Floating compact sidebar and its space previews: Artemis glass panel. */
+  /* Floating compact sidebar and its space previews: Artemis glass panel.
+     The glass is tinted by Zen's own workspace gradient: Zen paints it on the
+     ::after (current) and ::before (previous, for its crossfade) layers. Both
+     keep Zen's crossfade (--zen-background-opacity) and are scaled by the glass
+     opacity, so the workspace colours stay true and the page shows through.
+     At 100% opacity the surface is exactly Zen's own. (v1.0.0 hid these layers
+     and painted a near-black neutral surface instead, which looked much darker
+     than the workspace.) */
   :root[zen-compact-mode="true"] #navigator-toolbox .zen-toolbar-background {
-    background: var(--artemis-glass-panel-bg) !important;
+    background: transparent !important;
     backdrop-filter: var(--artemis-glass-filter) !important;
     box-shadow: var(--artemis-shadow-floating) !important;
     outline: 1px solid var(--artemis-hairline);
@@ -15,11 +22,13 @@
       border-radius: var(--artemis-radius-outer) !important;
     }
 
-    /* Zen paints its theme colour on opaque pseudo-layers that would hide the
-       glass. The theme colour is mixed into the glass tint instead. */
-    &::before,
     &::after {
-      opacity: 0 !important;
+      opacity: calc(var(--zen-background-opacity, 1) * var(--artemis-glass-panel-opacity)) !important;
+      outline: none !important;
+    }
+
+    &::before {
+      opacity: calc((1 - var(--zen-background-opacity, 1)) * var(--artemis-glass-panel-opacity)) !important;
       outline: none !important;
     }
   }
