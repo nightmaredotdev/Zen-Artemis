@@ -9,9 +9,65 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-08: Revision 2 approved; scaffold and M1 verification
+
+**Approved** by the owner (all eight revision-2 decisions), with these clarifications:
+
+1. **Architecture approved.** Area styling switches are **master overrides**, not bundled
+   presets. Turning an area off restores native Zen for the whole area. Individual feature
+   values stay independent and are preserved while the area is off. The tour is
+   skippable and reopenable.
+2. **Settings enhancer approved.** It may enhance only Artemis's own Sine dialog, must fail
+   safely if Sine changes, must keep the plain settings usable, and must never modify Sine
+   or interfere with other mods.
+3. **v1.0 scope approved:** 35 settings, backups, migration groundwork, onboarding.
+   Profiles and export/import go to v1.1; internal pages, settings pages, Sine UI and PDF
+   viewer go to v1.2.
+4. **Git workflow approved:** `main` holds finished releases, `dev` is for development,
+   `updatedAt` is maintained explicitly, and there are no force-pushes or history rewrites.
+5. **Store `ai` = `yes`.**
+6. **Licence:** MIT for the repository including the logo, provided the terms check finds
+   no relevant restriction. The SVG was edited in **Vector Lab**.
+7. **Testing:** the isolated test profile at `C:\Users\PlayrZ\ZenArtemisTest` is approved.
+   The real profile must not be touched, and everything created must be documented.
+8. **Defaults:** logo menu button on, subtle page dim on, minimal workspace switcher, tab
+   separators off, edge-to-edge off.
+
+**Implementation decisions (within the approved scope):**
+
+- Master overrides are implemented as a `"master"` key in `preferences.json` (ignored by
+  Sine). Feature gates test the feature's own pref and its master, and `check.py` enforces
+  this.
+- `popups.menus` was renamed `popups.style` (before any release) so area masters share
+  one naming pattern.
+- Defaults are seeded by reading `preferences.json` synchronously at import. M1 showed
+  seeding about 0.5 s before first paint, so the generated-table fallback is not needed.
+- `content.css` imports nothing until v1.2, so websites cannot be affected. The M1 test
+  showed the content sheet reaches browser pages, but website behaviour was untested.
+- `supportsUnload: true` was added after A6 passed.
+- Glass surfaces must be elements inside the window tree, because backdrop blur does not
+  apply to elements appended directly to the root (M1).
+- Test tooling: a Node.js built-ins-only Marionette client in `tools/zen/`, run with the
+  existing Windows Node.js. No dependencies were installed.
+
+**Open:**
+
+- **Licence:** no online SVG editor called "Vector Lab" could be found (the obvious domains
+  are dead, parked or broken, and search found only similarly named tools). `LICENSE` is
+  not added until its URL is known and its terms are checked. Anthropic's terms (reviewed
+  version effective Oct 8, 2025) assign Anthropic's rights in outputs, "if any", to the
+  user, and impose no output restriction as written.
+
+**Noted for the owner:** the development machine has Windows *Transparency effects* and
+*Animation effects* turned off. Following Zen, Artemis honours these system settings, so
+Artemis shows opaque surfaces and reduced motion there. This is not a code issue and needs
+no decision unless the owner wants different behaviour.
+
+---
+
 ## 2026-11-08: Architecture revision 2
 
-**Proposed**, awaiting owner approval:
+**Proposed**, then approved on 2026-11-08 (entry above):
 
 | # | Decision | Reference |
 |---|---|---|

@@ -1,6 +1,8 @@
 # Artemis: Architecture
 
-Status: **revision 2, awaiting owner approval.** Nothing here is implemented yet.
+Status: **revision 2, approved by the owner on 2026-11-08** (with the clarifications in
+[`DECISIONS.md`](DECISIONS.md)). The M0 scaffold exists on `dev`. The M1 verification
+results are in [`TESTING.md`](TESTING.md).
 Last reviewed: 2026-11-08, against Zen 1.24.1b (Windows) and Sine 2.3.4.1c.
 Decisions and approvals are recorded in [`DECISIONS.md`](DECISIONS.md).
 
@@ -130,6 +132,11 @@ Sources: the installed Sine source (`chrome/JS`, 2.3.4.1c), Zen 1.24.1b's `omni.
 Each is tested in the verification spike (milestone M1, §15) before code depends on it.
 Every item has a fallback.
 
+**M1 results (2026-11-08):** A1, A2, A4, A6, A7, A9 and A10 **pass**. A3 passes for browser
+pages. A5 passes for elements inside the window tree (`#navigator-toolbox`, `#browser`) but
+not for elements appended directly to the root. A8, A11 and A12 are deferred to M5, M4 and
+M2. Details are in [`TESTING.md`](TESTING.md).
+
 | # | Assumption | Depends on it | Fallback if false |
 |---|---|---|---|
 | A1 | Changing a **default-branch** value at runtime re-evaluates `-moz-pref()` live. | Seeding (§8.3) | Seed before the stylesheet loads (synchronous defaults table) |
@@ -218,10 +225,19 @@ Every item has a fallback.
 Implementation details (z-indices, per-layout offsets, pseudo-element fixes) are never
 settings.
 
-**Independence rule for area styles.** Every feature in an area must work on top of both
-the Artemis and the native area style. For example, `tabs.shape=pill` rounds native tabs
-too, and `tabs.separators` draws separators between native tabs. Testing covers both
-(§16.4).
+**Area styles are master overrides, not presets** (owner clarification, 2026-11-08).
+Turning an area style off restores Zen's native look for the **whole area**: its features
+stop applying as well. Their own values are **preserved** and apply again when the area is
+turned back on. Turning an area on never changes any feature's value.
+
+- A feature declares its area master in `preferences.json` with the Artemis-only key
+  `"master": "artemis.<area>.style"`. Sine ignores this key (F26).
+- A feature's CSS gate tests its own pref **and** its master:
+  `@media -moz-pref("artemis.tabs.style") and -moz-pref("artemis.tabs.separators")`. This is
+  the only cross-pref test allowed, and `check.py` enforces it.
+- Features stay visible in the settings while their area is off. The settings enhancer
+  shows them as inactive, with a note naming the area switch. Nothing is hidden or reset.
+- Within an area, features stay independent of each other.
 
 ### 6.2 Naming and types
 
@@ -281,8 +297,9 @@ artemis.appearance.radius-custom  "10px"   (shown only when radius = custom)
 ### 6.5 Dependencies
 
 The only declared dependencies are custom-value fields, hidden unless their token is
-`custom`. They use Sine `conditions`, so the dependency is visible. Features never read
-another feature's pref. Motion settings no longer depend on intensity (§10).
+`custom`. They use Sine `conditions`, so the dependency is visible. Apart from area
+masters (§6.1), features never read another feature's pref. Motion settings do not depend
+on intensity (§10).
 
 ---
 
@@ -397,9 +414,9 @@ After that, changing an Artemis default would no longer reach existing users.
 - `artemis.uc.js` repeats the same idempotent seed if the background module did not run
   (for example, when the mod is enabled mid-session).
 
-This is adopted only after A1 and A2 pass. The fallback is a defaults table generated into
-`artemis.sys.mjs` that seeds synchronously at import, checked by `check.py` against
-`preferences.json`.
+A1 and A2 passed in M1. `schema.mjs` reads `preferences.json` **synchronously** at import,
+through the chrome registry and a file stream, and seeding finished about 0.5 s before first
+paint. The generated defaults table fallback is therefore not needed.
 
 ### 8.4 Window bridge
 
@@ -430,9 +447,11 @@ switch (F6). If A9 fails, it also mirrors gate prefs to root attributes.
    visible effect alone, so turning features off truly restores native styling. The
    revision-1 "always-on `base.css`" is dropped (§21).
 2. **`styles/features/<area>/<feature>.css`:** one file per setting, with exactly **one
-   top-level gate** on its own pref. Dropdowns get one block per non-native value.
+   top-level gate** on its own pref, combined with its area master if it has one. Dropdowns get one block per non-native value.
 3. **`styles/pages/`** (from v1.2): internal pages, gated the same way, loaded from
-   `content.css`.
+   `content.css`. Until then, `content.css` imports **nothing**, so websites can never be
+   affected. From v1.2, page rules are explicitly scoped to browser-owned URLs
+   (`@-moz-document`).
 
 Entry files (`chrome.css`, `content.css`) contain only ordered `@import` lines:
 tokens → motion → features by area.
@@ -445,7 +464,12 @@ tokens → motion → features by area.
 - **Glass:** `--artemis-glass-alpha` comes from `appearance.transparency` and
   `--artemis-glass-blur` from `appearance.blur`. Surfaces combine a translucent tint with
   `backdrop-filter: blur()` (A5) and a hairline border for definition. `solid` / `none`
-  give opaque, unblurred surfaces.
+  give opaque, unblurred surfaces. Glass surfaces must be elements inside the normal window
+  tree. Backdrop blur does not apply to elements appended directly to the root (M1).
+- **System settings:** the OS "reduce transparency" setting makes glass opaque, and
+  "reduce motion" turns Artemis animations into short fades. This follows Zen's own
+  behaviour (Zen's acrylic surfaces honour reduced transparency). The owner's development
+  machine has both settings on (see TESTING.md).
 - **Shape:** `--artemis-radius` plus derived inner and outer radii, following Zen's
   squircle setting when it is enabled.
 - **Spacing:** a 4px-based scale multiplied by the `appearance.spacing` step.
@@ -658,12 +682,26 @@ The goal is all browser-owned UI. Website content is never restyled.
 | `essentials.style` | checkbox: Artemis essentials tiles | | on |
 | `urlbar.style` | checkbox: Artemis address bar and results popup | | on |
 | `toolbar.style` | checkbox: Artemis toolbar and navigation buttons | | on |
-| `popups.menus` | checkbox: Artemis menus, context menus and panels | | on |
+| `popups.style` | checkbox: Artemis menus, context menus and panels | | on |
 | `popups.findbar` | checkbox: floating Artemis find bar | | on |
 | `workspaces.switcher` | dropdown | `zen` · `minimal` · `dots` | `minimal` |
 | `media.controls` | checkbox: Artemis media controls card | | on |
 
 All names start with `artemis.`. Custom-value fields are shown only for `custom`.
+`popups.menus` was renamed `popups.style` before any release, so every area master follows
+the same `<area>.style` pattern (`window.frame` excepted). The rename needs no migration.
+
+**Area masters** (§6.1):
+
+| Master | Features it overrides |
+|---|---|
+| `window.frame` | `window.edge-to-edge` |
+| `sidebar.style` | `sidebar.hide-scrollbar` |
+| `tabs.style` | `tabs.height`, `tabs.shape`, `tabs.active-highlight`, `tabs.separators`, `folders.indent-guide` |
+| `urlbar.style` | `urlbar.dim-page` |
+| `toolbar.style` | `toolbar.logo-menu-button` |
+| `popups.style` | `popups.findbar` |
+| (none) | `essentials.style`, `media.controls`, `workspaces.switcher` (each is its own switch); appearance tokens; motion |
 
 ### 14.2 v1.0 optional features and motion
 
@@ -782,8 +820,8 @@ or other mods.
    internal; every pref is documented in `docs/PREFERENCES.md`.
 3. **Imports:** each resolves with exact case; no feature file is left unimported;
    filenames are lowercase.
-4. **Gating:** each feature file has one top-level gate on its own pref, and no feature
-   reads another feature's pref.
+4. **Gating:** each feature file has one top-level gate on its own pref plus its declared
+   area master, and reads no other feature's pref.
 5. **CSS hygiene:** forbidden selectors (§9.4); animations outside motion files; animated
    non-transform/opacity properties (warning); `!important` count per file; balanced braces.
 6. **JS rules:** `IOUtils` writes outside `storage.mjs`; non-validated pref writes; network
@@ -803,7 +841,8 @@ launched with `zen.exe -no-remote -profile <path>`. It gets its own copy of Sine
 junction `sine-mods/Artemis` → the repository. Test prefs:
 `toolkit.legacyUserProfileCustomizations.stylesheets=true`, `sine.allow-unsafe-js=true`,
 `sine.auto-updates=false`, `sine.enable-dev=true`. Creating it is outside the repository,
-so it needs owner approval (§22).
+and the owner approved it (2026-11-08). Exactly what was created is documented in
+[`TESTING.md`](TESTING.md).
 
 ### 16.3 Matrix
 
@@ -817,8 +856,10 @@ so it needs owner approval (§22).
 | Motion | each state; intensity steps; system reduced motion |
 | Area style | Artemis · native (for every feature in that area) |
 
-If A10 holds, a stdlib Python script drives the test profile over Marionette. It sets prefs
-for each matrix cell and saves chrome screenshots to a scratch directory for review. That
+A10 holds. `tools/zen/` (a Node.js built-ins-only Marionette client, run with the Windows
+Node.js) drives the test profile: it sets prefs for each matrix cell and runs check
+scripts. Marionette screenshots omit backdrop blur, so glass is checked with a real screen
+capture of the test window. That
 makes the four-layout × two-scheme matrix repeatable after every change. Without it, the
 matrix is run by hand. Either way, results and the Zen/Sine versions are logged in
 `docs/TESTING.md`.
@@ -877,7 +918,7 @@ under these conditions:
 - Concept and rough sketch: made by the owner in Paint.
 - SVG markup: generated by Claude through the claude.ai chat interface from the owner's
   description. No third-party artwork was given as a reference.
-- Refinement: edited by hand in an online SVG editor. **The editor is not yet named.**
+- Refinement: edited by hand by the owner in the **Vector Lab** online SVG editor.
 - Terms checked: the version of Anthropic's Consumer Terms reviewed assigns to the user
   whatever rights Anthropic has in outputs, "if any" (F32). The same version also contains
   a clause restricting commercial use of the Services. Whether that clause affects outputs
@@ -885,8 +926,11 @@ under these conditions:
 - Not claimed: whether AI-generated elements are protected by copyright, which differs by
   jurisdiction. The licence is granted to the extent the owner holds rights. `CREDITS.md`
   records the provenance above factually.
-- Still to check: the SVG editor's terms (some editors claim rights in exports or add
-  restrictions). This needs the editor's name.
+- Still to check: Vector Lab's terms. On 2026-11-08 no online SVG editor called Vector Lab
+  could be found: `vectorlab.app` refused connections, `www.vectorlab.app` is a parked
+  domain, `vectorlab.io` failed TLS, `vector-lab.com` does not resolve, and web search found
+  only similarly named tools. **`LICENSE` stays unadded until the editor's URL is known and
+  its terms are checked.** Anthropic's terms (F32) put no restriction on outputs as written.
 
 ### 17.4 `CREDITS.md` (created at M0)
 
@@ -905,15 +949,12 @@ under these conditions:
   reads `yes` as "Doomed AI slop". There is no official definition, but `partial`
   reasonably means "a person wrote substantial parts, with AI assistance". Under the agreed
   way of working, Claude writes most of the implementation and the owner directs, designs,
-  reviews and tests. Read plainly, that is closer to **`yes`** than `partial`. Recommendation:
-  `yes`, because it is honest about how the code is written, even though the store's script
-  labels it unflatteringly. `partial` is defensible only if the owner writes or substantially
-  edits a meaningful share of the code. Owner decides (§22). The field stays out of
-  `theme.json` until then.
+  reviews and tests. Read plainly, that is closer to **`yes`** than `partial`. **Decided: `yes`** (owner,
+  2026-11-08). It is set in `theme.json`.
 - **`license`:** unset until §17.2 is confirmed, then `"MIT"`.
 - **Other fields:** `id`, `name`, `description`, `author`, `version`, `homepage`, `readme`,
   `image`, `style`, `preferences`, `scripts`, `tags`, `fork: ["zen"]`, `createdAt`,
-  `updatedAt` (always explicit, F29), and `supportsUnload` (after A6).
+  `updatedAt` (always explicit, F29), and `supportsUnload: true` (A6 passed).
 
 ```json
 {
@@ -1040,22 +1081,8 @@ Contradictions in the brief itself, and how they are resolved:
 
 ---
 
-## 22. Decisions needed
+## 22. Decisions
 
-1. **Approve this revision:** the architecture as a whole, the settings model (§6, §14),
-   and the storage strategy (default-branch seeding, user values, `<profile>/artemis/` for
-   backups and profiles).
-2. **Settings enhancer** (§7.2): a small `about:preferences` script that decorates only
-   Artemis's Sine dialog. It is the only way to get search, collapsible sections,
-   descriptions and resets while staying inside Sine.
-3. **v1.0 scope:** 35 settings, the tour, reset-all with backups, and the migration
-   framework. Export/import and profiles move to v1.1.
-4. **Branch policy:** `main` holds releases only; development happens on `dev`.
-5. **Store `ai` value:** `yes` (recommended) or `partial` (§18).
-6. **Logo:** name the SVG editor so its terms can be checked, then confirm MIT for the
-   whole repository including the logo.
-7. **Test profile:** may Claude create it outside the repository (§16.2), and use
-   Marionette there for automated screenshots if A10 holds? Or will the owner create it?
-8. **Defaults to confirm:** `toolbar.logo-menu-button` on, `urlbar.dim-page` on,
-   `workspaces.switcher=minimal`, `tabs.separators` off, `window.edge-to-edge` off,
-   `motion.page-loading` off when it arrives in v1.1.
+All eight revision-2 decisions were approved on 2026-11-08 (see `DECISIONS.md`). Still open:
+
+1. **Vector Lab's URL**, so its terms can be checked before `LICENSE` (MIT) is added (§17.3).
