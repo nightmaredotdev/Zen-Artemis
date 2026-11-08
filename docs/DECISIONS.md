@@ -9,6 +9,23 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-08: Release workflow clarified (owner)
+
+**Approved** by the owner. Routine release steps need no extra manual testing or approval
+when the automated and isolated-environment checks give enough confidence. If all
+required checks pass, no significant issue is open and no architectural or out-of-scope
+decision is needed, Claude may merge `dev` into `main`, tag the version and publish the
+GitHub release on its own. Claude stops and asks only when a check fails or reveals a
+significant issue, something needs the owner's manual testing or judgment, an
+architectural or out-of-scope change is needed, or a destructive Git operation is being
+considered. The existing boundaries are unchanged: no force-pushes or history rewrites, no
+use of the real Zen profile, no Windows setting changes without permission.
+
+Release checks run headless (`tools/zen/launch.sh -headless`) so they never open or focus
+windows on the owner's desktop.
+
+---
+
 ## 2026-11-08: Layout requirement and motion scope settled (owner)
 
 **Approved** by the owner (resume instructions):

@@ -295,3 +295,27 @@ captured. Windows settings and the real Zen profile were untouched.
 
 All measurements are from the development machine only (AMD Radeon RX 9060 XT, 144 Hz).
 Mid-range hardware remains **untested**.
+
+### v1.0.0 release run: 2026-11-08 (release candidate `917c38f`)
+
+All checks ran **headless** (`tools/zen/launch.sh -headless`) in the isolated test profile,
+so nothing opened on the owner's desktop. Headless rendering is 1152×864 without GPU
+compositing. Native-restoration and independence comparisons are made within the same
+mode, so they remain valid. Glass appearance and GPU cost were verified separately with
+real captures and measurements ("Final integration, part 2").
+
+| Check | Result |
+|---|---|
+| `check.py --release` | 0 errors, 0 warnings |
+| Fresh install (all Artemis prefs wiped, then started) | 31 defaults seeded, tour auto-opened, no user values; `prefs.js` has **no** Artemis lines after start and quit |
+| Without JS | No instance, nothing seeded, no tour; window **pixel-identical** to pure Zen |
+| Layout matrix (18 cells) | **0 differing pixels** in all 18 |
+| Feature independence / master overrides / value preservation | Pass (only the known `about:robots` favicon flicker, 10 px) |
+| OS transparency and animation (emulated) | Effects on: glass 72%, blur 18 px, clip. Effects off / follow OS: opaque, no blur, no clip, no motion distance |
+| Motion | Hover 120 ms (102/138 ms at gentle/lively), Zen native, off; popups Artemis/Zen/off as before; reduced motion steps aside |
+| Settings enhancer | Enhanced (11 sections, 31 descriptions), only Artemis's dialog |
+| Runtime edge cases | Validation, live bridge, migration helpers, re-entrancy: pass |
+| Reset all / Restore through the real dialogs | Cancel: no change. OK: backup first, then cleared / restored |
+| Multiple windows | Instances, live sync, native restoration in second window, clean close: pass |
+| Disable / re-enable via Sine | Disabled: identical to pure Zen; re-enabled live |
+| Restart persistence | Value and backups survive; restore after restart works; tour does not reopen |
