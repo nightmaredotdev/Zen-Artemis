@@ -46,6 +46,36 @@ export function attachEnhancer(window, core) {
 
   const masterLabel = name => entries.find(e => e.property === name)?.label ?? name;
 
+  // Conditional rows (e.g. custom-value fields). Sine wires their visibility
+  // before appending the row to the dialog, so its initial hide/check finds no
+  // element and every conditional row starts visible (v1.0.0 bug). Artemis
+  // applies the same evaluation as Sine (same "if"/"not", nested groups and
+  // default operators) once the rows exist, and again on every pref change.
+  const readPref = (name, sample) => {
+    if (typeof sample === "boolean") return Services.prefs.getBoolPref(name, false);
+    if (typeof sample === "number") return Services.prefs.getIntPref(name, 0);
+    return Services.prefs.getStringPref(name, "");
+  };
+  const evaluate = (conditions, operator) => {
+    const list = Array.isArray(conditions) ? conditions : [conditions];
+    if (!list.length) return true;
+    const results = list.map(cond => {
+      if (cond.if || cond.not) {
+        const c = cond.if || cond.not;
+        const equal = readPref(c.property, c.value) === c.value;
+        return cond.not ? !equal : equal;
+      }
+      if (cond.conditions) return evaluate(cond.conditions, cond.operator || "AND");
+      return false;
+    });
+    return operator === "OR" ? results.some(Boolean) : results.every(Boolean);
+  };
+  const applyConditionalVisibility = row => {
+    const entry = entryById.get(row.id);
+    if (!entry?.conditions) return;
+    row.style.display = evaluate(entry.conditions, entry.operator || "OR") ? "flex" : "none";
+  };
+
   function enhance(content) {
     const added = [];      // nodes to remove on cleanup
     const moves = [];      // [node, originalParent, originalNextSibling] to undo
@@ -200,7 +230,10 @@ export function attachEnhancer(window, core) {
         if (input && input.value !== value && doc.activeElement !== input) input.value = value ?? "";
       }
     };
-    const refreshAll = () => rows.forEach(refreshRow);
+    const refreshAll = () => {
+      rows.forEach(refreshRow);
+      rows.forEach(r => applyConditionalVisibility(r.row));
+    };
     const observer = { observe: () => refreshAll() };
     Services.prefs.addObserver("artemis.", observer);
     refreshAll();

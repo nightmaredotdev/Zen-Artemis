@@ -20,6 +20,9 @@ All notable changes to Artemis are documented here. Artemis uses
 - **Settings sections collapsed the wrong section.** Clicking any section header in
   Artemis's settings toggled the last section (Motion). Each section now opens and closes
   on its own.
+- **Custom-value fields showed even when their dropdown wasn't set to Custom.** They are
+  now hidden on opening unless the dropdown is already on Custom, appear and disappear
+  immediately when you switch, and keep the value you entered.
 
 ## [1.0.0] - 2026-11-08
 

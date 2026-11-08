@@ -79,6 +79,7 @@ MOZ_REMOTE_ALLOW_SYSTEM_ACCESS=1 WSLENV=MOZ_REMOTE_ALLOW_SYSTEM_ACCESS \
 | `checks/os-settings.js` | Artemis response to OS transparency and motion settings |
 | `checks/scrollbar.js`, `checks/frame-timing.js`, `checks/gpu-scenario.js` | Targeted measurements |
 | `checks/transparency.js` | Regression (v1.0.0): glass opacity/blur of the compact sidebar and open address bar under OS effects on/off/follow-OS, for an explicit custom opacity (default ARGS) or defaults (`{"prefs":{}}`) |
+| `checks/custom-fields.js` | Regression (v1.0.0): custom-value fields visible only while their dropdown is Custom, from a fresh render (initial state, optional `{"start":{...}}`), switching via the real menulist, value persistence and independence across all four settings |
 | `checks/accordion.js` | Regression (v1.0.0): each settings section header toggles only its own section (every header clicked twice) |
 | `sidebar-tint.sh <dir>` | Regression (v1.0.0): at full glass opacity the compact sidebar background pixel equals Zen's own, explicit solid and OS default, dark and light |
 | `checks/toggle-mod.js` | Disable or enable Artemis through Sine's own toggle and report what remains |
@@ -346,3 +347,17 @@ works live.
 Not yet verified: a real-capture visual review of the fixed glass (blurred, workspace-tinted
 sidebar and address bar). Marionette screenshots do not show blur, and real captures need
 the owner's desktop to be free.
+
+### Custom-value field visibility: 2026-11-08
+
+| Check | Result |
+|---|---|
+| Reproduction (fresh render of Sine's settings page) | All four custom fields (accent colour, transparency, blur, radius) visible while their dropdowns were Zen accent / Medium / Medium / Medium |
+| Root cause | Sine calls `setupPrefObserver` for a mod row before appending the row to the dialog. Its initial hide and visibility check use `document.querySelector`, find nothing, and do nothing. Later changes work because the row is in the document by then |
+| Fix | The settings enhancer evaluates each Artemis row's `conditions` like Sine once the rows exist, and on every Artemis pref change. Sine is not modified |
+| `custom-fields.js`, all defaults | Initial: all four hidden. Each dropdown: Custom shows its field, another option hides it, the entered value survives switching away and back (input and pref), other fields unaffected. **0 failures** (4 initial-state failures before the fix) |
+| `custom-fields.js`, transparency and radius pre-set to Custom | Initial: exactly those two visible. Switching, persistence and independence: **0 failures** |
+| Search interplay | Searching "opacity" does not reveal the hidden custom transparency field |
+| After a full Sine rebuild | Still correct (0 failures) |
+| Accordion, settings page, runtime re-entrancy | Pass |
+| Browser-window regressions | Not re-run: the change affects only Artemis's settings dialog in `about:preferences` |

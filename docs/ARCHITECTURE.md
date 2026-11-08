@@ -335,6 +335,7 @@ dialog. It does not replace that dialog and does not open a separate interface.
 | Restore | A footer action that lists recent backups (§11.2) and restores one after confirmation |
 | Take the tour | A footer action that opens the first-launch tour (§12) in the most recent browser window |
 | Live application | Already true for checkboxes and dropdowns (A9) and for strings (F6 + bridge) |
+| Conditional rows | Sine wires a row's `conditions` before the row is in the dialog, so its initial hide/check never runs and every conditional row starts visible (Sine 2.3.4.1c). The enhancer applies the same evaluation as Sine once the rows exist and on every Artemis pref change, so custom-value fields are shown only while their dropdown is on Custom. Without the enhancer (no JS), Sine's behaviour is unchanged |
 
 Safety rules:
 

@@ -25,6 +25,7 @@ Bug fixes within the approved scope:
   the glass opacity and keeping Zen's crossfade, instead of hiding them behind a neutral
   dark surface (the M2 "theme tint" decision is superseded).
 - **Settings accordion.** Each section header captures its own section (closure bug).
+- **Custom-value fields.** The enhancer applies each conditional row's visibility itself, because Sine 2.3.4.1c wires conditions before the row is in the dialog and never applies the initial state. This works around a Sine bug inside Artemis's own dialog without modifying Sine.
 
 **Noted for the owner (no action taken):** Sine installs the public release into
 `sine-mods/Artemis`, which is this repository's folder (mod id = folder name). The owner's
