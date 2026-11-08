@@ -1,0 +1,81 @@
+/* First-launch tour card (author origin, loaded by scripts/window/onboarding.mjs). */
+
+#artemis-tour {
+  position: fixed;
+  z-index: 2147483000;
+  left: 50%;
+  bottom: 28px;
+  translate: -50% 0;
+  width: min(460px, calc(100vw - 48px));
+  box-sizing: border-box;
+  padding: 18px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-radius: calc(var(--artemis-radius-outer) + 2px);
+  background: var(--artemis-glass-panel-bg);
+  backdrop-filter: var(--artemis-glass-filter);
+  box-shadow: 0 0 0 1px var(--artemis-hairline), var(--artemis-shadow-floating);
+  color: var(--toolbox-textcolor, CanvasText);
+  font: menu;
+  font-size: 13px;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: artemis-tour-in var(--artemis-duration-slow) var(--artemis-ease-enter);
+  }
+}
+
+@keyframes artemis-tour-in {
+  from { opacity: 0; transform: translateY(calc(2 * var(--artemis-travel))); }
+}
+
+/* The glass blurs the page while the tour is shown. */
+#browser:has(#artemis-tour) #tabbrowser-tabpanels browser {
+  clip-path: var(--artemis-backdrop-clip);
+}
+
+.artemis-tour-head { display: flex; align-items: center; gap: 10px; }
+.artemis-tour-logo {
+  width: 22px; height: 22px; background-color: currentColor;
+  mask: url("../../assets/artemis.svg") center / contain no-repeat;
+}
+.artemis-tour-title { font-size: 15px; font-weight: 600; flex: 1; }
+.artemis-tour-count { color: var(--artemis-text-muted); font-size: 11px; }
+.artemis-tour-text { color: var(--artemis-text-muted); line-height: 1.45; }
+.artemis-tour-row { display: flex; flex-direction: column; gap: 6px; }
+.artemis-tour-label { font-weight: 500; }
+.artemis-tour-options { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.artemis-tour-option,
+.artemis-tour-button,
+.artemis-tour-link {
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  border: none;
+  border-radius: var(--artemis-radius-inner);
+  padding: 5px 11px;
+  background: var(--artemis-hover);
+  cursor: default;
+}
+.artemis-tour-option:hover,
+.artemis-tour-button:hover { background: var(--artemis-pressed); }
+.artemis-tour-option[aria-checked="true"] {
+  background: color-mix(in srgb, var(--artemis-accent-ui) 34%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--artemis-accent-ui) 70%, transparent);
+  font-weight: 600;
+}
+.artemis-tour-actions { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.artemis-tour-spacer { flex: 1; }
+.artemis-tour-link { background: transparent; color: var(--artemis-text-muted); padding-inline: 4px; }
+.artemis-tour-link:hover { color: inherit; }
+.artemis-tour-primary {
+  background: color-mix(in srgb, var(--artemis-accent-ui) 30%, transparent);
+}
+.artemis-tour-primary:hover {
+  background: color-mix(in srgb, var(--artemis-accent-ui) 40%, transparent);
+}
+:is(.artemis-tour-option, .artemis-tour-button, .artemis-tour-link):focus-visible {
+  outline: 2px solid var(--artemis-accent-ui);
+  outline-offset: 1px;
+}

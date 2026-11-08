@@ -36,6 +36,26 @@
     console.warn("[Artemis] Failed to load parts.css:", err);
   }
 
+  // Per-window modules. Each has init(window) / destroy(window).
+  const BASE = "chrome://sine/content/Artemis/scripts/";
+  try {
+    const { createBridge } = ChromeUtils.importESModule(BASE + "window/bridge.mjs");
+    const { createOnboardingModule } = ChromeUtils.importESModule(BASE + "window/onboarding.mjs");
+    const bridge = createBridge(window);
+    modules.push({ init: () => bridge.init(), destroy: () => bridge.destroy() });
+    modules.push(createOnboardingModule(core));
+  } catch (err) {
+    console.error("[Artemis] Failed to load window modules:", err);
+  }
+  for (const module of [...modules]) {
+    try {
+      module.init(window);
+    } catch (err) {
+      console.error("[Artemis] Module init failed:", err);
+      modules.splice(modules.indexOf(module), 1);
+    }
+  }
+
   const instance = {
     loadedAt: Date.now(),
     modules,

@@ -20,4 +20,9 @@ All notable changes to Artemis are documented here. Artemis uses
 - Workspace switcher styles (minimal, dots), Artemis menus and panels, a floating find bar,
   and media controls styling.
 - Motion: hover feedback and panel opening, each Artemis / Zen / Off, scaled by intensity.
+- Settings enhancements inside Sine: collapsible sections, search, descriptions,
+  per-setting reset, reset all, backup restore and "Take the tour".
+- Automatic backups before reset and restore, and settings migration groundwork.
+- First-launch tour with live controls; skippable and reopenable.
+- Live custom values (accent, transparency, blur, radius) from any source.
 - Layout matrix, native-restoration, feature-independence and performance test scripts.

@@ -1,0 +1,141 @@
+/* Settings enhancer (author origin, loaded into about:preferences by
+ * scripts/settings/enhancer.mjs). Scoped to Artemis's dialog only. */
+
+.artemis-enhanced {
+  --artemis-s-muted: color-mix(in srgb, currentColor 60%, transparent);
+  --artemis-s-line: color-mix(in srgb, currentColor 12%, transparent);
+  --artemis-s-hover: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.artemis-enhanced .artemis-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 4px 0 8px;
+  background: inherit;
+}
+
+.artemis-enhanced .artemis-search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--artemis-s-line);
+  background: var(--artemis-s-hover);
+  color: inherit;
+  font: inherit;
+}
+
+.artemis-enhanced .artemis-notice {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, #d9a400 16%, transparent);
+  line-height: 1.4;
+}
+
+.artemis-enhanced .artemis-section {
+  border-top: 1px solid var(--artemis-s-line);
+}
+
+.artemis-enhanced .artemis-section > vbox[id^="artemis-section-"] {
+  display: none !important; /* Sine's separator; the header replaces it */
+}
+
+.artemis-enhanced .artemis-section-header {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 2px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-align: start;
+}
+
+.artemis-enhanced .artemis-section-header:hover { background: var(--artemis-s-hover); border-radius: 6px; }
+
+.artemis-enhanced .artemis-chevron {
+  width: 0;
+  height: 0;
+  border-inline-start: 5px solid currentColor;
+  border-block: 4px solid transparent;
+  rotate: 90deg;
+  opacity: 0.6;
+}
+
+.artemis-enhanced .artemis-collapsed .artemis-chevron { rotate: 0deg; }
+.artemis-enhanced .artemis-collapsed .artemis-section-body { display: none; }
+.artemis-enhanced .artemis-section-body { padding-bottom: 8px; }
+
+.artemis-enhanced .artemis-labelbox {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+
+.artemis-enhanced .artemis-desc,
+.artemis-enhanced .artemis-inactive-note {
+  font-size: 0.9em;
+  color: var(--artemis-s-muted);
+  line-height: 1.35;
+}
+
+.artemis-enhanced .artemis-inactive > :not(.artemis-labelbox, .artemis-reset) { opacity: 0.45; }
+.artemis-enhanced .artemis-inactive .sineItemPreferenceLabel { opacity: 0.6; }
+
+.artemis-enhanced .artemis-reset {
+  appearance: none;
+  align-self: center;
+  width: 22px;
+  height: 22px;
+  margin-inline: 6px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--artemis-s-muted);
+  font: inherit;
+}
+
+.artemis-enhanced .artemis-reset::before { content: "↺"; font-size: 14px; line-height: 22px; }
+.artemis-enhanced .artemis-reset:hover { background: var(--artemis-s-hover); color: inherit; }
+.artemis-enhanced [hidden] { display: none !important; }
+.artemis-enhanced .artemis-filtered { display: none !important; }
+
+.artemis-enhanced .artemis-empty {
+  padding: 16px 2px;
+  color: var(--artemis-s-muted);
+}
+
+.artemis-enhanced .artemis-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--artemis-s-line);
+}
+
+.artemis-enhanced .artemis-footer-spacer { flex: 1; }
+
+.artemis-enhanced :is(.artemis-button, .artemis-select) {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--artemis-s-line);
+  background: var(--artemis-s-hover);
+  color: inherit;
+  font: inherit;
+}
+
+.artemis-enhanced .artemis-button:hover:not([disabled]) { background: color-mix(in srgb, currentColor 14%, transparent); }
+.artemis-enhanced .artemis-danger { color: light-dark(#b42318, #ff8a80); }
+.artemis-enhanced :is(.artemis-button, .artemis-select)[disabled] { opacity: 0.5; }

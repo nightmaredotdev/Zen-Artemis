@@ -20,6 +20,13 @@ export const INTERNAL_PREFS = Object.freeze({
 });
 
 let cache = null;
+let rawCache = null;
+
+/** The raw preferences.json entries (labels, descriptions, separators). */
+export function getRawEntries() {
+  if (!rawCache) rawCache = JSON.parse(readChromeText(`${BASE_URL}preferences.json`));
+  return rawCache;
+}
 
 /** Synchronously reads a chrome:// text file that maps to a local file. */
 function readChromeText(url) {
@@ -44,7 +51,7 @@ function readChromeText(url) {
  */
 export function getSettings() {
   if (cache) return cache;
-  const raw = JSON.parse(readChromeText(`${BASE_URL}preferences.json`));
+  const raw = getRawEntries();
   const settings = new Map();
   for (const entry of raw) {
     if (!entry.property || !entry.property.startsWith(PREFIX)) continue;
@@ -140,4 +147,55 @@ export function debugEnabled() {
 
 export function log(...args) {
   if (debugEnabled()) console.log("[Artemis]", ...args);
+}
+
+/** True if the user has set this declared setting (it differs from the Artemis default). */
+export function isUserSet(name) {
+  return getSettings().has(name) && Services.prefs.prefHasUserValue(name);
+}
+
+/** Writes a validated user value. Returns false (and writes nothing) if invalid. */
+export function setUserValue(name, value) {
+  if (!isValid(name, value)) return false;
+  const setting = getSettings().get(name);
+  if (setting.type === "checkbox") Services.prefs.setBoolPref(name, value);
+  else Services.prefs.setStringPref(name, value);
+  return true;
+}
+
+/** Returns a declared setting to its Artemis default. */
+export function clearUserValue(name) {
+  if (getSettings().has(name)) Services.prefs.clearUserPref(name);
+}
+
+/** Sparse map of every user-set declared setting (never internal prefs). */
+export function userSnapshot() {
+  const out = {};
+  for (const name of getSettings().keys()) {
+    if (Services.prefs.prefHasUserValue(name)) out[name] = getValue(name);
+  }
+  return out;
+}
+
+/** Returns every declared setting to its Artemis default. Internal prefs are untouched. */
+export function clearAllUserValues() {
+  for (const name of getSettings().keys()) Services.prefs.clearUserPref(name);
+}
+
+/** Internal prefs (never shown, exported or reset). */
+export function getInternal(name, fallback) {
+  const type = INTERNAL_PREFS[name];
+  if (!type) throw new Error(`Unknown internal pref ${name}`);
+  if (Services.prefs.getPrefType(name) === Ci.nsIPrefBranch.PREF_INVALID) return fallback;
+  if (type === "int") return Services.prefs.getIntPref(name, fallback);
+  if (type === "bool") return Services.prefs.getBoolPref(name, fallback);
+  return Services.prefs.getStringPref(name, fallback);
+}
+
+export function setInternal(name, value) {
+  const type = INTERNAL_PREFS[name];
+  if (!type) throw new Error(`Unknown internal pref ${name}`);
+  if (type === "int") Services.prefs.setIntPref(name, value);
+  else if (type === "bool") Services.prefs.setBoolPref(name, value);
+  else Services.prefs.setStringPref(name, value);
 }

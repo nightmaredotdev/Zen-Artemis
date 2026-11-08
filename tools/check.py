@@ -233,8 +233,13 @@ def check_imports() -> None:
             err(f"{entry}: entry files may only contain @import lines")
         walk(p.resolve(), set())
 
+    runtime_refs = " ".join(p.read_text(encoding="utf-8") for p in files("*.mjs") + files("*.js"))
     for css in files("*.css"):
         if css.name in {"chrome.css", "content.css", "parts.css"} and css.parent == ROOT:
+            continue
+        if "runtime" in css.relative_to(ROOT).parts:
+            if css.relative_to(ROOT).as_posix() not in runtime_refs:
+                err(f"{rel(css)}: runtime stylesheet is not loaded by any script")
             continue
         if css.resolve() not in imported:
             err(f"{rel(css)}: not imported by any entry file")
@@ -354,7 +359,7 @@ def check_css_hygiene() -> None:
         for rx, label in FORBIDDEN_CSS:
             if rx.search(text):
                 err(f"{rel(css)}: forbidden {label}")
-        in_motion = "motion" in css.relative_to(ROOT).parts
+        in_motion = bool({"motion", "runtime"} & set(css.relative_to(ROOT).parts))
         if not in_motion and re.search(r"@keyframes|\banimation\s*:|\btransition\s*:", text):
             warn(f"{rel(css)}: animation outside styles/features/motion/")
         for m in ANIMATED_PROP_RE.finditer(text):
@@ -374,7 +379,7 @@ FORBIDDEN_JS = [
     (re.compile(r"IOUtils\.(write|remove|move|copy|makeDirectory|setPermissions)"),
      "IOUtils writes", "scripts/core/storage.mjs"),
     (re.compile(r"Services\.prefs\.(set(Bool|Int|Char|String)Pref|clearUserPref)"),
-     "user-branch pref writes", "scripts/core/schema.mjs"),
+     "user-branch pref writes", ("scripts/core/schema.mjs", "scripts/core/migrations.mjs")),
 ]
 
 
@@ -391,7 +396,8 @@ def check_js() -> None:
     for p in js_files:
         text = strip_js_comments(p.read_text(encoding="utf-8"))
         for rx, label, allowed_in in FORBIDDEN_JS:
-            if rx.search(text) and rel(p) != allowed_in:
+            allowed = (allowed_in,) if isinstance(allowed_in, str) else (allowed_in or ())
+            if rx.search(text) and rel(p) not in allowed:
                 err(f"{rel(p)}: forbidden {label}")
     node = find_node()
     if not node:
@@ -487,6 +493,11 @@ def check_manifest(release: bool) -> None:
     for script in (theme.get("scripts") or {}):
         if not (ROOT / script).exists():
             err(f"theme.json: script {script} missing")
+    vfile = ROOT / "scripts" / "version.mjs"
+    if vfile.exists():
+        m = re.search(r'VERSION\s*=\s*"([^"]+)"', vfile.read_text(encoding="utf-8"))
+        if not m or m.group(1) != theme.get("version"):
+            err("scripts/version.mjs: VERSION does not match theme.json version")
     if release:
         changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
         if f"## [{theme.get('version')}]" not in changelog:

@@ -222,3 +222,27 @@ They remain release blocker B1.
 
 Performance figures in this log are from the development machine only (AMD Radeon RX 9060
 XT, 144 Hz). Mid-range hardware is **untested**.
+
+### M5 runtime: 2026-11-08
+
+| Check | Result |
+|---|---|
+| A8: enhancer script runs in `about:preferences` | **Pass**. It enhances only Artemis's dialog (exactly one `.artemis-enhanced`) |
+| Enhanced dialog | 11 collapsible sections, 31 descriptions, search (e.g. "tab" matches labels and descriptions across sections), reset buttons only on user-set rows |
+| Area master off in settings | Its features show "Turn on “Artemis tabs” to use this." Values unchanged |
+| Row reset (click) | Clears one value; Sine's widget refreshes (Pill → Rounded) |
+| Reset all | Backup written first (`<profile>/artemis/backups/…-before-reset-all.json`), then all user values cleared; internal prefs untouched |
+| Restore | Takes a "before-restore" backup, then applies the backup's 3 values |
+| Tampered backup validation | Only valid declared values are applied. Unknown keys, internal prefs, wrong types, out-of-range values, a CSS-injection string and a non-Artemis pref are rejected |
+| Bridge (live custom values) | A custom accent set directly in prefs applies live (`#00b894`); an invalid value is removed and the token falls back safely |
+| Migration helpers (`rename`, `mapValue`) on throwaway prefs | Rename moves the value; mapping translates; unknown values are kept and reported, not reset |
+| Schema stamping | Not written on a fresh install; written on the first user change (`artemis.internal.schema = 1`) |
+| Tour | Auto-opens once on first launch (one window). Skip keeps choices made so far (state `skipped`). "Take the tour" reopens it; Done records `completed`. Never auto-opens again after a restart |
+| Re-entrancy (full Sine rebuild) | One instance per window, no duplicate tour, one enhanced dialog (1 toolbar, 1 footer, 11 sections) |
+| Persistence | User values and backups survive restart |
+| Without JS (`sine.allow-unsafe-js` off) | No script runs, nothing seeded, no tour. Window with Artemis CSS loaded is **pixel-identical** to pure Zen |
+| Regression: native restoration, 8 layouts | **0 differing pixels** (known favicon noise aside) |
+
+Not tested by clicking: the Reset-all and Restore buttons' confirmation prompts are modal,
+and the test driver cannot dismiss them. The same code paths were exercised through the
+functions the buttons call.

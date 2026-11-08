@@ -9,6 +9,26 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-08: M5 implementation decisions (within approved scope)
+
+- **Schema stamping.** `artemis.internal.schema` is written on the first user change (not
+  at startup), so fresh installs keep `prefs.js` free of Artemis lines while every set
+  value still carries its schema.
+- **Pref writes.** Validated writes go through `schema.mjs`. `migrations.mjs` may also
+  write, because renames move raw values of old prefs. `check.py` enforces both.
+- **Tour.** Four steps of real controls (look, sidebar and tabs, motion) between welcome
+  and done. Options are generated from `preferences.json`. Choosing a default clears the
+  user value instead of pinning it. "Custom" options stay in settings only. Escape skips.
+  Closing the window mid-tour does not count as a skip.
+- **Enhancer.** Sine's separators get ids (`artemis-section-*`) so sections are found
+  without guessing. The enhancer waits until every declared row is rendered, moves Sine's
+  own nodes into section wrappers, and undoes every move and addition on teardown.
+  Confirmations use `Services.prompt`.
+- **Backups.** Stored in `<profile>/artemis/backups/`, newest 10 kept; taken before reset
+  all and restore (and later before import, profile overwrite and migration).
+
+---
+
 ## 2026-11-08: M4 findings and proposals (approval needed)
 
 **Horizontal tabs (release blocker B1).** Zen's official FAQ

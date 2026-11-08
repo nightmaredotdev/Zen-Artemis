@@ -17,6 +17,12 @@
       "include": [
         "chrome://browser/content/browser.xhtml"
       ]
+    },
+    "artemis-settings.uc.js": {
+      "include": [
+        "about:preferences*",
+        "about:settings*"
+      ]
     }
   },
   "tags": [
