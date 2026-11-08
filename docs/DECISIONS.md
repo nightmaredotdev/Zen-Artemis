@@ -9,6 +9,24 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-08: Layout requirement and motion scope settled (owner)
+
+**Approved** by the owner (resume instructions):
+
+- **B1:** the layout requirement is every layout Zen offers. That means Single toolbar,
+  Multiple toolbars and Collapsed, each with left and right sidebar and compact mode on and
+  off, in light and dark, with multiple windows. Horizontal tabs are not supported because
+  Zen does not offer them (A13). This is revisited if Zen ships them.
+- **B3:** the four JavaScript-driven animation settings (compact sidebar, tab open/close,
+  folders, workspaces) are not in v1.0 and are not reintroduced. v1.0 motion is
+  `intensity`, `hover` and `popups`.
+
+**Implementation note (M4):** under system reduced motion, Artemis animations step aside to
+native behaviour instead of becoming a short fade. On Windows, Firefox also turns panel
+animations off when "Animation effects" is off. ARCHITECTURE §10 is updated to match.
+
+---
+
 ## 2026-11-08: MIT licence adopted
 
 **Approved** by the owner. The logo was refined in SVG Vector Lab

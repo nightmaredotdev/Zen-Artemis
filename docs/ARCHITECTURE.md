@@ -153,7 +153,7 @@ M2. Details are in [`TESTING.md`](TESTING.md).
 | A10 | Zen supports Marionette (`-marionette`) for scripted test runs (chrome-context screenshots, setting prefs). | Automated layout-matrix runs (§16.3) | Manual matrix only |
 | A11 | Zen animates each area natively that Artemis offers a `zen` motion state for. **Result (M4):** hover feedback (CSS transitions) and panels (Firefox's `[animate]` transition on arrow panels and `.animatable-menupopup`) are CSS-driven and support all three states. The compact sidebar, tab open/close, folders and workspace switching are **JavaScript-driven** (Zen's `motion` library / Web Animations). CSS cannot replace or disable them, folder timing is a private field, and Zen exposes only its own hidden prefs (`zen.view.compact.animate-sidebar`, `zen.workspaces.switch-animation-duration`). | Three-state motion settings (§10) | Release blocker B3: owner decision on those four settings |
 | A12 | Glass on the sidebar plus open popups adds no noticeable frame-time cost on mid-range hardware. | Glass defaults | Lower default blur; limit blur to floating surfaces |
-| A13 | Horizontal tabs can be enabled for testing. **Result (M4): Zen does not offer horizontal tabs.** Its FAQ says they "will not be supported in the near future". Its layout settings write only `zen.view.sidebar-expanded` and `zen.view.use-single-toolbar` (Single / Multiple / Collapsed). `zen.tabs.vertical` is never set by Zen code, and setting it does not produce a working horizontal layout. | Horizontal-tab compatibility (owner requirement) | Release blocker B1: owner decision needed. Not simulated in CSS |
+| A13 | Horizontal tabs can be enabled for testing. **Result (M4): Zen does not offer horizontal tabs.** Its FAQ says they "will not be supported in the near future". Its layout settings write only `zen.view.sidebar-expanded` and `zen.view.use-single-toolbar` (Single / Multiple / Collapsed). `zen.tabs.vertical` is never set by Zen code, and setting it does not produce a working horizontal layout. | Horizontal-tab compatibility | **Resolved (owner, 2026-11-08):** the requirement became "every layout Zen offers" (§9.5). Not simulated in CSS |
 
 ---
 
@@ -497,13 +497,14 @@ There is no `@layer`. `check.py` reports the `!important` count per file.
 
 ### 9.5 Layout support
 
-Required: all four combinations of sidebar expanded/collapsed × compact on/off; left and
-right sidebar (`zen-right-side`); vertical and horizontal tabs (`zen.tabs.vertical`); single
-and multiple toolbars; and multiple windows (prefs are global, so every window updates
-together). Features adapt through Zen's own state, never through Artemis layout settings. A
-feature that cannot apply in some layout does nothing there. For example,
-`folders.indent-guide` does nothing in a collapsed sidebar, and `tabs.height` affects only
-vertical rhythm in horizontal tabs.
+Required (revised 2026-11-08, owner decision): every layout Zen offers — **Single toolbar,
+Multiple toolbars and Collapsed** — each with the sidebar on the left and right
+(`zen-right-side`) and compact mode on and off, in light and dark, and with multiple
+windows (prefs are global, so every window updates together). Horizontal tabs are not
+offered by Zen (A13) and are not supported; this is revisited if Zen ships them. Features
+adapt through Zen's own state, never through Artemis layout settings. A feature that cannot
+apply in some layout does nothing there; for example, `folders.indent-guide` does nothing
+in a collapsed sidebar.
 
 Primary configuration: Zen 1.24.1b, Windows, compact on, sidebar collapsed, multiple
 toolbars, dark.
@@ -534,8 +535,13 @@ Each animation is one setting with up to three states:
 - **`motion.intensity`** (`gentle | standard | lively`) scales duration and travel distance
   of animations in the `artemis` state only. It has no "off" value, it never changes an
   animation's state, and it never affects `zen` or `off`.
-- **System reduced motion:** animations in the `artemis` state switch to a short fade.
-  States are never changed.
+- **System reduced motion:** Artemis animations step aside and the native behaviour applies.
+  On Windows that means no panel animation, because Firefox follows the system "Animation
+  effects" setting. States are never changed. (Revision 1 planned a short fade instead;
+  following the OS was chosen at M4, and Firefox makes the same choice.)
+- **v1.0 motion settings:** `intensity`, `hover`, `popups`. The compact sidebar, tab
+  open/close, folder and workspace animations are JavaScript-driven in Zen, so they stay
+  native and are not Artemis settings (owner decision, 2026-11-08; A11).
 - Each animation lives in its own feature file and its own gate. Intensity is a token read
   through motion variables.
 
@@ -723,14 +729,11 @@ the same `<area>.style` pattern (`window.frame` excepted). The rename needs no m
 | `motion.intensity` | dropdown | `gentle` · `standard` · `lively` | `standard` |
 | `motion.hover` | motion | `artemis` · `zen` · `off` | `artemis` |
 | `motion.popups` | motion | `artemis` · `zen` · `off` | `artemis` |
-| `motion.sidebar` | motion: compact sidebar reveal | `artemis` · `zen` · `off` | `artemis` |
-| `motion.tabs` | motion: tab open/close | `artemis` · `zen` · `off` | `artemis` |
-| `motion.folders` | motion: folder expand/collapse | `artemis` · `zen` · `off` | `artemis` |
-| `motion.workspaces` | motion: workspace switch | `artemis` · `zen` · `off` | `artemis` |
-
-**v1.0 total: 35 user settings** (19 foundation + 16 optional/motion), plus two internal
-prefs: `artemis.internal.schema` and `artemis.internal.onboarding`. The `zen` state of each
-motion setting depends on A11.
+**v1.0 total: 31 user settings** (19 foundation + 9 optional + 3 motion), plus internal
+prefs `artemis.internal.schema`, `artemis.internal.onboarding` and `artemis.internal.debug`.
+`motion.sidebar`, `motion.tabs`, `motion.folders` and `motion.workspaces` were dropped from
+v1.0 (owner decision, 2026-11-08), because those animations are JavaScript-driven in Zen
+(A11).
 
 Not duplicated, because Zen already does it: sidebar auto-hide (compact mode), the gap
 around the page (`zen.theme.content-element-separation`), fading of unloaded tabs, the
@@ -796,7 +799,7 @@ takes `main`'s current contents. Therefore:
 | **M0 Scaffold** | §20.2 | `check.py` passes; installing in the test profile shows no visible change |
 | **M1 Verification spike** | A1–A12 in the test profile | Results in `docs/TESTING.md`; seeding approach confirmed or switched to the fallback |
 | **M2 Identity and sidebar/tabs** | Tokens, glass, `window.frame`, `sidebar.*`, `tabs.*`, `essentials.style`, `folders.indent-guide`, `window.edge-to-edge` | Four-layout matrix in light and dark; both area-style states for each feature |
-| **M3 Remaining core areas** | URL bar, toolbar and logo button, menus/popups, find bar, workspaces switcher, media controls | Same as M2, plus right side, horizontal tabs, multiple windows |
+| **M3 Remaining core areas** | URL bar, toolbar and logo button, menus/popups, find bar, workspaces switcher, media controls | Same as M2, plus right side and multiple windows (horizontal tabs dropped: A13) |
 | **M4 Motion** | Intensity and the six motion settings | Three states each; reduced motion; no layout animation; frame-time check |
 | **M5 Runtime** | Seeding, bridge, settings enhancer, reset/reset-all, backups and restore, migration framework (schema 1), tour | §16.4 runtime procedures pass |
 | **M6 Release hardening** | Full matrix, performance pass, README, screenshots, CREDITS, CHANGELOG (LICENSE added 2026-11-08) | → **v1.0.0** |
@@ -852,10 +855,10 @@ and the owner approved it (2026-11-08). Exactly what was created is documented i
 
 | Dimension | Values |
 |---|---|
-| Sidebar × layout | expanded/collapsed × compact/non-compact (all four required) |
-| Orientation and side | vertical (primary) · horizontal; left (primary) · right |
-| Toolbars | multiple (primary) · single |
-| Scheme | dark (primary) · light |
+| Zen layout | Single toolbar · Multiple toolbars · Collapsed (all three required) |
+| Compact mode | on · off |
+| Side | left · right |
+| Scheme | dark · light |
 | Windows | one · several (settings sync) |
 | Motion | each state; intensity steps; system reduced motion |
 | Area style | Artemis · native (for every feature in that area) |
@@ -863,9 +866,9 @@ and the owner approved it (2026-11-08). Exactly what was created is documented i
 A10 holds. `tools/zen/` (a Node.js built-ins-only Marionette client, run with the Windows
 Node.js) drives the test profile: it sets prefs for each matrix cell and runs check
 scripts. Marionette screenshots omit backdrop blur, so glass is checked with a real screen
-capture of the test window. That
-makes the four-layout × two-scheme matrix repeatable after every change. Without it, the
-matrix is run by hand. Either way, results and the Zen/Sine versions are logged in
+capture of the test window. That makes the 3 layouts × compact on/off × left/right matrix
+(12 cells, plus light-scheme cells) repeatable after every change. Without it, the matrix is
+run by hand. Either way, results and the Zen/Sine versions are logged in
 `docs/TESTING.md`.
 
 ### 16.4 Procedures

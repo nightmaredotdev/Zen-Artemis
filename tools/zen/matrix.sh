@@ -13,31 +13,41 @@ Z="$HERE/zrun.sh"; C="$HERE/checks"; PNG="$HERE/png.py"
 # (check.py has no runtime knowledge; tools/zen/masters.py prints the list).
 MASTERS_OFF=$(python3 "$HERE/masters.py" off)
 MASTERS_ON=$(python3 "$HERE/masters.py" on)
-# name | layout json (without braces)
-CELLS=(
-  "compact-collapsed-dark|\"compact\":true,\"expanded\":false,\"scheme\":2,\"singleToolbar\":false"
-  "compact-expanded-dark|\"compact\":true,\"expanded\":true,\"scheme\":2,\"singleToolbar\":false"
-  "full-collapsed-dark|\"compact\":false,\"expanded\":false,\"scheme\":2,\"singleToolbar\":false"
-  "full-expanded-dark|\"compact\":false,\"expanded\":true,\"scheme\":2,\"singleToolbar\":false"
-  "compact-collapsed-light|\"compact\":true,\"expanded\":false,\"scheme\":1,\"singleToolbar\":false"
-  "full-expanded-light|\"compact\":false,\"expanded\":true,\"scheme\":1,\"singleToolbar\":false"
-  "full-expanded-right|\"compact\":false,\"expanded\":true,\"scheme\":2,\"singleToolbar\":false,\"rightSide\":true"
-  "full-expanded-single|\"compact\":false,\"expanded\":true,\"scheme\":2,\"singleToolbar\":true"
+# Zen's three layouts, set exactly as Zen's own settings do (zen-settings.js):
+#   single    = use-single-toolbar true,  sidebar-expanded true
+#   multiple  = use-single-toolbar false, sidebar-expanded true
+#   collapsed = use-single-toolbar false, sidebar-expanded false
+declare -A LAYOUT=(
+  [single]='"singleToolbar":true,"expanded":true'
+  [multiple]='"singleToolbar":false,"expanded":true'
+  [collapsed]='"singleToolbar":false,"expanded":false'
 )
+# name | layout json (without braces): 3 layouts x compact/full x left/right in
+# dark, plus each layout in light (left; full and compact).
+CELLS=()
+for l in single multiple collapsed; do
+  for c in full compact; do
+    cj=false; [[ $c == compact ]] && cj=true
+    for s in left right; do
+      sj=false; [[ $s == right ]] && sj=true
+      CELLS+=("$l-$c-$s-dark|${LAYOUT[$l]},\"compact\":$cj,\"rightSide\":$sj,\"scheme\":2")
+    done
+    CELLS+=("$l-$c-left-light|${LAYOUT[$l]},\"compact\":$cj,\"rightSide\":false,\"scheme\":1")
+  done
+done
 for cell in "${CELLS[@]}"; do
   name="${cell%%|*}"; layout="${cell#*|}"
   [[ -n "$FILTER" && "$name" != *"$FILTER"* ]] && continue
-  hover=false; [[ "$name" == compact-* ]] && hover=true
-  "$Z" "$C/layout.js" - "{${layout},\"wait\":1500}" >/dev/null
+  hover=false; [[ "$name" == *-compact-* ]] && hover=true
+  "$Z" "$C/layout.js" - "{${layout},\"wait\":2500}" >/dev/null
   "$Z" "$C/layout.js" "$OUT/$name-artemis.png" "{\"prefs\":{${MASTERS_ON}},\"hover\":${hover}}" >/dev/null
   "$Z" "$C/layout.js" "$OUT/$name-off.png" "{\"prefs\":{${MASTERS_OFF}},\"hover\":${hover}}" >/dev/null
   "$Z" "$C/sheet.js" - '{"remove":true}' >/dev/null
   "$Z" "$C/layout.js" "$OUT/$name-zen.png" "{\"hover\":${hover}}" >/dev/null
   "$Z" "$C/sheet.js" - '{"remove":false}' >/dev/null
   "$Z" "$C/layout.js" - "{\"prefs\":{${MASTERS_ON}}}" >/dev/null
-  printf '%-26s off-vs-zen: %s\n' "$name" "$(python3 "$PNG" diff "$OUT/$name-off.png" "$OUT/$name-zen.png")"
+  printf '%-30s off-vs-zen: %s\n' "$name" "$(python3 "$PNG" diff "$OUT/$name-off.png" "$OUT/$name-zen.png")"
 done
 # Restore the default layout.
 "$Z" "$C/layout.js" - '{"compact":false,"expanded":true,"scheme":2,"singleToolbar":true,"rightSide":false}' >/dev/null
-# Horizontal tabs are not in the matrix: zen.tabs.vertical=false did not switch
-# Zen 1.24.1b's layout in the test profile, even after a restart (see TESTING.md).
+# Horizontal tabs are not in the matrix: Zen does not offer them (ARCHITECTURE A13).
