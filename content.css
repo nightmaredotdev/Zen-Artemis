@@ -2,7 +2,10 @@
  *
  * Sine applies this sheet to every page, websites included. Every imported
  * file must scope all of its rules to browser-owned URLs with @-moz-document
- * (ARCHITECTURE §9.1), so websites are never affected.
+ * (ARCHITECTURE §9.1), so websites are never affected. One exception:
+ * styles/pages/settings-tokens.css (imported by settings-keyboard.css) holds
+ * only custom properties and accent-color on :root[artemis-settings-page], an
+ * attribute that only Artemis's Settings actors set, on Settings pages.
  */
 
 @import "styles/pages/settings-keyboard.css";

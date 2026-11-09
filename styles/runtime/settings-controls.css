@@ -1,0 +1,112 @@
+/* Artemis Settings controls (artemis.settings.style).
+ *
+ * User-origin sheet, loaded by scripts/settings/page.mjs into the Settings
+ * pages (about:preferences, about:settings, about:addons) only, and only while
+ * the switch is on; removing it restores Firefox's controls. It is a separate,
+ * user-level sheet because the elements below live inside Firefox components'
+ * shadow trees (moz-checkbox, moz-radio, moz-select, moz-toggle, panel-list),
+ * which page (author) sheets cannot reach and which expose no ::part for them.
+ * Document-level user sheets apply inside shadow trees. Selectors use generic
+ * element types only (no Firefox class names), and every value comes from the
+ * --s-* tokens the page sheet defines on the root (styles/pages/
+ * settings-tokens.css), inherited into the shadow trees.
+ *
+ * Fails closed: if an element changes, it keeps Firefox's look.
+ * Windows high contrast (forced colours): nothing here applies. */
+
+@media not (forced-colors: active) {
+  /* ---- Checkboxes and radio buttons ------------------------------------- */
+
+  input:is([type="checkbox"], [type="radio"]) {
+    appearance: none !important;
+    box-sizing: border-box !important;
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    border: 1px solid var(--s-line-strong) !important;
+    border-radius: var(--s-radius-mark) !important;
+    background: var(--s-control) no-repeat center / 12px !important;
+    -moz-context-properties: fill;
+    fill: var(--s-on-accent);
+  }
+
+  input[type="radio"] {
+    border-radius: 50% !important;
+  }
+
+  input:is([type="checkbox"], [type="radio"]):not(:disabled):hover {
+    border-color: color-mix(in srgb, var(--s-ink-tinted) 40%, transparent) !important;
+    background-color: var(--s-hover) !important;
+  }
+
+  input[type="checkbox"]:is(:checked, :indeterminate) {
+    border-color: var(--s-accent) !important;
+    background-color: var(--s-accent) !important;
+    background-image: url("chrome://global/skin/icons/check.svg") !important;
+  }
+
+  input[type="checkbox"]:indeterminate {
+    background-image: linear-gradient(var(--s-on-accent), var(--s-on-accent)) !important;
+    background-size: 8px 2px !important;
+  }
+
+  input[type="radio"]:checked {
+    border-color: var(--s-accent) !important;
+    background: radial-gradient(circle, var(--s-on-accent) 0 3px, var(--s-accent) 3.5px) !important;
+  }
+
+  input:is([type="checkbox"], [type="radio"]):is(:checked, :indeterminate):not(:disabled):hover {
+    border-color: var(--color-accent-primary-hover) !important;
+    background-color: var(--color-accent-primary-hover) !important;
+  }
+
+  input:is([type="checkbox"], [type="radio"]):disabled {
+    opacity: var(--s-disabled-opacity) !important;
+  }
+
+  input:is([type="checkbox"], [type="radio"]):focus-visible {
+    outline: 2px solid var(--s-focus) !important;
+    outline-offset: 2px !important;
+  }
+
+  /* ---- Toggles ---------------------------------------------------------- */
+
+  moz-toggle {
+    --toggle-background-color: var(--s-control) !important;
+    --toggle-background-color-hover: var(--s-hover) !important;
+    --toggle-background-color-active: var(--s-pressed) !important;
+    --toggle-border-color: var(--s-line-strong) !important;
+    --toggle-border-color-hover: color-mix(in srgb, var(--s-ink-tinted) 40%, transparent) !important;
+    --toggle-border-color-active: color-mix(in srgb, var(--s-ink-tinted) 40%, transparent) !important;
+    --toggle-dot-background-color: color-mix(in srgb, var(--s-ink) 55%, transparent) !important;
+    --toggle-dot-background-color-hover: color-mix(in srgb, var(--s-ink) 65%, transparent) !important;
+    --toggle-dot-background-color-active: color-mix(in srgb, var(--s-ink) 65%, transparent) !important;
+    --toggle-background-color-pressed: var(--s-accent) !important;
+    --toggle-background-color-pressed-hover: var(--color-accent-primary-hover) !important;
+    --toggle-background-color-pressed-active: var(--color-accent-primary-active) !important;
+    --toggle-dot-background-color-on-pressed: var(--s-on-accent) !important;
+  }
+
+  /* ---- In-page menus: dropdown lists and three-dot menus ---------------- */
+
+  /* Lists that float over the page (not those hosted in an OS popup) are
+     frosted glass, like Artemis's floating panels. */
+  panel-list:not([inxulpanel]) {
+    --panel-list-background-color: var(--s-menu) !important;
+    --panel-list-border-color: var(--s-line) !important;
+    --panel-list-border-radius: var(--s-radius-card) !important;
+    --panel-list-box-shadow: var(--s-menu-shadow) !important;
+    padding: 4px !important;
+    backdrop-filter: var(--s-filter) !important;
+  }
+
+  panel-item {
+    --panel-item-button-border-radius: var(--s-radius-control) !important;
+  }
+}
+
+@media not (forced-colors: active) and (prefers-reduced-motion: no-preference) {
+  input:is([type="checkbox"], [type="radio"]) {
+    transition: background-color 120ms ease;
+  }
+}

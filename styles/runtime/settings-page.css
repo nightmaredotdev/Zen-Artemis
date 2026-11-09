@@ -18,75 +18,19 @@
  * fails closed: if markup or a token changes, that element keeps Zen's look.
  *   - Zen panes:     hbox.subcategory + groupbox, #search-container
  *   - about:addons:  addon-page-header .sticky-container/.main-search/.main-heading
- *   - Firefox:       design tokens of moz-card, moz-box-*, moz-page-nav,
- *                    moz-input-*, moz-select (no ::part, no shadow internals)
+ *   - Firefox:       design tokens (settings-tokens.css); XUL checkbox/radio
+ *                    (.checkbox-check, .radio-check), menulist popups
+ *                    (menupopup, [_moz-menuactive]); shadow-tree controls are
+ *                    in settings-controls.css
  *   - Sine:          #sineInstallationGroup, #sineInstalledGroup, .sineItem,
  *                    .sineInstallationItem, dialog.sineItemPreferenceDialog,
  *                    .sineItemPreferenceDialogTopBar/Content, .separator-label
  *
  * Windows high contrast (forced colours): nothing here applies. */
 
+@import url("../pages/settings-tokens.css");
+
 @media not (forced-colors: active) {
-
-/* ======================================================================== */
-/* Tokens                                                                    */
-/* ======================================================================== */
-
-:root[artemis-settings-page] {
-  --s-opacity: var(--artemis-s-glass-opacity, 72%);
-  /* Cards let the workspace colours through: medium 72% -> 52%, low 86% -> 76%,
-     solid stays opaque. Never below 45%, so text stays readable at very low
-     custom opacities. */
-  --s-card-opacity: clamp(45%, calc(100% - (100% - var(--artemis-s-glass-opacity, 72%)) * 1.7), 100%);
-  --s-filter: var(--artemis-s-glass-filter, blur(18px) saturate(140%));
-  --s-radius: var(--artemis-s-radius, 10px);
-  --s-radius-card: calc(var(--s-radius) + 4px);
-  --s-radius-control: max(4px, calc(var(--s-radius) - 2px));
-  --s-space: var(--artemis-s-space-factor, 1);
-  --s-pad: calc(16px * var(--s-space));
-  --s-gap: calc(12px * var(--s-space));
-  --s-accent: color-mix(in oklab, var(--artemis-s-accent, var(--zen-primary-color, #7c8aff)) 62%, light-dark(rgb(0 0 0), rgb(255 255 255)));
-
-  /* Surfaces, tinted with the workspace colour like Artemis's glass panels. */
-  --s-tint: var(--artemis-s-zen-primary-color, transparent);
-  --s-base: light-dark(rgb(244 244 247), rgb(22 22 26));
-  --s-raised: color-mix(in srgb, light-dark(rgb(255 255 255), rgb(24 24 29)), var(--s-tint) 8%);
-  --s-card: color-mix(in srgb, var(--s-raised) var(--s-card-opacity), transparent);
-  --s-line: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.09));
-  --s-divider: light-dark(rgb(0 0 0 / 0.06), rgb(255 255 255 / 0.06));
-  --s-control: light-dark(rgb(0 0 0 / 0.04), rgb(255 255 255 / 0.06));
-  --s-hover: light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.07));
-  --s-pressed: light-dark(rgb(0 0 0 / 0.09), rgb(255 255 255 / 0.11));
-  --s-muted: light-dark(rgb(0 0 0 / 0.6), rgb(255 255 255 / 0.6));
-
-  /* Shared card surface and inset row divider. */
-  --s-card-border: 1px solid var(--s-line);
-  --s-divider-image: linear-gradient(var(--s-divider), var(--s-divider));
-
-  /* Firefox design tokens (the public styling surface of moz-* components). */
-  --card-background-color: var(--s-card);
-  --card-border: var(--s-card-border);
-  --card-border-color: var(--s-line);
-  --card-border-radius: var(--s-radius-card);
-  --card-border-radius-compact: var(--s-radius);
-  --card-box-shadow: none;
-  --box-border-color: var(--s-line);
-  --box-border-radius: var(--s-radius);
-  --page-nav-border-color: transparent;
-  --page-nav-button-background-color-selected: var(--s-pressed);
-  --page-nav-button-text-color-selected: currentColor;
-  --page-nav-button-indicator-background-color: var(--s-accent);
-  --page-nav-button-border-radius: var(--s-radius-control);
-  /* Neutral buttons and selects everywhere on the page share one control look;
-     primary (accent) buttons keep Firefox's colours. */
-  --button-background-color: var(--s-control);
-  --button-background-color-hover: var(--s-hover);
-  --button-background-color-active: var(--s-pressed);
-  --button-border-color: var(--s-line);
-  --button-border-radius: var(--s-radius-control);
-  --select-border-color: var(--s-line);
-  --focus-outline-color: var(--s-accent);
-}
 
 /* ======================================================================== */
 /* Page                                                                      */
@@ -152,28 +96,28 @@
   border-radius: var(--s-radius-card);
   background: var(--s-card);
   --page-nav-margin-block-start: 0;
+  /* moz-page-nav defines its button tokens on its own host, so they are set
+     here: the selected page is workspace-tinted glass, no indicator bar. */
+  --page-nav-button-background-color-hover: var(--s-hover) !important;
+  --page-nav-button-background-color-active: var(--s-pressed) !important;
+  --page-nav-button-background-color-selected: var(--s-selected) !important;
+  --page-nav-button-text-color-selected: currentColor !important;
+  --page-nav-button-indicator-background-color: transparent !important;
+  --page-nav-button-border-radius: var(--s-radius-control) !important;
+  --page-nav-hr-background-color: var(--s-divider) !important;
 }
 
 /* ======================================================================== */
-/* Inputs (Firefox moz-input-* tokens, set on the hosts so they win)         */
+/* Search fields                                                             */
 /* ======================================================================== */
 
-:root[artemis-settings-page] :is(moz-input-search, moz-input-text) {
-  --input-border: 1px solid var(--s-line);
-  --input-border-radius: var(--s-radius-card);
-  --input-background-color: var(--s-card);
+/* Page search fields are the larger, card-shaped search pills. Buttons,
+   selects, toggles and menus take the shared tokens (settings-tokens.css). */
+:root[artemis-settings-page] :is(moz-input-search, #searchInput) {
+  --input-border: 1px solid var(--s-line) !important;
+  --input-border-radius: var(--s-radius-card) !important;
+  --input-background-color: var(--s-card) !important;
   --input-min-height: 40px;
-}
-
-/* Buttons and selects redefine the button tokens on their own host, so the
-   shared control look is set on the hosts too (primary buttons untouched). */
-:root[artemis-settings-page] :is(moz-button:not([type~="primary"], [type~="destructive"]), moz-select, moz-box-button) {
-  --button-background-color: var(--s-control);
-  --button-background-color-hover: var(--s-hover);
-  --button-background-color-active: var(--s-pressed);
-  --button-border-color: var(--s-line);
-  --button-border-radius: var(--s-radius-control);
-  --select-border-color: var(--s-line);
 }
 
 /* ======================================================================== */
@@ -211,16 +155,39 @@
   padding-top: calc(6px * var(--s-space)) !important;
 }
 
-/* Controls inside Zen's cards: one shared look. */
-:root[artemis-settings-page] groupbox :is(button, menulist):not(.sineItemConfigureButton, .sineItemHomepageButton, [class*="color-picker"]) {
+/* ======================================================================== */
+/* Controls in light DOM (Zen's and Sine's XUL and HTML controls)            */
+/* ======================================================================== */
+
+/* Buttons and dropdowns in Zen's cards, on Sine's page (including its
+   settings, Configure and Homepage icon buttons) and in every mod's settings
+   dialog: one shared look and the same states as Firefox's components. */
+:root[artemis-settings-page] groupbox :is(button, menulist, select):not([class*="color-picker"]) {
   border: 1px solid var(--s-line) !important;
   border-radius: var(--s-radius-control) !important;
   background-color: var(--s-control) !important;
   color: inherit !important;
+  box-shadow: none !important;
 }
 
-:root[artemis-settings-page] groupbox :is(button, menulist):not(.sineItemConfigureButton, .sineItemHomepageButton, [class*="color-picker"]):hover:not([disabled]) {
+:root[artemis-settings-page] groupbox :is(button, menulist, select):not([class*="color-picker"], [disabled], :disabled):hover {
+  border-color: var(--s-line-hover) !important;
   background-color: var(--s-hover) !important;
+}
+
+:root[artemis-settings-page] groupbox :is(button, menulist, select):not([class*="color-picker"], [disabled], :disabled):is(:active, [open]) {
+  background-color: var(--s-pressed) !important;
+}
+
+:root[artemis-settings-page] groupbox :is(button, menulist, select):is([disabled], :disabled) {
+  opacity: var(--s-disabled-opacity);
+}
+
+/* Sine's icon buttons (settings, Configure, Homepage, refresh, readme): the
+   icon stays Sine's, centred on the shared surface. */
+:root[artemis-settings-page] groupbox :is(.sineItemConfigureButton, .sineItemHomepageButton, .sineMarketplaceOpenButton) {
+  background-position: center !important;
+  background-repeat: no-repeat !important;
 }
 
 :root[artemis-settings-page] groupbox input:is([type="text"], [type="number"], [type="search"], :not([type])) {
@@ -228,6 +195,73 @@
   border-radius: var(--s-radius-control) !important;
   background-color: var(--s-control) !important;
   color: inherit !important;
+}
+
+:root[artemis-settings-page] groupbox input:is([type="text"], [type="number"], [type="search"], :not([type])):focus-visible {
+  border-color: var(--s-selected-line) !important;
+}
+
+/* XUL checkboxes and radio buttons: the same marks as Firefox's components
+   get from settings-controls.css. */
+:root[artemis-settings-page] :is(.checkbox-check, .radio-check) {
+  appearance: none !important;
+  box-sizing: border-box;
+  width: 16px !important;
+  height: 16px !important;
+  border: 1px solid var(--s-line-strong) !important;
+  border-radius: var(--s-radius-mark) !important;
+  background: var(--s-control) no-repeat center / 12px !important;
+  list-style-image: none !important;
+  -moz-context-properties: fill;
+  fill: var(--s-on-accent);
+}
+
+:root[artemis-settings-page] .radio-check {
+  border-radius: 50% !important;
+}
+
+:root[artemis-settings-page] :is(checkbox, radio):not([disabled]):hover > :is(.checkbox-check, .radio-check) {
+  border-color: color-mix(in srgb, var(--s-ink-tinted) 40%, transparent) !important;
+  background-color: var(--s-hover) !important;
+}
+
+:root[artemis-settings-page] checkbox[checked] > .checkbox-check {
+  border-color: var(--s-accent) !important;
+  background-color: var(--s-accent) !important;
+  background-image: url("chrome://global/skin/icons/check.svg") !important;
+}
+
+:root[artemis-settings-page] radio[selected] > .radio-check {
+  border-color: var(--s-accent) !important;
+  background: radial-gradient(circle, var(--s-on-accent) 0 3px, var(--s-accent) 3.5px) !important;
+}
+
+:root[artemis-settings-page] :is(checkbox[checked], radio[selected]):not([disabled]):hover > :is(.checkbox-check, .radio-check) {
+  border-color: var(--color-accent-primary-hover) !important;
+  background-color: var(--color-accent-primary-hover) !important;
+}
+
+:root[artemis-settings-page] :is(checkbox, radio)[disabled] > :is(.checkbox-check, .radio-check) {
+  opacity: var(--s-disabled-opacity);
+}
+
+/* Dropdown lists of XUL menulists. They open as OS popups, which cannot blur
+   the page, so they use the solid raised surface with the workspace tint. */
+:root[artemis-settings-page] menupopup {
+  --panel-background-color: var(--s-menu-solid) !important;
+  --panel-border-color: var(--s-line) !important;
+  --panel-border-radius: var(--s-radius-card) !important;
+  --panel-padding: 4px !important;
+  --menuitem-border-radius: var(--s-radius-control) !important;
+}
+
+:root[artemis-settings-page] menupopup > :is(menuitem, menu)[_moz-menuactive]:not([disabled]) {
+  background-color: color-mix(in srgb, var(--s-ink) 8%, var(--s-menu-solid)) !important;
+  color: inherit !important;
+}
+
+:root[artemis-settings-page] menupopup > menuitem:is([selected], [checked]) {
+  background-color: color-mix(in srgb, var(--s-accent) 16%, var(--s-menu-solid)) !important;
 }
 
 /* Inner surfaces Zen draws inside a card (theme builder, compact-mode previews). */
@@ -469,7 +503,7 @@
   outline: none;
 }
 
-:root[artemis-settings-page] .artemis-enhanced .artemis-search:focus-visible { border-color: var(--s-accent); }
+:root[artemis-settings-page] .artemis-enhanced .artemis-search:focus-visible { border-color: var(--s-selected-line) !important; }
 :root[artemis-settings-page] .artemis-enhanced .artemis-search::placeholder { color: var(--s-muted); opacity: 1; }
 
 :root[artemis-settings-page] .artemis-enhanced .artemis-section-header {
@@ -534,13 +568,21 @@
 /* Shared focus ring and motion                                              */
 /* ======================================================================== */
 
-:root[artemis-settings-page] :is(groupbox, dialog.sineItemPreferenceDialog) :is(menulist, button, checkbox, input, select):focus-visible {
-  outline: 2px solid var(--s-accent) !important;
-  outline-offset: 1px;
+/* A soft accent ring, the same as Firefox's components get from
+   --focus-outline-color. Checkboxes and radios ring their mark. */
+:root[artemis-settings-page] :is(groupbox, dialog.sineItemPreferenceDialog) :is(menulist, button, input, select):focus-visible,
+:root[artemis-settings-page] :is(checkbox, radio):focus-visible > :is(.checkbox-check, .radio-check) {
+  outline: 2px solid var(--s-focus) !important;
+  outline-offset: 2px !important;
+}
+
+:root[artemis-settings-page] :is(checkbox, radio):focus-visible {
+  outline: none !important;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  :root[artemis-settings-page] :is(groupbox, dialog.sineItemPreferenceDialog) :is(menulist, button) {
+  :root[artemis-settings-page] :is(groupbox, dialog.sineItemPreferenceDialog) :is(menulist, button, select),
+  :root[artemis-settings-page] :is(.checkbox-check, .radio-check) {
     transition: background-color 120ms ease;
   }
 }

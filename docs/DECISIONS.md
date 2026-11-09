@@ -9,6 +9,46 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-09: Settings visual consistency pass
+
+The owner found controls that still looked like Zen's or Firefox's: menus and buttons
+(the extension three-dot menu, Sine's settings, Configure and Homepage buttons, Make
+default, toolbar-icon menus), form controls (dropdowns and their lists, checkboxes, radio
+buttons, the System/Light/Dark picker, Add search engine), a neon focus ring on the
+Settings search, a grey selected navigation item, grey borders, and Zen's look flashing
+before Artemis's on Keyboard Shortcuts and Extensions. Decisions, within the approved
+scope and with no new settings (ARCHITECTURE §7.3):
+
+- **One token set.** `styles/pages/settings-tokens.css` defines the Settings tokens once
+  and maps Firefox's design tokens onto them, for all four page types. Zen's `!important`
+  tokens are outranked by specificity. Tokens a component redefines on its own host
+  (navigation, toggles, in-page menus) are set on that host.
+- **Look.** Neutral controls: faint fill, hairline, one step per state. Selected and
+  primary: accent-tinted glass, never solid (also the navigation, without its indicator
+  bar). Marks: lifted accent. Focus: accent at 55%. Hairlines lean slightly toward the
+  accent instead of neutral grey. In-page menus are frosted; OS popups solid with the
+  same tint.
+- **Controls inside shadow trees** (component checkboxes and radios, `panel-list`) are
+  styled by a separate user sheet loaded into the same pages, since user sheets apply in
+  shadow trees and page sheets do not; generic element types only. No `::part`, no
+  Firefox class names, no new window actor.
+- **Browser menus.** The existing `artemis.popups.style` gets the same tinted surface,
+  item states and panel buttons, so toolbar menus and native `<select>` dropdowns match.
+- **Loading.** Settings' page styling moved from Sine's script to the window actor (the
+  same one as Extensions and Themes, renamed `ArtemisSettingsPage`), and both actors act
+  when the root element is created, before the first paint. Keyboard Shortcuts reads the
+  last published values synchronously from shared data. Settings (about 500 ms) and
+  Keyboard Shortcuts (about 180 ms) no longer flash. **Limitation:** Extensions and Themes
+  still shows Firefox's default canvas colour for about 30 ms before its root element
+  exists; fixing that would need a browser colour preference, which Artemis does not
+  write.
+- **Bug found and fixed:** after a same-tab navigation between two parent-process
+  Settings pages, the old page's teardown removed the new page's sheets (`windowUtils`
+  acts on the tab's current document). Teardown now leaves them unless its document is
+  still current; `tools/zen/checks/settings-navigation.js` covers it.
+
+---
+
 ## 2026-11-09: Settings styling fixes after owner review
 
 The owner found three problems: the background was not genuinely transparent, card

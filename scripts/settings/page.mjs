@@ -8,7 +8,10 @@
  * an actor too.
  *
  * While the switch is on, attachPageStyle():
- *   - loads styles/runtime/settings-page.css as an author sheet;
+ *   - loads styles/runtime/settings-page.css as an author sheet (it imports
+ *     the shared tokens, settings-tokens.css) and settings-controls.css as a
+ *     user sheet (controls inside Firefox components' shadow trees, which
+ *     author sheets cannot reach);
  *   - mirrors the browser window's resolved Artemis glass tokens and Zen's
  *     workspace background (the gradient Zen paints behind the window, aligned
  *     to the page's place in the window) onto the page root as --artemis-s-*
@@ -19,12 +22,17 @@
  *   - marks where each card starts and ends in other mods' settings dialogs
  *     ([artemis-card]), from the rows that are actually visible, so every card
  *     keeps its rounded corners whatever rows a mod hides.
+ * It also publishes the values for Keyboard Shortcuts (publishKeyboardVars),
+ * so that page can apply them before its first paint.
  * Turning the switch off, disabling Artemis or unloading the page removes all
  * of it, which restores Zen's native page. Every step is guarded: if anything
  * fails, the page keeps Zen's look.
  */
 
 const SHEET = "chrome://sine/content/Artemis/styles/runtime/settings-page.css";
+const CONTROLS_SHEET = "chrome://sine/content/Artemis/styles/runtime/settings-controls.css";
+// Shared with the Keyboard Shortcuts actor child (content process).
+export const KEYBOARD_VARS_KEY = "Artemis:settingsKeyboardVars";
 export const SETTINGS_PREF = "artemis.settings.style";
 export const SEE_THROUGH_PREF = "browser.tabs.allow_transparent_browser";
 // Window tokens mirrored as --artemis-s-<name>.
@@ -163,6 +171,29 @@ export function watchWindow(chromeWin, embedder, onChange) {
   };
 }
 
+/**
+ * Keyboard Shortcuts runs in another process and would otherwise get these
+ * values only after a message round trip, after its first paint (a visible
+ * flash of the plain colour). The latest values are kept in shared data,
+ * which its actor child reads synchronously when the page's document is
+ * created; the live values follow over the actor as before. `embedder` is
+ * the browser element the page opens in (the selected browser when the page
+ * is opened from Settings or the address bar), so the copy lines up.
+ */
+export function storeKeyboardVars(data) {
+  try {
+    Services.ppmm.sharedData.set(KEYBOARD_VARS_KEY, data);
+    Services.ppmm.sharedData.flush();
+  } catch {}
+}
+
+export function publishKeyboardVars(chromeWin, embedder) {
+  try {
+    const active = settingsEnabled();
+    storeKeyboardVars({ active, vars: active ? readWindowVars(chromeWin, embedder) : {} });
+  } catch {}
+}
+
 /* ---- Card edges in other mods' settings dialogs ------------------------- */
 
 const CONTENT = ".sineItemPreferenceDialogContent:not(.artemis-enhanced)";
@@ -218,6 +249,7 @@ export function attachPageStyle(window) {
   const root = doc.documentElement;
   const wu = window.windowUtils;
   const sheetURI = Services.io.newURI(SHEET);
+  const controlsURI = Services.io.newURI(CONTROLS_SHEET);
   const chromeWin = window.browsingContext?.topChromeWindow ?? null;
   const embedder = window.browsingContext?.embedderElement ?? null;
   const mirrored = new Set();
@@ -239,6 +271,7 @@ export function attachPageStyle(window) {
         }
       }
       root.toggleAttribute("artemis-see-through", Services.prefs.getBoolPref(SEE_THROUGH_PREF, false));
+      if (embedder) publishKeyboardVars(chromeWin, embedder);
     } catch (err) {
       console.error("[Artemis] Settings page: could not read the window's values:", err);
     }
@@ -262,6 +295,12 @@ export function attachPageStyle(window) {
     } catch (err) {
       console.error("[Artemis] Settings page styling unavailable:", err);
       return;
+    }
+    try {
+      wu.loadSheet(controlsURI, wu.USER_SHEET);
+    } catch (err) {
+      // Controls inside components keep Firefox's look; the rest still applies.
+      console.error("[Artemis] Settings page controls styling unavailable:", err);
     }
     active = true;
     root.setAttribute("artemis-settings-page", "");
@@ -292,9 +331,20 @@ export function attachPageStyle(window) {
     mirrored.clear();
     root.removeAttribute("artemis-settings-page");
     root.removeAttribute("artemis-see-through");
+    // windowUtils acts on whatever document the tab shows now. After a
+    // navigation to another Settings page in the same tab (both are
+    // parent-process pages) that is the new page, which has its own sheets;
+    // this page's document is going away with its sheets, so leave them.
+    let current = false;
     try {
-      wu.removeSheet(sheetURI, wu.AUTHOR_SHEET);
+      current = window.document === doc && window.windowGlobalChild?.isCurrentGlobal === true;
     } catch {}
+    if (!current) return;
+    for (const [uri, type] of [[controlsURI, wu.USER_SHEET], [sheetURI, wu.AUTHOR_SHEET]]) {
+      try {
+        wu.removeSheet(uri, type);
+      } catch {}
+    }
   }
 
   const switchObserver = { observe: () => (settingsEnabled() ? activate() : deactivate()) };

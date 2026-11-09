@@ -1,15 +1,21 @@
 /* artemis.popups.style: Artemis menus, context menus and panels (area master for popups.*).
  * Popups are separate OS widgets, so glass blur of the page is not possible;
- * they use a raised Artemis surface instead. */
+ * they use a raised Artemis surface, tinted with the workspace colour like the
+ * Settings pages' menus, with the same item states (hover, pressed, checked,
+ * disabled) and control look for buttons inside panels. Native <select>
+ * dropdowns of pages and Settings open in the browser's own popup, so they
+ * follow this too. */
 
 @media -moz-pref("artemis.popups.style") {
   menupopup,
   panel {
-    --panel-background: light-dark(rgb(252 252 253), rgb(33 33 38)) !important;
-    --panel-background-color: light-dark(rgb(252 252 253), rgb(33 33 38)) !important;
-    --arrowpanel-background: light-dark(rgb(252 252 253), rgb(33 33 38)) !important;
+    --artemis-popup-surface: color-mix(in srgb, light-dark(rgb(252 252 253), rgb(32 32 38)), var(--zen-primary-color, transparent) 8%);
+    --panel-background: var(--artemis-popup-surface) !important;
+    --panel-background-color: var(--artemis-popup-surface) !important;
+    --arrowpanel-background: var(--artemis-popup-surface) !important;
     --panel-border-color: var(--artemis-hairline) !important;
     --arrowpanel-border-color: var(--artemis-hairline) !important;
+    --panel-separator-color: var(--artemis-hairline) !important;
     --panel-border-radius: var(--artemis-radius-outer) !important;
     --arrowpanel-border-radius: var(--artemis-radius-outer) !important;
     --menuitem-border-radius: var(--artemis-radius-inner) !important;
@@ -18,5 +24,63 @@
     --panel-item-hover-bgcolor: var(--artemis-hover) !important;
     --panel-item-active-bgcolor: var(--artemis-pressed) !important;
     --panel-shadow: 0 8px 28px light-dark(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.5)) !important;
+    /* Buttons inside panels (footers, extension and site panels). */
+    --button-background-color: var(--artemis-hover) !important;
+    --button-background-color-hover: var(--artemis-pressed) !important;
+    --button-background-color-active: color-mix(in srgb, currentColor 14%, transparent) !important;
+    --button-border-color: var(--artemis-hairline) !important;
+    --button-background-color-primary: var(--artemis-selected) !important;
+    --button-background-color-primary-hover: color-mix(in srgb, var(--artemis-accent-ui) 22%, transparent) !important;
+    --button-background-color-primary-active: color-mix(in srgb, var(--artemis-accent-ui) 28%, transparent) !important;
+    --button-text-color-primary: currentColor !important;
+    --button-border-color-primary: color-mix(in srgb, var(--artemis-accent-ui) 40%, transparent) !important;
+    --focus-outline-color: color-mix(in srgb, var(--artemis-accent-ui) 55%, transparent) !important;
+  }
+
+  /* Menu items: the same states as the Settings menus. */
+  menupopup :is(menu, menuitem)[_moz-menuactive]:not([disabled]) {
+    background-color: var(--artemis-hover) !important;
+    color: inherit !important;
+  }
+
+  menupopup :is(menu, menuitem)[_moz-menuactive][disabled] {
+    background-color: transparent !important;
+  }
+
+  /* Dialog-style buttons in panels (Zen gives them its own colours). */
+  panel .footer-button {
+    border: 1px solid var(--artemis-hairline) !important;
+    border-radius: var(--artemis-radius-inner) !important;
+    background-color: var(--artemis-hover) !important;
+    color: inherit !important;
+  }
+
+  panel .footer-button:not([disabled]):hover {
+    background-color: var(--artemis-pressed) !important;
+  }
+
+  panel .footer-button:is([default], .primary) {
+    border-color: color-mix(in srgb, var(--artemis-accent-ui) 40%, transparent) !important;
+    background-color: var(--artemis-selected) !important;
+  }
+
+  panel .footer-button:is([default], .primary):not([disabled]):hover {
+    background-color: color-mix(in srgb, var(--artemis-accent-ui) 22%, transparent) !important;
+  }
+
+  panel .footer-button[disabled] {
+    opacity: 0.45;
+  }
+
+  /* Highlighted banners in the app menu (sign-in promo, updates, add-ons): accent-tinted
+     glass instead of a solid accent fill. */
+  panel :is(.panel-banner-item, .addon-banner-item, #appMenu-fxa-sign-in-promo) {
+    background-color: var(--artemis-selected) !important;
+    color: inherit !important;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--artemis-accent-ui) 30%, transparent) !important;
+  }
+
+  panel :is(.panel-banner-item, .addon-banner-item, #appMenu-fxa-sign-in-promo):hover {
+    background-color: color-mix(in srgb, var(--artemis-accent-ui) 22%, transparent) !important;
   }
 }

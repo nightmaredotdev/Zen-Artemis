@@ -14,9 +14,18 @@
  * the named transparency and radius steps are used and the background is
  * Zen's plain window colour.
  *
+ * Tokens: the shared Settings tokens (styles/pages/settings-tokens.css,
+ * imported below) apply once the actor has marked the page
+ * [artemis-settings-page] (an attribute only Artemis sets, only on its
+ * Settings pages), so buttons, inputs, focus rings and borders match the
+ * other Settings pages exactly. The rules below are the no-JS fallback and the
+ * page-specific layout.
+ *
  * Fragile dependencies: Firefox design tokens (--card-*, --box-*, --input-*,
  * --button-*), .customkeys-sidebar and .main-container. If they change, the
  * page keeps Firefox's look. */
+
+@import url("settings-tokens.css") -moz-pref("artemis.settings.style");
 
 @-moz-document url-prefix("about:keyboard") {
   /* Fallbacks for the no-JS case (the window-side tokens are not visible here). */

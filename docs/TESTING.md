@@ -87,7 +87,9 @@ MOZ_REMOTE_ALLOW_SYSTEM_ACCESS=1 WSLENV=MOZ_REMOTE_ALLOW_SYSTEM_ACCESS \
 | `checks/multiwindow.js` | Second window: instances, live sync, native restoration, closing (opens a window: free desktop only). Ran successfully on 2026-11-08 |
 | `settings-native.sh <dir>` | Settings experience: for every Settings page (16 `about:preferences` panes, two `about:addons` views, `about:keyboard`) the switch-off page is pixel-identical to Artemis disabled through Sine, and the switch-on page differs; `about:about`, `about:support` and a website are identical in all states. Verifies each page switch and that Artemis is re-enabled |
 | `checks/settings-pane.js` | Shows one Settings page (`paneXxx`, `about:addons#<view>` or a URL), optional `scroll` / `search`, and reports what is shown and the page rectangle |
-| `checks/settings-style.js` | Settings page styling switch: live on/off and cleanup, other prefs untouched, see-through marking with Zen's transparent-browser pref, forced colours, live token mirroring |
+| `checks/settings-style.js` | Settings page styling switch: live on/off and cleanup, other prefs untouched, see-through marking with Zen's transparent-browser pref, forced colours, live token mirroring; controls inside Firefox components (user sheet) restyled only while on and not in forced colours; shared focus and navigation tokens applied and removed |
+| `checks/settings-navigation.js` | Navigates one tab through Settings, Extensions and Themes and Keyboard Shortcuts and back; every page must end up marked with both Artemis sheets present (a page's teardown must not remove the next page's sheets) |
+| `checks/settings-load.js` | Loading transition: samples the composited window every frame while a Settings page opens (new tab, or `{"from","mode":"current"}` for same-tab navigation) and lists each colour change with the page's state (`no-root`, `loading`, `styled`). Use a themed workspace so Zen's colour and Artemis's differ |
 | `checks/settings-corners.js` | Card corners on the Settings page: every visible card (Sine mod dialogs from their visible rows, Artemis's sections, Zen heading + groupbox cards, Firefox cards) has rounded top corners on its first and rounded bottom corners on its last element, nothing rounded in between. `{"dialogs":true}` opens every mod's dialog in turn |
 | `checks/toggle-mod.js` `{"id":"Nebula"}` | Toggles another mod through Sine (the report stays about Artemis) |
 | Test fixtures (test profile only) | `artemis-test-ext/` (a minimal temporary extension: card, details view, a shortcut), installed per session with `AddonManager.installTemporaryAddon`; the Nebula mod (copied from `references/`) for compatibility runs; workspace themes set through `gZenThemePicker` (violet three-colour, warm two-colour, teal single-colour) |
@@ -451,3 +453,28 @@ visible test window with the owner's confirmation that the desktop was free.
 Known interaction: with Nebula enabled, Nebula's user-level `!important` background for
 Zen's section bodies outranks page styles, so a Zen card's heading band is slightly
 lighter than its body.
+
+### Settings visual consistency pass: 2026-11-09
+
+Owner-reported native-looking controls, focus, selection, borders and loading flashes
+(DECISIONS 2026-11-09). Automated checks headless; visual review and performance in a
+visible test window with the owner's confirmation that the desktop was free (every
+capture verified the test browser's process id).
+
+| Check | Result |
+|---|---|
+| `check.py`, `git diff --check` | 0 errors, 0 warnings |
+| Switch (`settings-style.js`, extended) | On: component checkboxes restyled, Artemis's focus and navigation tokens; off and forced colours: Firefox's controls and tokens back; other prefs unchanged. 0 failures |
+| Same-tab navigation (`settings-navigation.js`, new) | Settings → Extensions → Settings → Keyboard Shortcuts → Extensions → Settings: every page marked with both sheets. Found and fixed a bug: the old page's teardown removed the new page's sheets |
+| Native restoration (`settings-native.sh`, violet theme) | 20/20 Settings pages identical to Artemis disabled with the switch off; styled when on; 3 unrelated pages identical in all states |
+| Disable / re-enable Artemis | All pages: attribute, mirrored values, both sheets and the Keyboard Shortcuts shared values removed; restored on re-enable |
+| Corners (`settings-corners.js`) | All dialogs and Sine's page, Look and Feel, Tab Management, Search, Privacy, Home: 0 problems |
+| Browser window | Feature independence, master overrides, value preservation pass; matrix 18/18 at 0 differing pixels |
+| Loading (`settings-load.js`, violet theme, 3 runs each) | Before: Settings showed Zen's look for about 500 ms, Keyboard Shortcuts its plain colour for about 180 ms, Extensions Zen's colour for about 80 ms. After: Settings and Keyboard Shortcuts go from the empty tab straight to Artemis's look, also when navigating between Settings pages; Extensions shows Firefox's default canvas colour for about 30 ms before its root element exists (documented limitation) |
+| **Visual review** | Dark (violet) and light (warm): every pane, Sine's page, Artemis's, Nebula-style and zia-style dialogs, Extensions list and shortcuts, Keyboard Shortcuts. Open states (real captures): dialog dropdown list (OS popup, hover), search-engine dropdown and extension three-dot menu (frosted, blurred), context menu and app menu (tinted; the app menu's sign-in promo was still a solid accent fill and was fixed). Solid, default, custom 10% and see-through. Focus: soft ring on the Settings search. Navigation: tinted selection without the indicator bar |
+| Performance (visible window, 144 Hz) | Scrolling Privacy for 4 s, twice per state: p50 6.9 ms, p99 7.1 ms, max 7.2–7.4 ms on vs 7.1–7.2 ms off, no frame over 25 ms |
+
+Not covered: native `<select>` lists (for example Home's New windows) could not be opened
+from a script in this build (synthetic click and keyboard both fail, and native input
+would move the owner's cursor). They open in the browser's own popup, which uses the same
+`artemis.popups.style` surface verified on the context and app menus.

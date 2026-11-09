@@ -5,7 +5,7 @@
  * while the Settings page styling switch is off.
  */
 
-import { readWindowVars, watchWindow, settingsEnabled } from "chrome://sine/content/Artemis/scripts/settings/page.mjs";
+import { readWindowVars, watchWindow, settingsEnabled, storeKeyboardVars } from "chrome://sine/content/Artemis/scripts/settings/page.mjs";
 
 export class ArtemisKeyboardParent extends JSWindowActorParent {
   #stop = null;
@@ -36,6 +36,8 @@ export class ArtemisKeyboardParent extends JSWindowActorParent {
       const embedder = this.browsingContext?.top?.embedderElement;
       const vars = active && embedder ? readWindowVars(embedder.ownerDocument.defaultView, embedder) : {};
       this.sendAsyncMessage("ArtemisKeyboard:vars", { active, vars });
+      // The next Keyboard Shortcuts page opens with these values.
+      storeKeyboardVars({ active, vars });
     } catch (err) {
       // The page may be going away; nothing to update.
     }

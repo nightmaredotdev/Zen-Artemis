@@ -18,9 +18,23 @@ All notable changes to Artemis are documented here. Artemis uses
 - **Settings page styling** switch (Settings page section, on by default). Off restores
   all of these pages to Zen's own look and changes no other setting.
 
+- **Matching controls everywhere in Settings.** Buttons, dropdowns and their lists,
+  checkboxes, radio buttons, switches, the System/Light/Dark picker and the three-dot
+  menus share one restrained glass look on every Settings page, with consistent hover,
+  pressed, selected, disabled and focus states, in light and dark mode and in your
+  workspace's colour. This includes Sine's settings, Configure and Homepage buttons and
+  every mod's settings window.
+
 ### Changed
 - Artemis's own settings window uses the same cards as every other mod's, with a fixed
   width and a list that scrolls below its title bar.
+- The selected page in the Settings navigation is tinted with your workspace colour
+  instead of grey; focus rings are softer; borders are subtler and follow your workspace
+  colour.
+- Menus, context menus and toolbar panels (Menus and popups) use the same tinted surface
+  and item states as the Settings pages, including drop-down lists of pages.
+- Settings and Keyboard Shortcuts open directly in Artemis's look, without showing Zen's
+  look first.
 
 ### Notes
 - Other mods keep their own settings layout and get no Artemis controls; inside a card,
@@ -29,6 +43,8 @@ All notable changes to Artemis are documented here. Artemis uses
   are not restyled. Windows high-contrast mode turns the styling off.
 - These pages need Sine's script support; without it only Keyboard Shortcuts is styled
   (with the named transparency steps and Zen's plain window colour).
+- Extensions and Themes can still show Firefox's plain dark colour for a moment (about
+  two frames) while it loads, before the page exists to be styled.
 - With another theme that styles these pages (such as Nebula) enabled at the same time,
   that theme's own rules can take precedence in places.
 

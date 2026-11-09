@@ -1,0 +1,167 @@
+/* Artemis Settings design tokens (artemis.settings.style).
+ *
+ * One token set for every page of the Settings experience. Imported by
+ * styles/runtime/settings-page.css (author sheet: Settings, Sine and mods'
+ * settings, Extensions and Themes) and by styles/pages/settings-keyboard.css
+ * (Sine's content sheet: Keyboard Shortcuts). Applies only while Artemis has
+ * marked the page root [artemis-settings-page], which it does only on those
+ * pages and only while the switch is on.
+ *
+ * Two layers:
+ *   1. --s-* : Artemis's values, from the window's mirrored --artemis-s-*
+ *      tokens (the keyboard sheet provides --s-glass-fallback and
+ *      --s-radius-fallback for the no-JS case).
+ *   2. Firefox design tokens (--button-*, --border-color*, --focus-outline-*,
+ *      --panel-*, ...), the public styling surface of Firefox's moz-*
+ *      components. They inherit into the components' shadow trees, so one set
+ *      restyles buttons, selects, toggles, menus, pickers and inputs on every
+ *      page. Zen defines several of them !important on :root; these win by
+ *      specificity (author origin) or origin (user origin, about:keyboard).
+ *      Component tokens that a component redefines on its own host (page
+ *      navigation, toggles, in-page menus) are set on those hosts instead
+ *      (settings-page.css, settings-controls.css).
+ *
+ * Windows high contrast (forced colours): nothing here applies. */
+
+@media not (forced-colors: active) {
+  :root[artemis-settings-page] {
+    /* ---- Artemis values ------------------------------------------------ */
+    --s-glass: var(--artemis-s-glass-opacity, var(--s-glass-fallback, 72%));
+    /* Cards let the workspace colours through: medium 72% -> 52%, low 86% ->
+       76%, solid stays opaque; never below 45%, so text stays readable. */
+    --s-card-opacity: clamp(45%, calc(100% - (100% - var(--s-glass)) * 1.7), 100%);
+    --s-filter: var(--artemis-s-glass-filter, blur(18px) saturate(140%));
+    --s-radius: var(--artemis-s-radius, var(--s-radius-fallback, 10px));
+    --s-radius-card: calc(var(--s-radius) + 4px);
+    --s-radius-control: max(4px, calc(var(--s-radius) - 2px));
+    --s-radius-mark: max(3px, calc(var(--s-radius) - 6px));
+    --s-space: var(--artemis-s-space-factor, 1);
+    --s-pad: calc(16px * var(--s-space));
+    --s-gap: calc(12px * var(--s-space));
+
+    /* Colour. The accent is lifted toward the text colour so it reads on any
+       surface (Zen's default accent can be nearly black in dark mode). */
+    --s-ink: light-dark(rgb(0 0 0), rgb(255 255 255));
+    --s-accent: color-mix(in oklab, var(--artemis-s-accent, var(--artemis-s-zen-primary-color, #7c8aff)) 62%, var(--s-ink));
+    --s-on-accent: light-dark(rgb(255 255 255), rgb(18 18 22));
+    --s-tint: var(--artemis-s-zen-primary-color, transparent);
+    --s-base: light-dark(rgb(244 244 247), rgb(22 22 26));
+    --s-raised: color-mix(in srgb, light-dark(rgb(255 255 255), rgb(24 24 29)), var(--s-tint) 8%);
+    --s-card: color-mix(in srgb, var(--s-raised) var(--s-card-opacity), transparent);
+
+    /* Lines are hairlines of the text colour leaning toward the accent, so
+       borders belong to the workspace instead of reading as neutral grey. */
+    --s-ink-tinted: color-mix(in srgb, var(--s-ink), var(--s-accent) 30%);
+    --s-line: color-mix(in srgb, var(--s-ink-tinted) 9%, transparent);
+    --s-line-hover: color-mix(in srgb, var(--s-ink-tinted) 16%, transparent);
+    --s-line-strong: color-mix(in srgb, var(--s-ink-tinted) 28%, transparent);
+    --s-divider: color-mix(in srgb, var(--s-ink-tinted) 6%, transparent);
+
+    /* Interactive states, shared by every control on every page. */
+    --s-control: light-dark(rgb(0 0 0 / 0.04), rgb(255 255 255 / 0.06));
+    --s-hover: light-dark(rgb(0 0 0 / 0.06), rgb(255 255 255 / 0.08));
+    --s-pressed: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.12));
+    --s-selected: color-mix(in srgb, var(--s-accent) 16%, transparent);
+    --s-selected-hover: color-mix(in srgb, var(--s-accent) 22%, transparent);
+    --s-selected-pressed: color-mix(in srgb, var(--s-accent) 28%, transparent);
+    --s-selected-line: color-mix(in srgb, var(--s-accent) 40%, transparent);
+    --s-focus: color-mix(in srgb, var(--s-accent) 55%, transparent);
+    --s-muted: light-dark(rgb(0 0 0 / 0.6), rgb(255 255 255 / 0.6));
+    --s-disabled-opacity: 0.45;
+
+    /* Menus. In-page lists (panel-list) float as frosted glass; OS popups
+       (XUL menupopup) cannot blur what is behind them, so they use a solid
+       raised surface with the same tint. */
+    --s-menu: color-mix(in srgb, var(--s-raised) 90%, transparent);
+    --s-menu-solid: color-mix(in srgb, light-dark(rgb(252 252 253), rgb(32 32 38)), var(--s-tint) 8%);
+    --s-menu-shadow: 0 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.3)), 0 8px 28px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.45));
+
+    --s-card-border: 1px solid var(--s-line);
+    --s-divider-image: linear-gradient(var(--s-divider), var(--s-divider));
+
+    accent-color: var(--s-accent);
+
+    /* ---- Firefox design tokens ------------------------------------------ */
+    --border-color: var(--s-line) !important;
+    --border-color-deemphasized: var(--s-divider) !important;
+    --border-color-interactive: var(--s-line) !important;
+    --border-color-interactive-hover: var(--s-line-hover) !important;
+    --border-color-interactive-active: var(--s-line-hover) !important;
+    --border-color-interactive-disabled: var(--s-divider) !important;
+    --border-color-selected: var(--s-selected-line) !important;
+
+    --color-accent-primary: var(--s-accent) !important;
+    --color-accent-primary-hover: color-mix(in srgb, var(--s-accent) 88%, var(--s-ink)) !important;
+    --color-accent-primary-active: color-mix(in srgb, var(--s-accent) 78%, var(--s-ink)) !important;
+    --color-accent-primary-selected: var(--s-accent) !important;
+    --focus-outline-color: var(--s-focus) !important;
+
+    /* Neutral buttons, selects, segmented controls. */
+    --button-background-color: var(--s-control) !important;
+    --button-background-color-hover: var(--s-hover) !important;
+    --button-background-color-active: var(--s-pressed) !important;
+    --button-background-color-disabled: var(--s-control) !important;
+    --button-border-color: var(--s-line) !important;
+    --button-border-color-hover: var(--s-line-hover) !important;
+    --button-border-color-active: var(--s-line-hover) !important;
+    --button-border-color-disabled: var(--s-divider) !important;
+    --button-border-radius: var(--s-radius-control) !important;
+    --button-opacity-disabled: var(--s-disabled-opacity) !important;
+    /* Primary actions: accent-tinted glass instead of a solid fill. */
+    --button-background-color-primary: var(--s-selected) !important;
+    --button-background-color-primary-hover: var(--s-selected-hover) !important;
+    --button-background-color-primary-active: var(--s-selected-pressed) !important;
+    --button-background-color-primary-disabled: var(--s-selected) !important;
+    --button-border-color-primary: var(--s-selected-line) !important;
+    --button-border-color-primary-hover: var(--s-selected-line) !important;
+    --button-border-color-primary-active: var(--s-selected-line) !important;
+    --button-border-color-primary-disabled: var(--s-selected-line) !important;
+    --button-text-color-primary: currentColor !important;
+    --button-text-color-primary-hover: currentColor !important;
+    --button-text-color-primary-active: currentColor !important;
+    --button-text-color-primary-disabled: currentColor !important;
+    --button-primary-color: currentColor !important;
+    --button-primary-hover-bgcolor: var(--s-selected-hover) !important;
+    --button-primary-active-bgcolor: var(--s-selected-pressed) !important;
+    /* Selected items (segmented control, list choices). */
+    --button-background-color-selected: var(--s-selected) !important;
+    --button-border-color-selected: var(--s-selected-line) !important;
+    --button-text-color-selected: currentColor !important;
+    /* Icon and list buttons (three-dot menus, navigation, menu items). */
+    --button-background-color-ghost-hover: var(--s-hover) !important;
+    --button-background-color-ghost-active: var(--s-pressed) !important;
+    --button-background-color-ghost-selected: var(--s-selected) !important;
+    --button-border-color-ghost-hover: transparent !important;
+    --button-border-color-ghost-active: transparent !important;
+    --button-background-color-menu-hover: var(--s-hover) !important;
+    --button-background-color-menu-active: var(--s-pressed) !important;
+    --button-background-color-menu-selected: var(--s-selected) !important;
+
+    /* Inputs. */
+    --input-background-color: var(--s-control) !important;
+    --input-border-color: var(--s-line) !important;
+    --input-border-radius: var(--s-radius-control) !important;
+
+    /* Surfaces inside cards (picker labels, promo buttons). */
+    --background-color-box: var(--s-control) !important;
+
+    /* Cards and grouped rows. */
+    --card-background-color: var(--s-card) !important;
+    --card-border: var(--s-card-border) !important;
+    --card-border-color: var(--s-line) !important;
+    --card-border-radius: var(--s-radius-card) !important;
+    --card-border-radius-compact: var(--s-radius) !important;
+    --card-box-shadow: none !important;
+    --box-border-color: var(--s-line) !important;
+    --box-border-radius: var(--s-radius) !important;
+
+    /* In-page menus (panel-list: dropdown lists, three-dot menus). */
+    --panel-background-color: var(--s-menu) !important;
+    --panel-border-color: var(--s-line) !important;
+    --panel-border-radius: var(--s-radius-card) !important;
+    --panel-menuitem-border-radius: var(--s-radius-control) !important;
+    --panel-separator-color: var(--s-divider) !important;
+    --panel-box-shadow: var(--s-menu-shadow) !important;
+    --popup-box-shadow: var(--s-menu-shadow) !important;
+  }
+}

@@ -379,50 +379,116 @@ pref. So:
 Cards let the theme through: their opacity is `100% − (100% − glass opacity) × 1.7`
 (medium 72% → 52%, solid stays opaque), never below 45% for readability.
 
+**One design system for every control.** `styles/pages/settings-tokens.css` defines the
+Settings tokens once, for all pages: Artemis's values (`--s-*`: surfaces, hairlines
+leaning toward the accent, control, hover, pressed, selected and focus states, menus) and
+the Firefox design tokens mapped onto them (`--button-*` including primary, ghost,
+selected and menu variants, `--border-color*`, `--focus-outline-color`,
+`--color-accent-primary*`, `--input-*`, `--panel-*`, `--card-*`, `--box-*`). Those tokens
+inherit into Firefox components' shadow trees, so one set restyles buttons, selects,
+segmented controls, the System/Light/Dark picker, toggles' surroundings, menus and inputs
+on every page. Zen defines several of them `!important` on `:root`; Artemis's win by
+specificity. Where a component redefines a token on its own host (page navigation,
+toggles, in-page menus), the token is set on that host. Visual rules:
+
+- Neutral controls: a faint fill and a hairline; hover and pressed darken or lighten one
+  step; disabled is 45% opacity.
+- Selected and primary: accent-tinted glass (accent 16%, hairline at 40%), never a solid
+  fill. The selected page in the navigation uses it too, with no indicator bar.
+- Checked marks (checkboxes, radios, toggles): the accent lifted toward the text colour,
+  with the mark in the page colour.
+- Focus: a 2px ring of the accent at 55% (instead of Firefox's full-strength accent).
+- Menus: in-page lists (`panel-list`: dropdown lists, three-dot menus) are frosted glass;
+  OS popups (XUL menulist popups) cannot blur the page, so they use a solid raised surface
+  with the same tint. The browser's own popups (`artemis.popups.style`) use the same
+  surface and item states, and native `<select>` dropdowns open in those popups.
+
+Controls inside components' shadow trees that expose no token or `::part` (the checkbox
+and radio inputs of `moz-checkbox`/`moz-radio`, `panel-list`, `panel-item`, `moz-toggle`
+hosts) are styled by `styles/runtime/settings-controls.css`, a **user sheet** loaded into
+the same pages: document-level user sheets apply inside shadow trees, author sheets do
+not. It uses generic element types only (`input[type=checkbox]`, `panel-list`), never
+Firefox class names. Zen's and Sine's XUL controls (buttons, `menulist` and its popup,
+`checkbox`/`radio`) are in light DOM and styled by the page sheet.
+
+**Loading transitions.** Sine runs mod scripts only after a page has painted, and an actor
+message arrives after the first paint too; either way the page first showed Zen's look
+(measured: Settings about 500 ms, Keyboard Shortcuts about 180 ms, Extensions about 80 ms).
+Both actors now act on `DOMDocElementInserted`, when the page's root element is created and
+before anything is painted: the page actor attaches the styling there, and the keyboard
+child applies values the Settings pages last published in shared data
+(`Services.ppmm.sharedData`, read synchronously; the live values for its own window follow
+over the actor). Measured after (`tools/zen/checks/settings-load.js`): Settings and
+Keyboard Shortcuts go straight from the empty tab to Artemis's look; navigating between
+Settings pages in one tab shows no intermediate look, except one case. **Limitation:**
+Extensions and Themes waits for its own stylesheets before its first layout, and until
+its root element exists Firefox paints the empty document in its default canvas colour
+(`#1c1b22` in dark mode, also the colour of Zen's native Extensions page) for about
+30 ms (2 frames at 60 Hz). No page sheet or actor can style a document with no element;
+changing that colour needs a browser colour preference, which Artemis does not write.
+Forcing an earlier layout would show the page without its own CSS, which is worse. The
+grey of a brand-new empty tab before any page loads is Zen's and is not part of Settings.
+
 | Page | Document | Technique | Notes |
 |---|---|---|---|
-| Settings (`about:preferences`): Zen panes, Firefox panes, navigation, search | Shared, parent process | Sine runs `artemis-settings.uc.js` there; `scripts/settings/page.mjs` loads `styles/runtime/settings-page.css` as an author sheet and mirrors the window's tokens and background | Zen panes: `hbox.subcategory` + `groupbox` become one card. Firefox panes: design tokens only |
+| Settings (`about:preferences`): Zen panes, Firefox panes, navigation, search | Shared, parent process | Window actor `ArtemisSettingsPage` (child only) attaches the styling when the root element is created: `scripts/settings/page.mjs` loads `styles/runtime/settings-page.css` (author; imports the shared tokens) and `styles/runtime/settings-controls.css` (user) and mirrors the window's tokens and background. Sine's `artemis-settings.uc.js` still attaches Artemis's own dialog enhancer (§7.2) | Zen panes: `hbox.subcategory` + `groupbox` become one card. Firefox panes: design tokens |
 | Sine's mod page and every mod's settings dialog, Sine's own settings, store readmes | Same document | Same sheet; the module marks each card's visible first and last row (`[artemis-card~="start"/"end"]`) | Each separator starts a card, text rows are headings between cards, per-row margins inside a card are replaced by Artemis's row spacing; order, controls, sizes and behaviour stay the mod's |
-| Extensions and Themes (`about:addons`) | Separate document, parent process | Window actor `ArtemisAddons` (child only), registered by Artemis's window script, attaches the same page styling | Does not depend on Sine's per-mod include list (an installed copy may never refresh it). Extensions' own options pages stay native |
-| Keyboard Shortcuts (`about:keyboard`) | Separate document in the privileged-about content process; Sine runs no mod scripts there, and Zen exposes no workspace colours there | Window actor `ArtemisKeyboard`: the parent reads the same values as the other pages, the child sets them as `--artemis-s-*`; `content.css` imports `styles/pages/settings-keyboard.css`, scoped with `@-moz-document url-prefix("about:keyboard")` and gated with `-moz-pref("artemis.settings.style")` | Without JS, named transparency and radius steps and Zen's plain window colour |
+| Extensions and Themes (`about:addons`) | Separate document, parent process | The same `ArtemisSettingsPage` actor and page styling | Does not depend on Sine's per-mod include list (an installed copy may never refresh it). Extensions' own options pages stay native |
+| Keyboard Shortcuts (`about:keyboard`) | Separate document in the privileged-about content process; Sine runs no mod scripts there, and Zen exposes no workspace colours there | Window actor `ArtemisKeyboard`: the child applies the last published values when the root element is created, then the parent sends the live values for its window; values become `--artemis-s-*`. `content.css` imports `styles/pages/settings-keyboard.css`, scoped with `@-moz-document url-prefix("about:keyboard")` and gated with `-moz-pref("artemis.settings.style")`; it imports the shared tokens, which apply only on `:root[artemis-settings-page]` | Without JS, named transparency and radius steps and Zen's plain window colour |
 | Zen support | A website | Not styled | Website content is never restyled |
 | Popup documents (Manage Exceptions and other subdialogs) | Own documents | Not styled | Kept native (owner, 2026-11-09); verified pixel-identical with the switch on and off |
 
-Files: `scripts/settings/page.mjs` (mirroring, watching, card marking, page styling),
-`scripts/settings/settings-actors.mjs` (registers both actors while at least one Artemis
-window runs; `artemis.uc.js` retains/releases it, so disabling Artemis unregisters them),
-`keyboard-parent.mjs`, `keyboard-child.mjs`, `addons-child.mjs`.
+Files: `scripts/settings/page.mjs` (mirroring, watching, card marking, page styling,
+publishing values for Keyboard Shortcuts), `scripts/settings/settings-actors.mjs`
+(registers both actors while at least one Artemis window runs; `artemis.uc.js`
+retains/releases it, so disabling Artemis unregisters them and clears the shared values),
+`page-child.mjs`, `keyboard-parent.mjs`, `keyboard-child.mjs`;
+`styles/pages/settings-tokens.css` (shared tokens), `styles/runtime/settings-page.css`
+(author: pages, cards, light-DOM controls), `styles/runtime/settings-controls.css` (user:
+shadow-tree controls), `styles/pages/settings-keyboard.css`.
 
 Rules:
 
-- **Strict scoping.** The page sheet is only loaded into `about:preferences`,
-  `about:settings` and `about:addons`; the actors match only `about:addons*` and
-  `about:keyboard*`. The CSS for `about:keyboard` sits in Sine's content sheet, which
-  applies to every web page, so all of it is inside `@-moz-document`.
-- **Graceful fallback.** Styling uses stable hooks first: Firefox design tokens
-  (`--card-*`, `--box-*`, `--page-nav-*`, `--input-*`, `--button-*`), never `::part()` or
-  shadow internals; Zen's and Sine's class names; host-level styles. If an update renames
-  a token or class, that element keeps Zen's look and nothing breaks. Every JS step is
-  guarded, and a failure leaves Zen's page untouched.
-- **Clean teardown.** Sine keeps one unload callback per script and window (a second
-  `addUnloadListener` call replaces the first), so `artemis-settings.uc.js` tears down
-  the page styling and the enhancer in a single callback.
+- **Strict scoping.** The page and controls sheets are only loaded into
+  `about:preferences`, `about:settings` and `about:addons` (top-level documents only, so
+  subdialogs stay native); the actors match only those and `about:keyboard*`. The CSS for
+  `about:keyboard` sits in Sine's content sheet, which applies to every web page, so all of
+  its rules are inside `@-moz-document`. The one exception is the shared token file it
+  imports: custom properties and `accent-color` only, on `:root[artemis-settings-page]`, an
+  attribute only Artemis's actors set, on Settings pages.
+- **Graceful fallback.** Styling uses stable hooks first: Firefox design tokens, then
+  generic element types for controls inside shadow trees (user sheet), then Zen's and
+  Sine's class names. Never `::part()` and never Firefox's internal class names. If an
+  update renames a token or element, that element keeps Firefox's or Zen's look and
+  nothing breaks. Every JS step is guarded, and a failure leaves Zen's page untouched.
+- **Clean teardown.** Turning the switch off, disabling Artemis (actors unregistered) or
+  unloading a page removes everything Artemis added. `windowUtils` acts on whatever
+  document a tab shows now, so a page's teardown leaves the sheets alone once its document
+  is no longer the tab's current one: after a navigation to another Settings page in the
+  same tab, they belong to the new page. Sine keeps one unload callback per script and
+  window, so `artemis-settings.uc.js` tears down the enhancer in a single callback.
 - **High contrast.** Everything is inside `@media not (forced-colors: active)`.
 - **Live.** The module and the keyboard actor observe the switch, Artemis's glass prefs,
   Zen's transparent-browser pref, the OS reduce-transparency setting, the workspace
   background element, the window root and the page's size and place in the window.
 - **Without JS** only `about:keyboard` is styled (named steps); the other pages stay native.
+- **Reduced motion.** Control transitions (background colour only) run only with
+  `prefers-reduced-motion: no-preference`.
 - **Other themes.** Another theme's own user-origin `!important` rules for these pages
   outrank any page stylesheet. With Nebula enabled, for example, Nebula's darker
   background for Zen's section bodies wins, so a card's heading band is slightly lighter
   than its body; everything else keeps Artemis's look.
 
 Fragile dependencies, re-checked after every Zen or Sine update (`tools/zen/settings-native.sh`,
-`tools/zen/checks/settings-style.js`, `tools/zen/checks/settings-corners.js`):
+`tools/zen/checks/settings-style.js`, `tools/zen/checks/settings-corners.js`,
+`tools/zen/checks/settings-navigation.js`, `tools/zen/checks/settings-load.js`):
 
 | Dependency | Used for | If it changes |
 |---|---|---|
-| Firefox design tokens of `moz-card`, `moz-box-*`, `moz-page-nav(-button)`, `moz-input-*`, `moz-select`, `moz-button` | Cards, inner boxes, navigation, inputs and buttons on Firefox panes, `about:addons` and `about:keyboard` | Those elements fall back to Firefox's look |
+| Firefox design tokens (`--button-*`, `--border-color*`, `--focus-outline-color`, `--color-accent-primary*`, `--input-*`, `--panel-*`, `--card-*`, `--box-*`; host tokens of `moz-page-nav`, `moz-toggle`, `panel-list`, `panel-item`) | Every Firefox control on Firefox panes, `about:addons` and `about:keyboard` | Those elements fall back to Firefox's look |
+| User sheets apply inside shadow trees; `input[type=checkbox/radio]` inside `moz-checkbox`/`moz-radio` | Checkbox and radio marks | Firefox's marks |
+| XUL: `.checkbox-check`, `.radio-check`, `menulist` > `menupopup`, `[_moz-menuactive]` | Zen's and Sine's checkboxes, radios and dropdown lists | Zen's look |
+| JSWindowActor `DOMDocElementInserted` event; `Services.ppmm.sharedData` | Styling before the first paint | Styling arrives at `DOMContentLoaded` / after the actor message (a brief flash) |
 | Zen: `gZenThemePicker.browserBackgroundElement` / `#zen-browser-background::after` (background layers), the window root's background colour, `--zen-primary-color` | Page background and tint | The background falls back to Zen's plain window colour |
 | Zen markup: `hbox.subcategory` + `groupbox`, `.visually-hidden` (search), `#search-container` | Zen pane cards, search results, sticky search | Zen panes fall back to native |
 | Sine markup: `dialog.sineItemPreferenceDialog`, `.sineItemPreferenceDialogTopBar/Content`, `.separator-label`, `.sineItemPreferenceLabel`, `.sineItem`, `.sineInstallationItem`, `#sineInstall*Group`; one unload callback per script | Dialog and mod-page cards, teardown | Sine's own look; Artemis's enhancer already has the same dependency (§7.2) |
@@ -450,9 +516,10 @@ and a master on/off switch (Sine already has one).
 | `artemis.uc.js` | Each `browser.xhtml` window | Bootstrap: re-entry guard, unload listener, window bridge, module registry |
 | `scripts/window/bridge.mjs` | Imported | Mirrors custom values to `--artemis-live-*` on the window root |
 | `scripts/window/onboarding.mjs` | Imported | First-launch tour (§12) |
-| `artemis-settings.uc.js` | `about:preferences`, `about:settings` | Bootstrap for the settings page styling and the settings enhancer |
-| `scripts/settings/page.mjs` | Imported | Settings page styling (§7.3): loads `styles/runtime/settings-page.css`, mirrors the window's tokens and workspace background, marks card edges |
-| `scripts/settings/settings-actors.mjs` | Imported by `artemis.uc.js` | Registers the `about:addons` and `about:keyboard` window actors (§7.3) while Artemis runs |
+| `artemis-settings.uc.js` | `about:preferences`, `about:settings` | Bootstrap for the settings enhancer (the page styling is attached by a window actor, §7.3) |
+| `scripts/settings/page.mjs` | Imported | Settings page styling (§7.3): loads `styles/runtime/settings-page.css` and `settings-controls.css`, mirrors the window's tokens and workspace background, marks card edges, publishes values for Keyboard Shortcuts |
+| `scripts/settings/page-child.mjs` | Window actor child | Attaches the page styling to `about:preferences`, `about:settings` and `about:addons` before their first paint |
+| `scripts/settings/settings-actors.mjs` | Imported by `artemis.uc.js` | Registers the Settings page (`about:preferences`, `about:settings`, `about:addons`) and `about:keyboard` window actors (§7.3) while Artemis runs |
 | `scripts/settings/enhancer.mjs` | Imported | Settings enhancer for Artemis's own dialog (§7.2) |
 | `scripts/strings.mjs` | Imported | All user-visible strings that are not in `preferences.json`, in one English table keyed by id, ready for later localization |
 
