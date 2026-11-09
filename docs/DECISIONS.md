@@ -9,6 +9,40 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-09: Settings styling fixes after owner review
+
+The owner found three problems: the background was not genuinely transparent, card
+corners were inconsistent, and Extensions and Themes and Keyboard Shortcuts were not
+styled correctly. Findings and decisions (ARCHITECTURE §7.3):
+
+- **Background.** Zen sets the workspace gradient on `#zen-browser-background`, not on the
+  window root; Artemis had read the root's default and painted a flat colour. The module
+  now copies the gradient layers (or the single theme colour) and aligns them with the
+  window, so the theme stays visible behind the cards. Genuine see-through remains tied to
+  Zen's `browser.tabs.allow_transparent_browser`, which Artemis never writes. Cards are
+  more transparent (medium 52%, floor 45%).
+- **Keyboard Shortcuts.** No CSS mechanism exposes the workspace colours in its process
+  (checked: `--zen-primary-color` is the system accent, `--zen-main-browser-background`
+  the default, and Zen pushes no theme variables there). **Approved** by the owner: a
+  small window actor limited to `about:keyboard` carries the same values in; it is
+  registered only while Artemis runs.
+- **Extensions and Themes** moved from Sine's per-mod include list to a window actor as
+  well: an installed copy's Sine registry may never pick up a new include (the owner's
+  real profile did not), which left the page unstyled.
+- **Corners.** Cards in other mods' dialogs are now drawn from the rows that are actually
+  visible (the module marks each card's first and last visible row), so hidden or
+  conditional rows never cost a card its rounded corners; Sine's own groupboxes are no
+  longer chained into one card; search results no longer join cards to hidden headings.
+- **Teardown bug.** Disabling Artemis left the Settings page styled, because Sine keeps
+  one unload callback per script and window; both parts now share one callback. The
+  native-restoration test now takes its pure-Zen baseline with the switch on, which
+  catches this.
+- **Nebula** (installed in the test profile at the owner's request): Artemis's look holds;
+  Nebula's user-level `!important` background for Zen's section bodies outranks page
+  styles, a documented interaction.
+
+---
+
 ## 2026-11-09: Settings experience styling (owner)
 
 **Approved** by the owner, in four steps on 2026-11-09:

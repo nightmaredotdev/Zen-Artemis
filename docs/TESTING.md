@@ -88,6 +88,9 @@ MOZ_REMOTE_ALLOW_SYSTEM_ACCESS=1 WSLENV=MOZ_REMOTE_ALLOW_SYSTEM_ACCESS \
 | `settings-native.sh <dir>` | Settings experience: for every Settings page (16 `about:preferences` panes, two `about:addons` views, `about:keyboard`) the switch-off page is pixel-identical to Artemis disabled through Sine, and the switch-on page differs; `about:about`, `about:support` and a website are identical in all states. Verifies each page switch and that Artemis is re-enabled |
 | `checks/settings-pane.js` | Shows one Settings page (`paneXxx`, `about:addons#<view>` or a URL), optional `scroll` / `search`, and reports what is shown and the page rectangle |
 | `checks/settings-style.js` | Settings page styling switch: live on/off and cleanup, other prefs untouched, see-through marking with Zen's transparent-browser pref, forced colours, live token mirroring |
+| `checks/settings-corners.js` | Card corners on the Settings page: every visible card (Sine mod dialogs from their visible rows, Artemis's sections, Zen heading + groupbox cards, Firefox cards) has rounded top corners on its first and rounded bottom corners on its last element, nothing rounded in between. `{"dialogs":true}` opens every mod's dialog in turn |
+| `checks/toggle-mod.js` `{"id":"Nebula"}` | Toggles another mod through Sine (the report stays about Artemis) |
+| Test fixtures (test profile only) | `artemis-test-ext/` (a minimal temporary extension: card, details view, a shortcut), installed per session with `AddonManager.installTemporaryAddon`; the Nebula mod (copied from `references/`) for compatibility runs; workspace themes set through `gZenThemePicker` (violet three-colour, warm two-colour, teal single-colour) |
 | Test mods `ArtemisTestPrefsNebula`, `ArtemisTestPrefszia` (test profile only) | Two settings-only mods in the test profile whose `preferences.json` is copied from the Nebula and zia references (no styles or scripts), so other mods' settings dialogs can be tested |
 
 ### Scripted checks (Marionette)
@@ -423,3 +426,28 @@ Not covered: a colourful workspace theme (the test profile uses Zen's neutral de
 workspace tinting was verified through the mirrored values rather than a vivid gradient),
 and mods with long conditional sections (known limitation: a card loses its rounded
 bottom corners when its last row is hidden by a condition).
+
+### Settings styling fixes after owner review: 2026-11-09
+
+Owner-reported: background not genuinely transparent, inconsistent card corners,
+Extensions and Themes and Keyboard Shortcuts not styled correctly. Investigated and fixed
+(DECISIONS 2026-11-09). Automated checks headless; visual review and performance in a
+visible test window with the owner's confirmation that the desktop was free.
+
+| Check | Result |
+|---|---|
+| Root causes | Background read from the window root's default instead of `#zen-browser-background::after`; single-colour themes paint a colour, not an image; Sine groupboxes carry `.subcategory` and were chained; search hides headings with `.visually-hidden`; `about:addons` relied on a Sine include an installed copy never refreshed; Sine keeps one unload callback per script and window (disabling Artemis left the Settings page styled) |
+| Keyboard Shortcuts theme variables | In its process `--zen-primary-color` is the system accent and `--zen-main-browser-background` the default; Zen pushes no theme variables. Solved with the approved window actor |
+| Corners (`settings-corners.js`) | 46 cards across all dialogs (Artemis, Nebula-style, zia-style, Sine's own) and 14–26 per pane on Sine's page, Look and Feel, Tab Management, General, Privacy, Search and search results: 0 problems. zia's conditional last rows (four sections) toggled off/on/off: 0 problems each time |
+| Native restoration (`settings-native.sh`, pure-Zen baseline now taken with the switch on) | 20/20 Settings pages (16 panes, Extensions, Plugins, Manage Extension Shortcuts, Keyboard Shortcuts) identical to Artemis disabled; styled when on; 3 unrelated pages identical in all states. Same result with the violet workspace theme |
+| Disable / re-enable Artemis (switch on) | Settings, Extensions and Themes and Keyboard Shortcuts: all styling and mirrored values removed; restored on re-enable |
+| Popup documents | Manage Exceptions interior pixel-identical with the switch on and off |
+| Opaque-surface audit | No large opaque surfaces left on Settings panes, Extensions views or Keyboard Shortcuts after styling the shortcut input fields |
+| Switch, accordion, custom fields, runtime, rebuild, multiple windows | Pass (re-entrancy now 3 window modules) |
+| Browser window | Matrix 18/18 and feature independence pass (known favicon flicker cleared on re-run) |
+| **Visual review (real captures)** | Violet theme dark, warm theme light, teal single-colour theme, no theme; Nebula mod enabled with teal; default glass, Solid, custom 10%, see-through (Zen's pref on, dark and light); Settings panes, search, Sine's page, Artemis's, Nebula-style and zia-style dialogs (scrolled through conditional sections), Extensions list, details and shortcuts, Keyboard Shortcuts. Theme colours visible behind the cards on all three page types and aligned with the window; corners consistent; one defect found and fixed during the review (single-colour themes) |
+| Performance (visible window, 144 Hz) | Scrolling Privacy for 4 s: p99 6.9 ms with the switch on and off (max 8.9 vs 6.9 ms), no frame over 25 ms; GPU 3D while scrolling 3.9% on vs 3.3% off |
+
+Known interaction: with Nebula enabled, Nebula's user-level `!important` background for
+Zen's section bodies outranks page styles, so a Zen card's heading band is slightly
+lighter than its body.

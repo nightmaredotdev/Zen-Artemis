@@ -1,9 +1,13 @@
-// Artemis Settings pages bootstrap. Loaded by Sine into about:preferences,
-// about:settings and about:addons. Re-entrant. Two independent parts:
+// Artemis Settings page bootstrap. Loaded by Sine into about:preferences and
+// about:settings (Extensions and Themes and Keyboard Shortcuts are styled
+// through window actors, scripts/settings/settings-actors.mjs). Re-entrant.
+// Two independent parts:
 //   - page styling (artemis.settings.style): glass look for the whole page;
-//   - settings enhancer: decorates Artemis's own Sine settings dialog only
-//     (settings page only).
+//   - settings enhancer: decorates Artemis's own Sine settings dialog only.
 // Either part failing leaves the other, and Zen's page, working.
+// Sine keeps ONE unload callback per script and window (a second
+// addUnloadListener call replaces the first), so both parts are torn down by
+// a single callback.
 
 (() => {
   for (const handle of [window.ArtemisSettings, window.ArtemisSettingsPage]) {
@@ -13,31 +17,33 @@
       } catch {}
     }
   }
-  let core, enhancer, page;
+  delete window.ArtemisSettings;
+  delete window.ArtemisSettingsPage;
+
   try {
-    page = ChromeUtils.importESModule("chrome://sine/content/Artemis/scripts/settings/page.mjs");
-    const pageHandle = page.attachPageStyle(window);
-    window.ArtemisSettingsPage = pageHandle;
-    if (typeof window.addUnloadListener === "function") {
-      window.addUnloadListener(() => pageHandle.destroy());
-    }
+    const page = ChromeUtils.importESModule("chrome://sine/content/Artemis/scripts/settings/page.mjs");
+    window.ArtemisSettingsPage = page.attachPageStyle(window);
   } catch (err) {
     console.error("[Artemis] Settings page styling unavailable:", err);
   }
-  // Artemis's own Sine dialog exists only on the settings page (not about:addons).
-  if (!/^about:(preferences|settings)/.test(window.location.href)) {
-    return;
-  }
+
   try {
-    core = ChromeUtils.importESModule("chrome://sine/content/Artemis/scripts/artemis.sys.mjs");
-    enhancer = ChromeUtils.importESModule("chrome://sine/content/Artemis/scripts/settings/enhancer.mjs");
+    const core = ChromeUtils.importESModule("chrome://sine/content/Artemis/scripts/artemis.sys.mjs");
+    const enhancer = ChromeUtils.importESModule("chrome://sine/content/Artemis/scripts/settings/enhancer.mjs");
+    window.ArtemisSettings = enhancer.attachEnhancer(window, core);
   } catch (err) {
     console.error("[Artemis] Settings enhancer unavailable:", err);
-    return;
   }
-  const handle = enhancer.attachEnhancer(window, core);
-  window.ArtemisSettings = handle;
+
   if (typeof window.addUnloadListener === "function") {
-    window.addUnloadListener(() => handle.destroy());
+    const page = window.ArtemisSettingsPage;
+    const settings = window.ArtemisSettings;
+    window.addUnloadListener(() => {
+      for (const handle of [settings, page]) {
+        try {
+          handle?.destroy();
+        } catch {}
+      }
+    });
   }
 })();

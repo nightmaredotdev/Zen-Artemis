@@ -44,6 +44,10 @@
     const bridge = createBridge(window);
     modules.push({ init: () => bridge.init(), destroy: () => bridge.destroy() });
     modules.push(createOnboardingModule(core));
+    // Extensions and Themes and Keyboard Shortcuts styling (window actors,
+    // registered while Artemis runs; see settings/settings-actors.mjs).
+    const settingsActors = ChromeUtils.importESModule(BASE + "settings/settings-actors.mjs");
+    modules.push({ init: () => settingsActors.retain(), destroy: () => settingsActors.release() });
   } catch (err) {
     console.error("[Artemis] Failed to load window modules:", err);
   }

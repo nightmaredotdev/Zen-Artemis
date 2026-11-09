@@ -356,51 +356,78 @@ Artemis's glass look covers every page that belongs to Zen's Settings experience
 reachable from its navigation, controlled by one switch, `artemis.settings.style`
 (**Settings page styling**, on by default). Off restores every one of these pages to Zen's
 native appearance and changes no other preference. The visual language is the same
-everywhere: a transparent page background (the window's workspace background, or
-see-through to the window when the user enabled Zen's
-`browser.tabs.allow_transparent_browser`), separate workspace-tinted glass cards with
+everywhere: a transparent page background, separate workspace-tinted glass cards with
 hairline borders, consistent spacing, and a restrained accent. Artemis-specific controls
 stay inside Artemis's own dialog (§7.2); other mods keep their own settings layout.
 
+**Transparent background.** A page inside a tab cannot show the window behind it unless
+Zen's `browser.tabs.allow_transparent_browser` is on (the `<browser>` then has the
+`transparent` attribute and Zen paints only a light veil). Artemis never writes that
+pref. So:
+
+- *Pref on:* the page root is transparent: genuine see-through to the window, through
+  Zen's own veil.
+- *Pref off (default):* the page shows a copy of the window's workspace background. Zen
+  paints it as gradient layers (64 vertical strips plus a base gradient, or one colour for
+  a single-colour theme) on `#zen-browser-background::after` over the window's base colour,
+  sized in pixels across the whole window. The module copies those layers and shifts each
+  by the page's offset inside the window, so the page lines up with what Zen paints around
+  it and reads as transparent. It follows workspace switches, theme edits, window resizes
+  and layout changes. (Zen's root `--zen-main-browser-background` is only a default; the
+  real gradient lives on that element.)
+
+Cards let the theme through: their opacity is `100% − (100% − glass opacity) × 1.7`
+(medium 72% → 52%, solid stays opaque), never below 45% for readability.
+
 | Page | Document | Technique | Notes |
 |---|---|---|---|
-| Settings (`about:preferences`): Zen panes, Firefox panes, navigation, search | Shared, parent process | JS: `scripts/settings/page.mjs` loads `styles/runtime/settings-page.css` as an author sheet and mirrors the window's tokens | Zen panes: `hbox.subcategory` + `groupbox` become one card. Firefox panes: design tokens only |
-| Sine's mod page and every mod's settings dialog, Sine's own settings, store readmes | Same document | Same sheet | Each separator starts a card, text rows are headings between cards, per-row margins inside a card are replaced by Artemis's row spacing; order, controls, sizes and behaviour stay the mod's |
-| Extensions and Themes (`about:addons`) | Separate document, parent process | Same module and sheet (`artemis-settings.uc.js` also includes `about:addons*`) | Extension options pages embedded there are the extension's own documents and stay native |
-| Keyboard Shortcuts (`about:keyboard`) | Separate document in the privileged-about content process; Sine runs no mod scripts there | CSS only: `content.css` imports `styles/pages/settings-keyboard.css`, scoped with `@-moz-document url-prefix("about:keyboard")` and gated with `-moz-pref("artemis.settings.style")` (user sheet, `!important` tokens) | No access to the window's workspace colours or custom glass values: neutral tint and named transparency/radius steps only |
+| Settings (`about:preferences`): Zen panes, Firefox panes, navigation, search | Shared, parent process | Sine runs `artemis-settings.uc.js` there; `scripts/settings/page.mjs` loads `styles/runtime/settings-page.css` as an author sheet and mirrors the window's tokens and background | Zen panes: `hbox.subcategory` + `groupbox` become one card. Firefox panes: design tokens only |
+| Sine's mod page and every mod's settings dialog, Sine's own settings, store readmes | Same document | Same sheet; the module marks each card's visible first and last row (`[artemis-card~="start"/"end"]`) | Each separator starts a card, text rows are headings between cards, per-row margins inside a card are replaced by Artemis's row spacing; order, controls, sizes and behaviour stay the mod's |
+| Extensions and Themes (`about:addons`) | Separate document, parent process | Window actor `ArtemisAddons` (child only), registered by Artemis's window script, attaches the same page styling | Does not depend on Sine's per-mod include list (an installed copy may never refresh it). Extensions' own options pages stay native |
+| Keyboard Shortcuts (`about:keyboard`) | Separate document in the privileged-about content process; Sine runs no mod scripts there, and Zen exposes no workspace colours there | Window actor `ArtemisKeyboard`: the parent reads the same values as the other pages, the child sets them as `--artemis-s-*`; `content.css` imports `styles/pages/settings-keyboard.css`, scoped with `@-moz-document url-prefix("about:keyboard")` and gated with `-moz-pref("artemis.settings.style")` | Without JS, named transparency and radius steps and Zen's plain window colour |
 | Zen support | A website | Not styled | Website content is never restyled |
-| Popup documents (Manage Exceptions and other subdialogs) | Own documents | Not styled | Kept native (owner, 2026-11-09) |
+| Popup documents (Manage Exceptions and other subdialogs) | Own documents | Not styled | Kept native (owner, 2026-11-09); verified pixel-identical with the switch on and off |
+
+Files: `scripts/settings/page.mjs` (mirroring, watching, card marking, page styling),
+`scripts/settings/settings-actors.mjs` (registers both actors while at least one Artemis
+window runs; `artemis.uc.js` retains/releases it, so disabling Artemis unregisters them),
+`keyboard-parent.mjs`, `keyboard-child.mjs`, `addons-child.mjs`.
 
 Rules:
 
-- **Strict scoping.** The JS sheet is only ever loaded into `about:preferences`,
-  `about:settings` and `about:addons`. The CSS for `about:keyboard` sits in Sine's content
-  sheet, which applies to every web page, so all of it is inside
-  `@-moz-document url-prefix("about:keyboard")`. No other page is affected.
+- **Strict scoping.** The page sheet is only loaded into `about:preferences`,
+  `about:settings` and `about:addons`; the actors match only `about:addons*` and
+  `about:keyboard*`. The CSS for `about:keyboard` sits in Sine's content sheet, which
+  applies to every web page, so all of it is inside `@-moz-document`.
 - **Graceful fallback.** Styling uses stable hooks first: Firefox design tokens
   (`--card-*`, `--box-*`, `--page-nav-*`, `--input-*`, `--button-*`), never `::part()` or
   shadow internals; Zen's and Sine's class names; host-level styles. If an update renames
   a token or class, that element keeps Zen's look and nothing breaks. Every JS step is
   guarded, and a failure leaves Zen's page untouched.
+- **Clean teardown.** Sine keeps one unload callback per script and window (a second
+  `addUnloadListener` call replaces the first), so `artemis-settings.uc.js` tears down
+  the page styling and the enhancer in a single callback.
 - **High contrast.** Everything is inside `@media not (forced-colors: active)`.
-- **Live.** The module observes the switch, Artemis's glass prefs, Zen's
-  transparent-browser pref, the OS reduce-transparency setting and the window's workspace
-  colours. `about:keyboard` follows the switch through `-moz-pref()`.
-- **Without JS** only `about:keyboard` is styled; the other pages stay native.
+- **Live.** The module and the keyboard actor observe the switch, Artemis's glass prefs,
+  Zen's transparent-browser pref, the OS reduce-transparency setting, the workspace
+  background element, the window root and the page's size and place in the window.
+- **Without JS** only `about:keyboard` is styled (named steps); the other pages stay native.
+- **Other themes.** Another theme's own user-origin `!important` rules for these pages
+  outrank any page stylesheet. With Nebula enabled, for example, Nebula's darker
+  background for Zen's section bodies wins, so a card's heading band is slightly lighter
+  than its body; everything else keeps Artemis's look.
 
 Fragile dependencies, re-checked after every Zen or Sine update (`tools/zen/settings-native.sh`,
-`tools/zen/checks/settings-style.js`):
+`tools/zen/checks/settings-style.js`, `tools/zen/checks/settings-corners.js`):
 
 | Dependency | Used for | If it changes |
 |---|---|---|
 | Firefox design tokens of `moz-card`, `moz-box-*`, `moz-page-nav(-button)`, `moz-input-*`, `moz-select`, `moz-button` | Cards, inner boxes, navigation, inputs and buttons on Firefox panes, `about:addons` and `about:keyboard` | Those elements fall back to Firefox's look |
-| Zen markup: `hbox.subcategory` + `groupbox`, `#search-container`, `--zen-main-browser-background`, `--zen-primary-color` | Zen pane cards, sticky search, page background and tint | Zen panes or the background fall back to native |
-| Sine markup: `dialog.sineItemPreferenceDialog`, `.sineItemPreferenceDialogTopBar/Content`, `.separator-label`, `.sineItem`, `.sineInstallationItem`, `#sineInstall*Group` | Dialog and mod-page cards | Sine's own look; Artemis's enhancer already has the same dependency (§7.2) |
-| `about:addons` markup (`addon-card .card`, `addon-page-header`) | Extension cards, header | Firefox's look |
-| `about:keyboard` markup (`customkeys-sidebar`, `moz-card`) | Card tokens | Firefox's look |
-
-Known limitation: in a mod's dialog, a card loses its rounded bottom corners when its last
-row is hidden by a condition (CSS cannot see "the last visible row").
+| Zen: `gZenThemePicker.browserBackgroundElement` / `#zen-browser-background::after` (background layers), the window root's background colour, `--zen-primary-color` | Page background and tint | The background falls back to Zen's plain window colour |
+| Zen markup: `hbox.subcategory` + `groupbox`, `.visually-hidden` (search), `#search-container` | Zen pane cards, search results, sticky search | Zen panes fall back to native |
+| Sine markup: `dialog.sineItemPreferenceDialog`, `.sineItemPreferenceDialogTopBar/Content`, `.separator-label`, `.sineItemPreferenceLabel`, `.sineItem`, `.sineInstallationItem`, `#sineInstall*Group`; one unload callback per script | Dialog and mod-page cards, teardown | Sine's own look; Artemis's enhancer already has the same dependency (§7.2) |
+| `about:addons` markup (`addon-card .card`, `addon-page-header`, `input.shortcut-input`) | Extension cards, header, shortcut fields | Firefox's look |
+| `about:keyboard` markup (`customkeys-sidebar`, `moz-card`, `input.shortcut-input`) | Sidebar panel, cards, shortcut fields | Firefox's look |
 
 ### 7.4 Not built
 
@@ -423,8 +450,9 @@ and a master on/off switch (Sine already has one).
 | `artemis.uc.js` | Each `browser.xhtml` window | Bootstrap: re-entry guard, unload listener, window bridge, module registry |
 | `scripts/window/bridge.mjs` | Imported | Mirrors custom values to `--artemis-live-*` on the window root |
 | `scripts/window/onboarding.mjs` | Imported | First-launch tour (§12) |
-| `artemis-settings.uc.js` | `about:preferences`, `about:settings`, `about:addons` | Bootstrap for the settings page styling and the settings enhancer |
-| `scripts/settings/page.mjs` | Imported | Settings page styling (§7.3): loads `styles/runtime/settings-page.css`, mirrors the window's tokens and workspace colours |
+| `artemis-settings.uc.js` | `about:preferences`, `about:settings` | Bootstrap for the settings page styling and the settings enhancer |
+| `scripts/settings/page.mjs` | Imported | Settings page styling (§7.3): loads `styles/runtime/settings-page.css`, mirrors the window's tokens and workspace background, marks card edges |
+| `scripts/settings/settings-actors.mjs` | Imported by `artemis.uc.js` | Registers the `about:addons` and `about:keyboard` window actors (§7.3) while Artemis runs |
 | `scripts/settings/enhancer.mjs` | Imported | Settings enhancer for Artemis's own dialog (§7.2) |
 | `scripts/strings.mjs` | Imported | All user-visible strings that are not in `preferences.json`, in one English table keyed by id, ready for later localization |
 
@@ -727,7 +755,7 @@ The goal is all browser-owned UI. Website content is never restyled.
 | Tab-modal and window dialogs | v1.1 | chrome CSS, `@-moz-document` | |
 | Remaining v1.1 features (§14.3) | v1.1 | CSS | |
 | Profiles, export/import | v1.1 | JS | |
-| Settings experience: `about:preferences` (Zen and Firefox panes), Sine and every mod's settings, `about:addons`, `about:keyboard` | Next release (approved 2026-11-09) | JS author sheet; `about:keyboard` scoped content CSS (§7.3) | One switch, `artemis.settings.style` |
+| Settings experience: `about:preferences` (Zen and Firefox panes), Sine and every mod's settings, `about:addons`, `about:keyboard` | Next release (approved 2026-11-09) | JS author sheet and window actors; `about:keyboard` scoped content CSS (§7.3) | One switch, `artemis.settings.style` |
 | Zen welcome/onboarding screens | v1.2 | chrome/content CSS | Verify where they render |
 | Internal pages: new tab, error pages, `about:` pages | v1.2 | content CSS (A3) | |
 | Reader mode, PDF viewer | v1.2 | content CSS | Own implementation, not Natsumi's |

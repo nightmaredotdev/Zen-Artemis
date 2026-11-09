@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Native restoration of the Settings experience (artemis.settings.style).
 # Settings pages: with the switch OFF each page must be pixel-identical to the
-# same page with Artemis disabled through Sine (pure Zen); with it ON it must
+# same page with Artemis disabled through Sine (pure Zen, taken with the switch
+# ON, so a disabled Artemis must leave nothing behind); with it ON it must
 # differ (styling present). Unrelated pages (other about: pages, a website)
 # must be identical in all three states. The page area is cropped with a 16px
 # inset so Artemis's window-frame styling (not part of this switch) is excluded.
@@ -13,7 +14,7 @@ Z="$HERE/zrun.sh"; C="$HERE/checks"; PNG="$HERE/png.py"
 SETTINGS=(paneGeneral paneSineMods paneZenLooks paneZenTabManagement paneSync paneHome paneSearch
   panePrivacy panePasswordsAutofill paneAppearance paneDownloads paneTabsBrowsing paneAccessibility
   paneLanguages panePermissionsData paneAbout
-  "about:addons#addons://list/extension" "about:addons#addons://list/plugin" about:keyboard)
+  "about:addons#addons://list/extension" "about:addons#addons://list/plugin" "about:addons#addons://shortcuts/shortcuts" about:keyboard)
 UNRELATED=(about:about about:support "data:text/html")
 name() { echo "$1" | tr -c 'A-Za-z0-9\n' '_'; }
 setpref() { "$Z" "$C/layout.js" - "{\"prefs\":{\"artemis.settings.style\":$1}}" >/dev/null; }
@@ -41,9 +42,11 @@ ALL=("${SETTINGS[@]}" "${UNRELATED[@]}")
 "$Z" "$C/tour-drive.js" - '{"actions":["skip"]}' >/dev/null
 setpref null;  for t in "${ALL[@]}"; do shot on "$t"; done
 setpref false; for t in "${ALL[@]}"; do shot off "$t"; done
+# Pure Zen: Artemis disabled through Sine WITH the switch on, so anything a
+# disabled Artemis leaves behind on a page shows up as a difference.
+setpref null
 toggle false && { for t in "${ALL[@]}"; do shot zen "$t"; done; }
 toggle true
-setpref null
 same() { [[ "$(python3 "$PNG" diff "$1" "$2")" == *"differing pixels: 0/"* ]]; }
 for t in "${SETTINGS[@]}"; do
   n=$(name "$t")

@@ -101,7 +101,7 @@ Those options keep their values and apply again when the area is turned back on.
 
 | Setting | Values | Default | What it does |
 |---|---|---|---|
-| `artemis.settings.style` | on · off | on | Glass styling for every page in Zen's Settings experience: Settings (`about:preferences`: Zen's and Firefox's panes, navigation, search), Sine's page and every mod's settings dialog, Extensions and Themes (`about:addons`) and Keyboard Shortcuts (`about:keyboard`). Off restores all of them and changes no other setting. Without Sine's script support only Keyboard Shortcuts is styled. Keyboard Shortcuts cannot follow workspace colours or custom glass values (it runs in a separate process). Popup documents such as Manage Exceptions, extensions' own options pages and websites are never styled, and Windows high-contrast mode turns it off |
+| `artemis.settings.style` | on · off | on | Glass styling for every page in Zen's Settings experience: Settings (`about:preferences`: Zen's and Firefox's panes, navigation, search), Sine's page and every mod's settings dialog, Extensions and Themes (`about:addons`) and Keyboard Shortcuts (`about:keyboard`). Off restores all of them and changes no other setting. The page background shows your workspace theme behind the cards (genuinely see-through when Zen's `browser.tabs.allow_transparent_browser` is on). Without Sine's script support only Keyboard Shortcuts is styled, using the named steps and Zen's plain window colour. Popup documents such as Manage Exceptions, extensions' own options pages and websites are never styled, and Windows high-contrast mode turns it off |
 
 ## Motion
 

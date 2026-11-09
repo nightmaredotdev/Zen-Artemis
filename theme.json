@@ -21,8 +21,7 @@
     "artemis-settings.uc.js": {
       "include": [
         "about:preferences*",
-        "about:settings*",
-        "about:addons*"
+        "about:settings*"
       ]
     }
   },

@@ -8,12 +8,13 @@ All notable changes to Artemis are documented here. Artemis uses
 
 ### Added
 - **Glass Settings pages.** Every page in Zen's Settings experience now uses Artemis's
-  look: a transparent background, separate workspace-tinted glass cards with subtle
-  borders, and consistent spacing. This covers Settings (Zen's and Firefox's panes,
-  navigation and search), Sine's mod page and every mod's settings window, Extensions and
-  Themes, and Keyboard Shortcuts. Cards follow your transparency, blur, radius and spacing
-  settings; Keyboard Shortcuts uses the named steps only. With Zen's
-  `browser.tabs.allow_transparent_browser` enabled, the pages are see-through to the window.
+  look: a transparent background that shows your workspace theme, separate translucent
+  glass cards with subtle borders, and consistent spacing. This covers Settings (Zen's and
+  Firefox's panes, navigation and search), Sine's mod page and every mod's settings window,
+  Extensions and Themes, and Keyboard Shortcuts. Cards follow your transparency, blur,
+  radius and spacing settings and keep rounded corners whatever rows a mod shows or hides.
+  With Zen's `browser.tabs.allow_transparent_browser` enabled, the pages are genuinely
+  see-through to the window.
 - **Settings page styling** switch (Settings page section, on by default). Off restores
   all of these pages to Zen's own look and changes no other setting.
 
@@ -26,8 +27,10 @@ All notable changes to Artemis are documented here. Artemis uses
   their row spacing follows Artemis's.
 - Pop-up windows such as Manage Exceptions, extensions' own options pages and websites
   are not restyled. Windows high-contrast mode turns the styling off.
-- Settings, Sine and Extensions and Themes need Sine's script support; without it only
-  Keyboard Shortcuts is styled.
+- These pages need Sine's script support; without it only Keyboard Shortcuts is styled
+  (with the named transparency steps and Zen's plain window colour).
+- With another theme that styles these pages (such as Nebula) enabled at the same time,
+  that theme's own rules can take precedence in places.
 
 ## [1.0.1] - 2026-11-08
 

@@ -34,8 +34,10 @@
 
 :root[artemis-settings-page] {
   --s-opacity: var(--artemis-s-glass-opacity, 72%);
-  /* Cards are text-heavy panels: never below 55% even for a lower custom opacity. */
-  --s-card-opacity: max(55%, var(--artemis-s-glass-panel-opacity, 84%));
+  /* Cards let the workspace colours through: medium 72% -> 52%, low 86% -> 76%,
+     solid stays opaque. Never below 45%, so text stays readable at very low
+     custom opacities. */
+  --s-card-opacity: clamp(45%, calc(100% - (100% - var(--artemis-s-glass-opacity, 72%)) * 1.7), 100%);
   --s-filter: var(--artemis-s-glass-filter, blur(18px) saturate(140%));
   --s-radius: var(--artemis-s-radius, 10px);
   --s-radius-card: calc(var(--s-radius) + 4px);
@@ -48,7 +50,7 @@
   /* Surfaces, tinted with the workspace colour like Artemis's glass panels. */
   --s-tint: var(--artemis-s-zen-primary-color, transparent);
   --s-base: light-dark(rgb(244 244 247), rgb(22 22 26));
-  --s-raised: color-mix(in srgb, light-dark(rgb(255 255 255), rgb(36 36 42)), var(--s-tint) 10%);
+  --s-raised: color-mix(in srgb, light-dark(rgb(255 255 255), rgb(24 24 29)), var(--s-tint) 8%);
   --s-card: color-mix(in srgb, var(--s-raised) var(--s-card-opacity), transparent);
   --s-line: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.09));
   --s-divider: light-dark(rgb(0 0 0 / 0.06), rgb(255 255 255 / 0.06));
@@ -56,7 +58,6 @@
   --s-hover: light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.07));
   --s-pressed: light-dark(rgb(0 0 0 / 0.09), rgb(255 255 255 / 0.11));
   --s-muted: light-dark(rgb(0 0 0 / 0.6), rgb(255 255 255 / 0.6));
-  --s-page: var(--artemis-s-zen-main-browser-background, var(--s-base));
 
   /* Shared card surface and inset row divider. */
   --s-card-border: 1px solid var(--s-line);
@@ -91,8 +92,16 @@
 /* Page                                                                      */
 /* ======================================================================== */
 
+/* The page background is the window's own workspace background: the gradient
+   layers and base colour Zen paints behind the window (mirrored), so the page
+   reads as transparent and the theme colours stay visible. Without a themed
+   workspace this is Zen's plain window colour. */
 :root[artemis-settings-page] {
-  background: var(--s-page) !important;
+  background-color: var(--artemis-s-zen-base, var(--s-base)) !important;
+  background-image: var(--artemis-s-zen-background, none) !important;
+  background-size: var(--artemis-s-zen-bg-size, 100% 100%) !important;
+  background-position: var(--artemis-s-zen-bg-position, 0 0) !important;
+  background-repeat: var(--artemis-s-zen-bg-repeat, no-repeat) !important;
   background-attachment: fixed !important;
 }
 
@@ -118,6 +127,14 @@
 
 :root[artemis-settings-page] addon-page-header :is(.main-search, .main-heading) {
   background: transparent !important;
+}
+
+/* Manage Extension Shortcuts: the shortcut fields share the control look. */
+:root[artemis-settings-page] input.shortcut-input {
+  border: 1px solid var(--s-line) !important;
+  border-radius: var(--s-radius-control) !important;
+  background-color: var(--s-control) !important;
+  color: inherit !important;
 }
 
 /* ======================================================================== */
@@ -173,7 +190,7 @@
 }
 
 /* A visible heading directly before its groupbox becomes the card's top. */
-:root[artemis-settings-page] .subcategory:not([hidden], .visually-hidden):has(+ groupbox:not([hidden], .visually-hidden)) {
+:root[artemis-settings-page] hbox.subcategory:not([hidden], .visually-hidden):has(+ groupbox:not([hidden], .visually-hidden)) {
   box-sizing: border-box;
   margin: 0 !important;
   padding: calc(14px * var(--s-space)) var(--s-pad) calc(4px * var(--s-space)) !important;
@@ -183,12 +200,12 @@
   background: var(--s-card) !important;
 }
 
-:root[artemis-settings-page] .subcategory:not([hidden], .visually-hidden):has(+ groupbox:not([hidden], .visually-hidden)) h1 {
+:root[artemis-settings-page] hbox.subcategory:not([hidden], .visually-hidden):has(+ groupbox:not([hidden], .visually-hidden)) h1 {
   margin: 0 !important;
   font-size: 1.25em;
 }
 
-:root[artemis-settings-page] .subcategory:not([hidden], .visually-hidden) + groupbox:not([hidden], .visually-hidden) {
+:root[artemis-settings-page] hbox.subcategory:not([hidden], .visually-hidden) + groupbox:not([hidden], .visually-hidden) {
   border-top: none !important;
   border-radius: 0 0 var(--s-radius-card) var(--s-radius-card) !important;
   padding-top: calc(6px * var(--s-space)) !important;
@@ -318,71 +335,45 @@
 
 /* ---- Other mods (Sine's flat list): each separator starts a card --------- */
 
-/* Every row and separator draws its part of the card; the first item, every
-   separator and the item before a separator / the last item round the card.
-   Rows keep Sine's layout and any inline styles a mod sets. */
-:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div) {
+/* Rows (Sine's hbox/vbox/div entries, not text headings) draw their part of a
+   card. The page module marks the visible first and last row of every card
+   with [artemis-card~="start"] / [artemis-card~="end"], so corners stay
+   rounded whatever rows a mod hides or shows. Rows keep Sine's layout and any
+   inline styles a mod sets, except per-row vertical margins, which Artemis's
+   row spacing replaces so a section stays one continuous card. */
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div):not(hbox:not([id]):has(> .sineItemPreferenceLabel:only-child)) {
   box-sizing: border-box;
   width: 100% !important;
-  margin: 0;
+  margin-block: 0 !important;
   padding: calc(10px * var(--s-space)) var(--s-pad) !important;
   border-inline: var(--s-card-border);
-  background: var(--s-card);
-}
-
-:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div) + :is(hbox, div):not(vbox) {
   background: var(--s-divider-image) top center / calc(100% - 2 * var(--s-pad)) 1px no-repeat, var(--s-card);
 }
 
-:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div):first-child,
-:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > vbox:has(> hr) {
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > [artemis-card~="start"] {
   border-top: var(--s-card-border);
   border-start-start-radius: var(--s-radius-card);
   border-start-end-radius: var(--s-radius-card);
+  background: var(--s-card);
 }
 
-:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > vbox:has(> hr) {
-  margin-bottom: 0 !important;
-}
-:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > vbox:has(> hr):not(:first-child) {
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > [artemis-card~="start"]:not(:first-child) {
   margin-top: var(--s-gap) !important;
 }
 
-:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div):last-child,
-:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div):has(+ vbox > hr) {
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > [artemis-card~="end"] {
   border-bottom: var(--s-card-border);
   border-end-start-radius: var(--s-radius-card);
   border-end-end-radius: var(--s-radius-card);
 }
 
-/* Inside a card, Artemis's row spacing replaces per-row margins so a section
-   stays one continuous card. Text-row headings keep the mod's own margins. */
-:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div):not(hbox:not([id]):has(> .sineItemPreferenceLabel:only-child), vbox:has(> hr)) {
-  margin-block: 0 !important;
-}
-
 /* Sine "text" rows (an id-less hbox holding only a label) are headings a mod
-   places between sections: no card, and they end / start the cards around
-   them. Their inline margin and size are kept. */
+   places between sections: no card, and the mod's own margin and size stay. */
 :root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > hbox:not([id]):has(> .sineItemPreferenceLabel:only-child) {
   border: none !important;
   border-radius: 0 !important;
   background: none !important;
   padding-block: calc(6px * var(--s-space)) !important;
-}
-
-:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox:not([id]):has(> .sineItemPreferenceLabel:only-child), button) + :is(hbox, vbox, div) {
-  border-top: var(--s-card-border);
-  border-start-start-radius: var(--s-radius-card);
-  border-start-end-radius: var(--s-radius-card);
-  background: var(--s-card);
-}
-
-:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div):has(+ hbox:not([id]) > .sineItemPreferenceLabel:only-child) {
-  border-bottom: var(--s-card-border);
-  border-end-start-radius: var(--s-radius-card);
-  border-end-end-radius: var(--s-radius-card);
-  margin-bottom: var(--s-gap);
 }
 
 /* Separator = card heading (Sine draws a line with a label over it). */
