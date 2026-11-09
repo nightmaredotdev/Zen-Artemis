@@ -1,0 +1,99 @@
+/* Keyboard Shortcuts (about:keyboard), part of the Settings experience.
+ * @pref artemis.settings.style
+ *
+ * This page runs in Firefox's privileged-about content process, where Sine runs
+ * no mod scripts, so it is styled by CSS alone through Sine's content sheet.
+ * That sheet applies to every page, so every rule here is scoped to
+ * about:keyboard with @-moz-document and gated on the Settings page styling
+ * switch; Windows high contrast (forced colours) turns it off. User-origin
+ * rules need !important to override the page's own (author) tokens.
+ *
+ * Limits (ARCHITECTURE §7.3): this process cannot see the window's workspace
+ * colours or custom glass values, so cards use a neutral tint and Artemis's
+ * named transparency and radius steps (a custom value uses the medium step).
+ *
+ * Fragile dependencies: Firefox design tokens (--card-*, --box-*, --input-*,
+ * --button-*) and .customkeys-sidebar. If they change, the page keeps
+ * Firefox's look. */
+
+@-moz-document url-prefix("about:keyboard") {
+  @media -moz-pref("artemis.settings.style") and (forced-colors: none) {
+    :root {
+      --s-card-opacity: 84.6%;
+      --s-radius: 10px;
+      --s-raised: light-dark(rgb(255 255 255), rgb(36 36 42));
+      --s-line: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.09));
+      --s-control: light-dark(rgb(0 0 0 / 0.04), rgb(255 255 255 / 0.06));
+      --s-hover: light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.07));
+      --s-pressed: light-dark(rgb(0 0 0 / 0.09), rgb(255 255 255 / 0.11));
+    }
+  }
+
+  /* Named glass steps (the window-side tokens are not visible here). */
+  @media -moz-pref("artemis.appearance.transparency", "solid") { :root { --s-card-opacity: 100%; } }
+  @media -moz-pref("artemis.appearance.transparency", "low") { :root { --s-card-opacity: 92.3%; } }
+  @media -moz-pref("artemis.appearance.transparency", "high") { :root { --s-card-opacity: 76.2%; } }
+  @media (prefers-reduced-transparency: reduce) { :root { --s-card-opacity: 100%; } }
+  @media -moz-pref("artemis.appearance.radius", "small") { :root { --s-radius: 6px; } }
+  @media -moz-pref("artemis.appearance.radius", "large") { :root { --s-radius: 14px; } }
+
+  @media -moz-pref("artemis.settings.style") and (forced-colors: none) {
+    :root {
+      --s-card: color-mix(in srgb, var(--s-raised) var(--s-card-opacity), transparent);
+      /* Zen's default window background (no workspace theme is visible here). */
+      background: light-dark(rgb(235 235 235), #1b1b1b) !important;
+
+      --card-background-color: var(--s-card) !important;
+      --card-border: 1px solid var(--s-line) !important;
+      --card-border-color: var(--s-line) !important;
+      --card-border-radius: calc(var(--s-radius) + 4px) !important;
+      --card-box-shadow: none !important;
+      --box-border-color: var(--s-line) !important;
+      --box-border-radius: var(--s-radius) !important;
+      --button-background-color: var(--s-control) !important;
+      --button-background-color-hover: var(--s-hover) !important;
+      --button-background-color-active: var(--s-pressed) !important;
+      --button-border-color: var(--s-line) !important;
+      --button-border-radius: max(4px, calc(var(--s-radius) - 2px)) !important;
+    }
+
+    /* Components that redefine tokens on their own host. */
+    :is(moz-card, moz-box-group, moz-box-item) {
+      --card-background-color: var(--s-card) !important;
+      --card-border: 1px solid var(--s-line) !important;
+      --card-border-radius: calc(var(--s-radius) + 4px) !important;
+      --box-border-color: var(--s-line) !important;
+      --box-border-radius: var(--s-radius) !important;
+    }
+
+    :is(moz-button:not([type~="primary"], [type~="destructive"]), moz-select) {
+      --button-background-color: var(--s-control) !important;
+      --button-background-color-hover: var(--s-hover) !important;
+      --button-background-color-active: var(--s-pressed) !important;
+      --button-border-color: var(--s-line) !important;
+      --button-border-radius: max(4px, calc(var(--s-radius) - 2px)) !important;
+    }
+
+    :is(moz-input-search, moz-input-text) {
+      --input-border: 1px solid var(--s-line) !important;
+      --input-border-radius: calc(var(--s-radius) + 4px) !important;
+      --input-background-color: var(--s-card) !important;
+    }
+
+    /* The sidebar floats as one glass panel, like Settings' navigation. */
+    .customkeys-sidebar {
+      top: 12px !important;
+      height: calc(100vh - 24px) !important;
+      margin-block: 12px !important;
+      padding: 16px 12px !important;
+      border: 1px solid var(--s-line) !important;
+      border-radius: calc(var(--s-radius) + 4px) !important;
+      background-color: var(--s-card) !important;
+    }
+  }
+
+  /* Zen's transparent-browser pref enabled by the user: see-through to the window. */
+  @media -moz-pref("artemis.settings.style") and -moz-pref("browser.tabs.allow_transparent_browser") and (forced-colors: none) {
+    :root { background: transparent !important; }
+  }
+}

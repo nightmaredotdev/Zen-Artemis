@@ -460,6 +460,18 @@
   },
   {
     "type": "separator",
+    "label": "Settings page",
+    "id": "artemis-section-settings-page"
+  },
+  {
+    "type": "checkbox",
+    "property": "artemis.settings.style",
+    "label": "Settings page styling",
+    "description": "Glass styling for Zen's Settings pages: Settings, Sine and every mod's settings, Extensions and Themes, Keyboard Shortcuts. Off restores them.",
+    "defaultValue": true
+  },
+  {
+    "type": "separator",
     "label": "Motion",
     "id": "artemis-section-motion"
   },

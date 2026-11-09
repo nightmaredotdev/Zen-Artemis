@@ -85,6 +85,10 @@ MOZ_REMOTE_ALLOW_SYSTEM_ACCESS=1 WSLENV=MOZ_REMOTE_ALLOW_SYSTEM_ACCESS \
 | `checks/toggle-mod.js` | Disable or enable Artemis through Sine's own toggle and report what remains |
 | `prompt-ui.mjs <resetAll\|restore> <accept\|dismiss>` | Clicks Reset all / Restore and answers the real confirmation dialog through WebDriver alert commands (opens a dialog: free desktop only). Supersedes `checks/prompt.js`, which Marionette's default prompt handling defeats |
 | `checks/multiwindow.js` | Second window: instances, live sync, native restoration, closing (opens a window: free desktop only). Ran successfully on 2026-11-08 |
+| `settings-native.sh <dir>` | Settings experience: for every Settings page (16 `about:preferences` panes, two `about:addons` views, `about:keyboard`) the switch-off page is pixel-identical to Artemis disabled through Sine, and the switch-on page differs; `about:about`, `about:support` and a website are identical in all states. Verifies each page switch and that Artemis is re-enabled |
+| `checks/settings-pane.js` | Shows one Settings page (`paneXxx`, `about:addons#<view>` or a URL), optional `scroll` / `search`, and reports what is shown and the page rectangle |
+| `checks/settings-style.js` | Settings page styling switch: live on/off and cleanup, other prefs untouched, see-through marking with Zen's transparent-browser pref, forced colours, live token mirroring |
+| Test mods `ArtemisTestPrefsNebula`, `ArtemisTestPrefszia` (test profile only) | Two settings-only mods in the test profile whose `preferences.json` is copied from the Nebula and zia references (no styles or scripts), so other mods' settings dialogs can be tested |
 
 ### Scripted checks (Marionette)
 
@@ -393,3 +397,29 @@ test browser's process id in the foreground first, and no other application was 
 Test-procedure note: `checks/runtime-state.js` imports Artemis's core module, which seeds
 the defaults. In a without-JS run, take screenshots and check prefs **before** running it,
 or Artemis's CSS switches on and the comparison with pure Zen is invalid.
+
+### Settings experience styling: 2026-11-09
+
+Implemented on `dev` in three stages (settings-page foundation and Zen panes; Sine and
+every mod's settings; Firefox panes), then extended to Extensions and Themes and Keyboard
+Shortcuts. Zen 1.24.1b, Sine 2.3.4.1c, isolated test profile. Automated checks ran
+headless; the visual review ran in a visible test window with the owner's confirmation
+that the desktop was free (every capture verified the test browser's process id).
+
+| Check | Result |
+|---|---|
+| `check.py`, `git diff --check` | 0 errors, 0 warnings |
+| Native restoration (`settings-native.sh`) | Switch off: **0 differing pixels** against Artemis disabled on all 19 Settings pages (16 panes, Extensions, Plugins, Keyboard Shortcuts); switch on: styled on all 19. `about:about`, `about:support` and a website: identical in all three states |
+| Switch (`settings-style.js`) | Live on/off; no mirrored variables or attributes left when off; other Artemis prefs unchanged; see-through attribute and transparent root only while Zen's pref is on; forced colours: Firefox's own tokens; radius change mirrored live. 0 failures |
+| Keyboard Shortcuts gating | Sine's content sheet reaches the privileged-about process; `-moz-pref()` follows the switch live, default value included (probe in the test profile's generated sheet, removed afterwards) |
+| Artemis settings window | 12 sections, 32 descriptions; search; accordion 24/24; custom fields 0 failures; re-entrancy one enhanced dialog; page styling survives a full Sine rebuild |
+| Disable / re-enable Artemis via Sine | Disabled: page styling and mirrored variables removed. Re-enabled: page styling back |
+| Browser window regressions | 18-cell matrix 0 pixels (one cell showed the known favicon flicker, clean on re-run); feature independence, master overrides and value preservation pass; OS settings, motion and multiple windows unchanged |
+| Fresh install | 32 defaults seeded, no Artemis lines in `prefs.js` |
+| Without JS | Window pixel-identical to Zen; Settings pages native; Keyboard Shortcuts styled when the switch's pref exists (Sine writes checkbox defaults when its settings page renders, F2) |
+| **Visual review (real captures)** | Dark and light: Settings panes (General, Privacy scrolled under the frosted sticky search, Look and Feel, Tab Management, Sine's page), search results, Artemis's window, Nebula-style and zia-style mod windows, Sine's own settings, Extensions and Themes, Keyboard Shortcuts. Compact mode with multiple toolbars. Solid; custom 10% with large radius (readability floor holds); see-through with Zen's transparent-browser pref. One defect found and fixed: search results joined each card to its hidden heading (Firefox hides headings with `.visually-hidden`) |
+
+Not covered: a colourful workspace theme (the test profile uses Zen's neutral default, so
+workspace tinting was verified through the mirrored values rather than a vivid gradient),
+and mods with long conditional sections (known limitation: a card loses its rounded
+bottom corners when its last row is hidden by a condition).

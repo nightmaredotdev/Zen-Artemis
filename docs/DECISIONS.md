@@ -9,6 +9,48 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-09: Settings experience styling (owner)
+
+**Approved** by the owner, in four steps on 2026-11-09:
+
+1. The next cycle refines the settings interface visually (no new features, presets or
+   settings-system rewrite). Background for Artemis's dialog: **adaptive** (blurred, tinted
+   page by default; see-through to the window only while the user has enabled Zen's
+   `browser.tabs.allow_transparent_browser`, which Artemis never writes).
+2. Scope widened from Artemis's dialog to the whole settings dialog (every mod), then to
+   the whole `about:preferences` page, Zen's and Firefox's panes included. This reverses
+   the earlier rule that Artemis styles only its own dialog (§7.2 safety rules still apply
+   to the enhancer) and brings the settings-page part of the v1.2 internal-pages scope
+   forward.
+3. Scope widened to **every page reachable from Zen's Settings navigation**: Extensions
+   and Themes (`about:addons`) and Keyboard Shortcuts (`about:keyboard`) included,
+   wherever technically feasible, without affecting other pages or websites.
+4. One independent switch, `artemis.settings.style` (Settings page styling, on by
+   default): off restores every Settings page to native and changes no other preference.
+   Implementation is script-based (the owner accepted that the settings pages stay native
+   without Sine's script support), strictly scoped, with graceful fallback to native.
+
+Investigation results that shaped the design (ARCHITECTURE §7.3):
+
+- `about:preferences` and `about:addons` are chrome documents in the parent process: Sine
+  runs mod scripts there, so one module (`scripts/settings/page.mjs`) and one author sheet
+  cover both, with the window's tokens and workspace colours mirrored.
+- `about:keyboard` runs in the privileged-about content process: Sine runs no mod scripts
+  there, but its content user sheet reaches it and `-moz-pref()` follows the switch live
+  (verified in the test profile). It gets scoped content CSS (`styles/pages/`), the first
+  use of `content.css`, so it cannot follow workspace colours or custom glass values.
+- Zen support opens a website and is not styled. Popup documents (Manage Exceptions and
+  other subdialogs) and extensions' own options pages stay native.
+- Firefox's panes are web components with shadow DOM. They are styled through their
+  design tokens only (no `::part()`), so a renamed token simply leaves that element
+  native.
+- Other mods keep their own layout and get no Artemis controls; inside a card, per-row
+  margins are replaced by Artemis's row spacing so each section reads as one card. For
+  consistency Artemis's own rows keep Sine's layout too (an Artemis-only control
+  reordering was dropped).
+
+---
+
 ## 2026-11-08: v1.0.1 released as a bug-fix-only patch (owner)
 
 **Approved** by the owner: v1.0.1 contains only the post-release fixes below. The owner

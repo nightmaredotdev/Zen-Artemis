@@ -1,5 +1,8 @@
 /* Artemis: content entry point. Ordered imports only; no rules here.
  *
- * Intentionally empty until v1.2. Internal-page styling will be explicitly
- * scoped to browser-owned pages so that website content is never touched.
+ * Sine applies this sheet to every page, websites included. Every imported
+ * file must scope all of its rules to browser-owned URLs with @-moz-document
+ * (ARCHITECTURE §9.1), so websites are never affected.
  */
+
+@import "styles/pages/settings-keyboard.css";

@@ -1,0 +1,557 @@
+/* Artemis settings page styling (artemis.settings.style).
+ *
+ * Author sheet loaded into about:preferences, about:settings and about:addons by
+ * scripts/settings/page.mjs only
+ * while the switch is on; removing it restores Zen's settings page. It never
+ * applies to any other document. Separate popup documents (subdialogs such as
+ * Manage Exceptions) are their own documents and are not touched.
+ *
+ * Visual language: the page background is the window's own workspace
+ * background (see-through to the window when the user enabled Zen's
+ * transparent-browser pref); every section is a separate, workspace-tinted
+ * glass card with a hairline border; consistent spacing; restrained accent.
+ * Glass values come from the browser window's Artemis tokens, mirrored by the
+ * module as --artemis-s-* (transparency, blur, radius, spacing, accent, OS
+ * fallback). Readability floors keep text legible at very low opacities.
+ *
+ * Fragile dependencies (documented in docs/ARCHITECTURE.md §7.3). Every one
+ * fails closed: if markup or a token changes, that element keeps Zen's look.
+ *   - Zen panes:     hbox.subcategory + groupbox, #search-container
+ *   - about:addons:  addon-page-header .sticky-container/.main-search/.main-heading
+ *   - Firefox:       design tokens of moz-card, moz-box-*, moz-page-nav,
+ *                    moz-input-*, moz-select (no ::part, no shadow internals)
+ *   - Sine:          #sineInstallationGroup, #sineInstalledGroup, .sineItem,
+ *                    .sineInstallationItem, dialog.sineItemPreferenceDialog,
+ *                    .sineItemPreferenceDialogTopBar/Content, .separator-label
+ *
+ * Windows high contrast (forced colours): nothing here applies. */
+
+@media not (forced-colors: active) {
+
+/* ======================================================================== */
+/* Tokens                                                                    */
+/* ======================================================================== */
+
+:root[artemis-settings-page] {
+  --s-opacity: var(--artemis-s-glass-opacity, 72%);
+  /* Cards are text-heavy panels: never below 55% even for a lower custom opacity. */
+  --s-card-opacity: max(55%, var(--artemis-s-glass-panel-opacity, 84%));
+  --s-filter: var(--artemis-s-glass-filter, blur(18px) saturate(140%));
+  --s-radius: var(--artemis-s-radius, 10px);
+  --s-radius-card: calc(var(--s-radius) + 4px);
+  --s-radius-control: max(4px, calc(var(--s-radius) - 2px));
+  --s-space: var(--artemis-s-space-factor, 1);
+  --s-pad: calc(16px * var(--s-space));
+  --s-gap: calc(12px * var(--s-space));
+  --s-accent: color-mix(in oklab, var(--artemis-s-accent, var(--zen-primary-color, #7c8aff)) 62%, light-dark(rgb(0 0 0), rgb(255 255 255)));
+
+  /* Surfaces, tinted with the workspace colour like Artemis's glass panels. */
+  --s-tint: var(--artemis-s-zen-primary-color, transparent);
+  --s-base: light-dark(rgb(244 244 247), rgb(22 22 26));
+  --s-raised: color-mix(in srgb, light-dark(rgb(255 255 255), rgb(36 36 42)), var(--s-tint) 10%);
+  --s-card: color-mix(in srgb, var(--s-raised) var(--s-card-opacity), transparent);
+  --s-line: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.09));
+  --s-divider: light-dark(rgb(0 0 0 / 0.06), rgb(255 255 255 / 0.06));
+  --s-control: light-dark(rgb(0 0 0 / 0.04), rgb(255 255 255 / 0.06));
+  --s-hover: light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.07));
+  --s-pressed: light-dark(rgb(0 0 0 / 0.09), rgb(255 255 255 / 0.11));
+  --s-muted: light-dark(rgb(0 0 0 / 0.6), rgb(255 255 255 / 0.6));
+  --s-page: var(--artemis-s-zen-main-browser-background, var(--s-base));
+
+  /* Shared card surface and inset row divider. */
+  --s-card-border: 1px solid var(--s-line);
+  --s-divider-image: linear-gradient(var(--s-divider), var(--s-divider));
+
+  /* Firefox design tokens (the public styling surface of moz-* components). */
+  --card-background-color: var(--s-card);
+  --card-border: var(--s-card-border);
+  --card-border-color: var(--s-line);
+  --card-border-radius: var(--s-radius-card);
+  --card-border-radius-compact: var(--s-radius);
+  --card-box-shadow: none;
+  --box-border-color: var(--s-line);
+  --box-border-radius: var(--s-radius);
+  --page-nav-border-color: transparent;
+  --page-nav-button-background-color-selected: var(--s-pressed);
+  --page-nav-button-text-color-selected: currentColor;
+  --page-nav-button-indicator-background-color: var(--s-accent);
+  --page-nav-button-border-radius: var(--s-radius-control);
+  /* Neutral buttons and selects everywhere on the page share one control look;
+     primary (accent) buttons keep Firefox's colours. */
+  --button-background-color: var(--s-control);
+  --button-background-color-hover: var(--s-hover);
+  --button-background-color-active: var(--s-pressed);
+  --button-border-color: var(--s-line);
+  --button-border-radius: var(--s-radius-control);
+  --select-border-color: var(--s-line);
+  --focus-outline-color: var(--s-accent);
+}
+
+/* ======================================================================== */
+/* Page                                                                      */
+/* ======================================================================== */
+
+:root[artemis-settings-page] {
+  background: var(--s-page) !important;
+  background-attachment: fixed !important;
+}
+
+/* Zen's transparent-browser pref enabled by the user: see-through to the window. */
+:root[artemis-settings-page][artemis-see-through] {
+  background: transparent !important;
+}
+
+/* Sticky search header: frosted, so content scrolling underneath stays quiet;
+   the bottom edge fades instead of cutting. */
+:root[artemis-settings-page] #search-container {
+  background: transparent !important;
+  backdrop-filter: blur(16px);
+  mask-image: linear-gradient(to bottom, black calc(100% - 10px), transparent);
+}
+
+/* Extensions and Themes (about:addons): same frosted sticky header. */
+:root[artemis-settings-page] addon-page-header .sticky-container {
+  background: transparent !important;
+  backdrop-filter: blur(16px);
+  mask-image: linear-gradient(to bottom, black calc(100% - 10px), transparent);
+}
+
+:root[artemis-settings-page] addon-page-header :is(.main-search, .main-heading) {
+  background: transparent !important;
+}
+
+/* ======================================================================== */
+/* Navigation                                                                */
+/* ======================================================================== */
+
+/* The category list floats as one glass panel. Host-level styling only. */
+:root[artemis-settings-page] moz-page-nav {
+  box-sizing: border-box;
+  top: var(--s-gap) !important;
+  height: calc(100vh - 2 * var(--s-gap)) !important;
+  margin-block: var(--s-gap) !important;
+  padding: var(--s-pad) calc(10px * var(--s-space)) !important;
+  border: var(--s-card-border) !important;
+  border-radius: var(--s-radius-card);
+  background: var(--s-card);
+  --page-nav-margin-block-start: 0;
+}
+
+/* ======================================================================== */
+/* Inputs (Firefox moz-input-* tokens, set on the hosts so they win)         */
+/* ======================================================================== */
+
+:root[artemis-settings-page] :is(moz-input-search, moz-input-text) {
+  --input-border: 1px solid var(--s-line);
+  --input-border-radius: var(--s-radius-card);
+  --input-background-color: var(--s-card);
+  --input-min-height: 40px;
+}
+
+/* Buttons and selects redefine the button tokens on their own host, so the
+   shared control look is set on the hosts too (primary buttons untouched). */
+:root[artemis-settings-page] :is(moz-button:not([type~="primary"], [type~="destructive"]), moz-select, moz-box-button) {
+  --button-background-color: var(--s-control);
+  --button-background-color-hover: var(--s-hover);
+  --button-background-color-active: var(--s-pressed);
+  --button-border-color: var(--s-line);
+  --button-border-radius: var(--s-radius-control);
+  --select-border-color: var(--s-line);
+}
+
+/* ======================================================================== */
+/* Zen panes and Sine's page: subcategory heading + groupbox = one card      */
+/* ======================================================================== */
+
+:root[artemis-settings-page] groupbox:not([hidden], .visually-hidden) {
+  box-sizing: border-box;
+  margin: 0 0 calc(20px * var(--s-space)) !important;
+  padding: calc(14px * var(--s-space)) var(--s-pad) !important;
+  border: var(--s-card-border) !important;
+  border-radius: var(--s-radius-card) !important;
+  background: var(--s-card) !important;
+}
+
+/* A visible heading directly before its groupbox becomes the card's top. */
+:root[artemis-settings-page] .subcategory:not([hidden], .visually-hidden):has(+ groupbox:not([hidden], .visually-hidden)) {
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: calc(14px * var(--s-space)) var(--s-pad) calc(4px * var(--s-space)) !important;
+  border: var(--s-card-border) !important;
+  border-bottom: none !important;
+  border-radius: var(--s-radius-card) var(--s-radius-card) 0 0 !important;
+  background: var(--s-card) !important;
+}
+
+:root[artemis-settings-page] .subcategory:not([hidden], .visually-hidden):has(+ groupbox:not([hidden], .visually-hidden)) h1 {
+  margin: 0 !important;
+  font-size: 1.25em;
+}
+
+:root[artemis-settings-page] .subcategory:not([hidden], .visually-hidden) + groupbox:not([hidden], .visually-hidden) {
+  border-top: none !important;
+  border-radius: 0 0 var(--s-radius-card) var(--s-radius-card) !important;
+  padding-top: calc(6px * var(--s-space)) !important;
+}
+
+/* Controls inside Zen's cards: one shared look. */
+:root[artemis-settings-page] groupbox :is(button, menulist):not(.sineItemConfigureButton, .sineItemHomepageButton, [class*="color-picker"]) {
+  border: 1px solid var(--s-line) !important;
+  border-radius: var(--s-radius-control) !important;
+  background-color: var(--s-control) !important;
+  color: inherit !important;
+}
+
+:root[artemis-settings-page] groupbox :is(button, menulist):not(.sineItemConfigureButton, .sineItemHomepageButton, [class*="color-picker"]):hover:not([disabled]) {
+  background-color: var(--s-hover) !important;
+}
+
+:root[artemis-settings-page] groupbox input:is([type="text"], [type="number"], [type="search"], :not([type])) {
+  border: 1px solid var(--s-line) !important;
+  border-radius: var(--s-radius-control) !important;
+  background-color: var(--s-control) !important;
+  color: inherit !important;
+}
+
+/* Inner surfaces Zen draws inside a card (theme builder, compact-mode previews). */
+:root[artemis-settings-page] :is(#zen-theme-builder, .zen-compact-mode-styles-browser-wrapper) {
+  border: 1px solid var(--s-line) !important;
+  background: var(--s-control) !important;
+}
+
+/* ---- Sine's page --------------------------------------------------------- */
+
+:root[artemis-settings-page] :is(.sineItem, .sineInstallationItem) {
+  border: 1px solid var(--s-line) !important;
+  border-radius: var(--s-radius) !important;
+  background-color: var(--s-control) !important;
+  box-shadow: none !important;
+}
+
+/* ======================================================================== */
+/* Sine settings dialogs (every mod, Sine's own settings, store readmes)     */
+/* ======================================================================== */
+
+:root[artemis-settings-page] dialog.sineItemPreferenceDialog {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: calc(20px * var(--s-space)) calc(24px * var(--s-space)) !important;
+  /* Stable width; the title bar stays put while the content scrolls. */
+  width: min(880px, 92vw) !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+:root[artemis-settings-page] dialog.sineItemPreferenceDialog[open] {
+  display: flex !important;
+  flex-direction: column;
+}
+
+/* Page behind an open dialog: blurred and tinted. The tint follows the glass
+   opacity (solid 100%, medium 44%, at least 20%), so "Solid" and the OS
+   fallback give an opaque backdrop. */
+:root[artemis-settings-page] dialog.sineItemPreferenceDialog::backdrop {
+  background: color-mix(
+    in srgb,
+    var(--s-base) clamp(20%, calc((var(--artemis-s-glass-opacity, 72%) - 50%) * 2), 100%),
+    transparent
+  );
+  backdrop-filter: blur(24px) saturate(120%);
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogTopBar {
+  flex: none;
+  gap: 8px;
+  margin: 0 0 var(--s-gap) !important;
+  padding: 0 0 0 var(--s-pad) !important; /* title lines up with the card text */
+  border-bottom: none !important;
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogTopBar :is(h3, .sineItemTitle) {
+  margin: 0;
+  font-size: 1.25em;
+  font-weight: 600;
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogTopBar > :is(a, button) { margin: 0 !important; }
+:root[artemis-settings-page] .sineItemPreferenceDialogTopBar > :is(h3, .sineItemTitle) + :is(a, button),
+:root[artemis-settings-page] .sineItemPreferenceDialogTopBar > :is(a, button):first-child {
+  margin-inline-start: auto !important;
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogTopBar button {
+  height: auto !important;
+  min-height: 32px;
+  padding: 6px 14px !important;
+  border: 1px solid var(--s-line) !important;
+  border-radius: var(--s-radius-control) !important;
+  background-color: var(--s-card) !important;
+  color: inherit !important;
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogTopBar button.github-link {
+  min-width: 34px;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 16px !important;
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogTopBar button:hover {
+  background-color: var(--s-raised) !important;
+}
+
+/* Content: the card list scrolls below the title bar. A little inline padding
+   keeps focus rings and borders from being clipped. */
+:root[artemis-settings-page] .sineItemPreferenceDialogContent {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  overflow-y: auto;
+  padding: 0 3px 3px !important;
+  margin-inline: -3px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--s-line) transparent;
+}
+
+/* ---- Other mods (Sine's flat list): each separator starts a card --------- */
+
+/* Every row and separator draws its part of the card; the first item, every
+   separator and the item before a separator / the last item round the card.
+   Rows keep Sine's layout and any inline styles a mod sets. */
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div) {
+  box-sizing: border-box;
+  width: 100% !important;
+  margin: 0;
+  padding: calc(10px * var(--s-space)) var(--s-pad) !important;
+  border-inline: var(--s-card-border);
+  background: var(--s-card);
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div) + :is(hbox, div):not(vbox) {
+  background: var(--s-divider-image) top center / calc(100% - 2 * var(--s-pad)) 1px no-repeat, var(--s-card);
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div):first-child,
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > vbox:has(> hr) {
+  border-top: var(--s-card-border);
+  border-start-start-radius: var(--s-radius-card);
+  border-start-end-radius: var(--s-radius-card);
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > vbox:has(> hr) {
+  margin-bottom: 0 !important;
+}
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > vbox:has(> hr):not(:first-child) {
+  margin-top: var(--s-gap) !important;
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div):last-child,
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div):has(+ vbox > hr) {
+  border-bottom: var(--s-card-border);
+  border-end-start-radius: var(--s-radius-card);
+  border-end-end-radius: var(--s-radius-card);
+}
+
+/* Inside a card, Artemis's row spacing replaces per-row margins so a section
+   stays one continuous card. Text-row headings keep the mod's own margins. */
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div):not(hbox:not([id]):has(> .sineItemPreferenceLabel:only-child), vbox:has(> hr)) {
+  margin-block: 0 !important;
+}
+
+/* Sine "text" rows (an id-less hbox holding only a label) are headings a mod
+   places between sections: no card, and they end / start the cards around
+   them. Their inline margin and size are kept. */
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > hbox:not([id]):has(> .sineItemPreferenceLabel:only-child) {
+  border: none !important;
+  border-radius: 0 !important;
+  background: none !important;
+  padding-block: calc(6px * var(--s-space)) !important;
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox:not([id]):has(> .sineItemPreferenceLabel:only-child), button) + :is(hbox, vbox, div) {
+  border-top: var(--s-card-border);
+  border-start-start-radius: var(--s-radius-card);
+  border-start-end-radius: var(--s-radius-card);
+  background: var(--s-card);
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogContent:not(.artemis-enhanced) > :is(hbox, vbox, div):has(+ hbox:not([id]) > .sineItemPreferenceLabel:only-child) {
+  border-bottom: var(--s-card-border);
+  border-end-start-radius: var(--s-radius-card);
+  border-end-end-radius: var(--s-radius-card);
+  margin-bottom: var(--s-gap);
+}
+
+/* Separator = card heading (Sine draws a line with a label over it). */
+:root[artemis-settings-page] .sineItemPreferenceDialogContent > vbox:has(> hr) > hr {
+  display: none !important;
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogContent > vbox:has(> hr) > .separator-label {
+  position: static !important;
+  transform: none !important;
+  margin: 0 !important;
+  padding: calc(4px * var(--s-space)) 0 !important;
+  background: transparent !important;
+  color: inherit !important;
+  font-size: 1.05em;
+  font-weight: 600;
+}
+
+/* ---- Rows and controls in every dialog ----------------------------------- */
+
+:root[artemis-settings-page] .sineItemPreferenceDialogContent hbox {
+  gap: 12px;
+  min-height: 44px;
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogContent :is(menulist, button.settingsBtn),
+:root[artemis-settings-page] .sineItemPreferenceDialogContent hbox > input:not([type="checkbox"]) {
+  box-sizing: border-box;
+  min-height: 32px;
+  height: auto !important;
+  padding: 5px 12px !important;
+  border: 1px solid var(--s-line) !important;
+  border-radius: var(--s-radius-control) !important;
+  background-color: var(--s-control) !important;
+  color: inherit !important;
+  font-weight: 500;
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogContent hbox > input:not([type="checkbox"]) {
+  min-width: 12em;
+  font-weight: 400;
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogContent :is(menulist, button.settingsBtn):hover:not([disabled]) {
+  background-color: var(--s-hover) !important;
+}
+
+:root[artemis-settings-page] .sineItemPreferenceDialogContent .markdown-body {
+  padding: var(--s-pad);
+  background: transparent !important;
+}
+
+/* ---- Artemis's own dialog: same cards, plus its extras ------------------- */
+
+:root[artemis-settings-page] .artemis-enhanced {
+  display: flex !important;
+  flex-direction: column;
+  gap: var(--s-gap);
+}
+
+:root[artemis-settings-page] .artemis-enhanced > :is(.artemis-toolbar, .artemis-section, .artemis-footer, .artemis-notice, .artemis-empty) {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 !important;
+}
+
+:root[artemis-settings-page] .artemis-enhanced :is(.artemis-section, .artemis-footer, .artemis-empty) {
+  border: var(--s-card-border) !important;
+  border-radius: var(--s-radius-card);
+  background: var(--s-card);
+}
+
+:root[artemis-settings-page] .artemis-enhanced .artemis-section {
+  padding: 0 !important;
+  border-top: var(--s-card-border) !important;
+  overflow: clip;
+}
+
+:root[artemis-settings-page] .artemis-enhanced .artemis-toolbar {
+  top: 0;
+  padding: 0 !important;
+  background: transparent;
+}
+
+:root[artemis-settings-page] .artemis-enhanced .artemis-search {
+  min-height: 40px;
+  padding: 9px 14px;
+  border: var(--s-card-border) !important;
+  border-radius: var(--s-radius-card) !important;
+  /* Cards scroll underneath the sticky search: frosted and more opaque. */
+  background: color-mix(in srgb, var(--s-raised) 88%, transparent) !important;
+  backdrop-filter: var(--s-filter);
+  outline: none;
+}
+
+:root[artemis-settings-page] .artemis-enhanced .artemis-search:focus-visible { border-color: var(--s-accent); }
+:root[artemis-settings-page] .artemis-enhanced .artemis-search::placeholder { color: var(--s-muted); opacity: 1; }
+
+:root[artemis-settings-page] .artemis-enhanced .artemis-section-header {
+  justify-content: flex-start !important;
+  gap: 10px;
+  margin: 0 !important;
+  padding: calc(13px * var(--s-space)) var(--s-pad) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: inherit !important;
+  font-size: 1.05em;
+}
+
+:root[artemis-settings-page] .artemis-enhanced .artemis-section-header > span:last-child { flex: 1; }
+:root[artemis-settings-page] .artemis-enhanced .artemis-section-header:hover { background: var(--s-hover) !important; }
+
+:root[artemis-settings-page] .artemis-enhanced .artemis-section-body {
+  padding: 0 var(--s-pad) calc(4px * var(--s-space)) !important;
+}
+
+/* Every visible row draws the line above it (also the line under the header). */
+:root[artemis-settings-page] .artemis-enhanced .artemis-section-body > hbox {
+  box-sizing: border-box;
+  width: 100% !important;
+  min-height: 52px;
+  margin: 0 !important;
+  padding: calc(10px * var(--s-space)) 0 !important;
+  border-top: 1px solid var(--s-divider);
+}
+
+:root[artemis-settings-page] .artemis-enhanced .artemis-labelbox > .sineItemPreferenceLabel { font-weight: 500; }
+:root[artemis-settings-page] .artemis-enhanced :is(.artemis-desc, .artemis-inactive-note) { color: var(--s-muted); font-size: 0.88em; line-height: 1.4; }
+
+:root[artemis-settings-page] .artemis-enhanced .artemis-reset {
+  width: 26px !important;
+  min-width: 0 !important;
+  height: 26px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  border-radius: var(--s-radius-control);
+}
+
+:root[artemis-settings-page] .artemis-enhanced .artemis-footer { padding: calc(12px * var(--s-space)) var(--s-pad) !important; border-top: var(--s-card-border) !important; }
+:root[artemis-settings-page] .artemis-enhanced .artemis-empty { padding: calc(20px * var(--s-space)) var(--s-pad) !important; text-align: center; }
+:root[artemis-settings-page] .artemis-enhanced .artemis-notice {
+  padding: 10px var(--s-pad) !important;
+  border: 1px solid color-mix(in srgb, #d9a400 35%, transparent);
+  border-radius: var(--s-radius-card);
+  background: color-mix(in srgb, #d9a400 14%, var(--s-card));
+}
+
+:root[artemis-settings-page] .artemis-enhanced :is(.artemis-button, .artemis-select) {
+  min-height: 32px;
+  padding: 5px 12px;
+  border-radius: var(--s-radius-control);
+  background-color: var(--s-control);
+  font-weight: 500;
+}
+
+/* ======================================================================== */
+/* Shared focus ring and motion                                              */
+/* ======================================================================== */
+
+:root[artemis-settings-page] :is(groupbox, dialog.sineItemPreferenceDialog) :is(menulist, button, checkbox, input, select):focus-visible {
+  outline: 2px solid var(--s-accent) !important;
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[artemis-settings-page] :is(groupbox, dialog.sineItemPreferenceDialog) :is(menulist, button) {
+    transition: background-color 120ms ease;
+  }
+}
+
+} /* not forced colours */

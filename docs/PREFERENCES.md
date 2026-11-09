@@ -97,6 +97,12 @@ Those options keep their values and apply again when the area is turned back on.
 |---|---|---|---|
 | `artemis.media.controls` | on · off | on | Artemis styling of the media controls card in the sidebar |
 
+## Settings page
+
+| Setting | Values | Default | What it does |
+|---|---|---|---|
+| `artemis.settings.style` | on · off | on | Glass styling for every page in Zen's Settings experience: Settings (`about:preferences`: Zen's and Firefox's panes, navigation, search), Sine's page and every mod's settings dialog, Extensions and Themes (`about:addons`) and Keyboard Shortcuts (`about:keyboard`). Off restores all of them and changes no other setting. Without Sine's script support only Keyboard Shortcuts is styled. Keyboard Shortcuts cannot follow workspace colours or custom glass values (it runs in a separate process). Popup documents such as Manage Exceptions, extensions' own options pages and websites are never styled, and Windows high-contrast mode turns it off |
+
 ## Motion
 
 | Setting | Values | Default | What it does |

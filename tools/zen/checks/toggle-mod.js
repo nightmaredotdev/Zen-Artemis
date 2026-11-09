@@ -22,6 +22,8 @@ return {
   tourCard: !!win.document.getElementById("artemis-tour"),
   enhancedDialog: pdoc ? pdoc.querySelectorAll(".artemis-enhanced").length : "no prefs tab",
   enhancerAdded: pdoc ? pdoc.querySelectorAll(".artemis-toolbar, .artemis-footer, .artemis-section").length : null,
+  settingsPageStyled: pdoc ? pdoc.documentElement.hasAttribute("artemis-settings-page") : null,
+  settingsPageVars: pdoc ? [...pdoc.documentElement.style].filter(p => p.startsWith("--artemis-s-")).length : null,
   scrollbarPart: (() => {
     const box = win.document.querySelector(".workspace-arrowscrollbox");
     const sb = box?.shadowRoot?.querySelector("scrollbox");

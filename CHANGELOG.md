@@ -6,6 +6,29 @@ All notable changes to Artemis are documented here. Artemis uses
 
 ## [Unreleased]
 
+### Added
+- **Glass Settings pages.** Every page in Zen's Settings experience now uses Artemis's
+  look: a transparent background, separate workspace-tinted glass cards with subtle
+  borders, and consistent spacing. This covers Settings (Zen's and Firefox's panes,
+  navigation and search), Sine's mod page and every mod's settings window, Extensions and
+  Themes, and Keyboard Shortcuts. Cards follow your transparency, blur, radius and spacing
+  settings; Keyboard Shortcuts uses the named steps only. With Zen's
+  `browser.tabs.allow_transparent_browser` enabled, the pages are see-through to the window.
+- **Settings page styling** switch (Settings page section, on by default). Off restores
+  all of these pages to Zen's own look and changes no other setting.
+
+### Changed
+- Artemis's own settings window uses the same cards as every other mod's, with a fixed
+  width and a list that scrolls below its title bar.
+
+### Notes
+- Other mods keep their own settings layout and get no Artemis controls; inside a card,
+  their row spacing follows Artemis's.
+- Pop-up windows such as Manage Exceptions, extensions' own options pages and websites
+  are not restyled. Windows high-contrast mode turns the styling off.
+- Settings, Sine and Extensions and Themes need Sine's script support; without it only
+  Keyboard Shortcuts is styled.
+
 ## [1.0.1] - 2026-11-08
 
 Bug-fix release. No new features or settings; existing settings are kept as they are.

@@ -17,6 +17,10 @@ A minimalist, customizable theme for **Zen Browser**. Designed to bring a clean,
   appearance or behaviour.
 - **Settings live in Sine:** open Artemis's settings from Sine's mod list. Changes apply
   immediately.
+- **Glass Settings pages:** Zen's Settings (including Sine and every mod's settings),
+  Extensions and Themes, and Keyboard Shortcuts share the same glass cards. One switch,
+  *Settings page styling*, restores them to Zen's own look. Websites and other pages are
+  never restyled.
 
 ## Compatibility
 
