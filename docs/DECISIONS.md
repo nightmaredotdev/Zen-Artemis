@@ -9,6 +9,25 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-09: Genuinely translucent toolbar panels (owner decision)
+
+The owner found toolbar panels (Downloads and others) matching the cards' colours but
+fully opaque, even at 10%. Cause: the panel surface had a single painted layer, the
+panel's content box, and its background colour was the window's opaque base under the
+copied workspace gradient; the configured opacity only applied to the glass layer above
+that opaque base (no Zen layer or pseudo-element involved). On Settings pages the same
+design reads as transparent only because the copied gradient shows through the cards.
+
+Decision: toolbar panels drop the copy and the base and keep only the glass layer, so
+what is under them genuinely shows through (sharp: popup windows cannot blur). Shown on
+screen at 10%: the cards' formula (45%), the same with a text halo, and a 70% floor.
+**Owner chose the 70% floor**: panels follow the transparency setting but never go below
+70%. This applies to toolbar panels (Firefox's arrow panels); menus and the other panels
+(autocomplete drop-downs over web pages, the Ctrl+Tab switcher) keep the workspace
+glass.
+
+---
+
 ## 2026-11-09: Popup glass and Keyboard Shortcuts gutter (owner decisions)
 
 The owner found toolbar panels (Downloads, Extensions) still solid and the Keyboard

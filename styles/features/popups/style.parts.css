@@ -1,17 +1,28 @@
-/* artemis.popups.style: workspace glass for menus and panels (author origin:
- * ::part() is ignored in user sheets).
- * Popups are separate OS windows, so nothing behind them can be blurred
- * (Windows draws a blurred backdrop only for menus, and only with its
- * transparency effects on). Like the Settings pages, a popup shows a copy of
- * the window's workspace background aligned to where it opens
- * (scripts/window/popup-glass.mjs sets --artemis-popup-* and [artemis-glass]),
- * under the same translucent card layer (--artemis-popup-glass, style.css).
- * Without the copy, the solid tinted surface of style.css stays. Menus keep
- * Windows' own blurred backdrop where it is available. */
+/* artemis.popups.style: glass for menus and panels (author origin: ::part() is
+ * ignored in user sheets).
+ *
+ * Toolbar panels (arrow panels: Downloads, Extensions, the app menu, site and
+ * Zen panels, previews) are genuinely translucent: their surface is only a glass layer in the
+ * Settings cards' tint (--artemis-panel-glass, style.css), following Artemis's
+ * transparency setting with a 70% readability floor (opaque for Solid and
+ * reduced transparency), so the window and anything else under the panel
+ * shows through. Popup windows cannot blur what is behind them (only Windows'
+ * acrylic menu backdrop can, with its transparency effects on), so that
+ * content shows through sharp; the floor keeps panel text readable.
+ *
+ * Menus (context menus, menulist lists) and the other panels (autocomplete
+ * drop-downs over web pages, the Ctrl+Tab switcher) keep the workspace glass: a copy of
+ * the window's workspace background aligned to where they open
+ * (scripts/window/popup-glass.mjs sets --artemis-popup-* and [artemis-glass])
+ * under the same glass layer. Menus keep Windows' own blurred backdrop where it
+ * is available. <select> lists are left alone. */
 
 @media -moz-pref("artemis.popups.style") and (forced-colors: none) {
-  panel[artemis-glass]::part(content),
-  menupopup[artemis-glass]::part(content) {
+  panel[type="arrow"]::part(content) {
+    background: var(--artemis-panel-glass) !important;
+  }
+
+  :is(menupopup, panel:not([type="arrow"]))[artemis-glass]::part(content) {
     background-color: var(--artemis-popup-base) !important;
     background-image: linear-gradient(var(--artemis-popup-glass), var(--artemis-popup-glass)), var(--artemis-popup-bg) !important;
     background-size: 100% 100%, var(--artemis-popup-bg-size) !important;

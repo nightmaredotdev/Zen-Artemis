@@ -36,6 +36,18 @@
         clamp(45%, calc(100% - (100% - var(--artemis-glass-opacity)) * 1.7), 100%),
       transparent
     );
+    /* Toolbar (arrow) panels are genuinely translucent over whatever is under them
+       (style.parts.css). Nothing behind a popup window can be blurred, so
+       content underneath shows through sharp: they follow Artemis's
+       transparency setting but never go below 70% opacity, so their text stays
+       readable (default 72%, low 86%, high and custom below 70%: 70%; solid
+       and reduced transparency: opaque). Owner's choice. */
+    --artemis-panel-glass: color-mix(
+      in srgb,
+      color-mix(in srgb, light-dark(rgb(255 255 255), rgb(24 24 29)), var(--zen-primary-color, transparent) 8%)
+        clamp(70%, var(--artemis-glass-opacity), 100%),
+      transparent
+    );
     /* Buttons inside panels (footers, extension and site panels). */
     --button-background-color: var(--artemis-hover) !important;
     --button-background-color-hover: var(--artemis-pressed) !important;

@@ -406,16 +406,24 @@ toggles, in-page menus), the token is set on that host. Visual rules:
   nothing behind it can be blurred: CSS `backdrop-filter` only blurs content of the
   same window, and Windows draws a blurred (acrylic) backdrop only for menus and only
   with its transparency effects on. Unblurred, the text behind runs through the menu
-  text. So, like the Settings pages, menus and panels show a **copy of the window's
-  workspace background aligned to where they open**, under exactly a card's glass layer
-  (`scripts/window/popup-glass.mjs` copies the layers with `readWindowVars` relative to
-  the popup's content box on `popuppositioned`/`popupshown`;
-  `styles/features/popups/style.parts.css` paints them on `::part(content)`, author
-  origin). They follow the workspace gradient like a card does (violet: 45,33,69 at the
-  top to 58,28,57 at the bottom; cards 42–47,36–37,66–68). Without a themed workspace or
-  JS, the solid surface tinted 14% toward the workspace colour stays. Where Windows
-  draws its acrylic menu backdrop, menus use translucent glass over it instead.
-  `<select>` drop-down lists are left alone (websites can colour them).
+  text. **Toolbar panels** (Firefox's arrow panels: Downloads, Extensions, the app menu,
+  overflow, site and Zen panels, previews) are genuinely translucent: their surface (`::part(content)`,
+  `styles/features/popups/style.parts.css`, author origin) is only a glass layer in the
+  cards' tint, following Artemis's transparency setting with a **70% readability floor**
+  (`--artemis-panel-glass`: default 72%, low 86%, high and custom below 70%: 70%; solid
+  and reduced transparency opaque; owner's choice after comparing the cards' 45% floor,
+  a text halo and the floor on screen). The window and anything under a panel show
+  through, sharp. **Menus** (context menus, menulist lists) and the **other panels**
+  (autocomplete drop-downs, which open over web pages, and the Ctrl+Tab switcher)
+  instead show a copy of the
+  window's workspace background aligned to where they open, under exactly a card's
+  glass layer (`scripts/window/popup-glass.mjs` copies the layers with `readWindowVars`
+  relative to the popup's content box on `popuppositioned`/`popupshown`). An earlier
+  version gave panels that copy too; it sat on the window's opaque base colour, so
+  panels looked like glass but stayed opaque at any transparency setting. Without a
+  themed workspace or JS, menus keep the solid surface tinted 14% toward the workspace
+  colour. Where Windows draws its acrylic menu backdrop, menus use translucent glass
+  over it. `<select>` drop-down lists are left alone (websites can colour them).
 - Notices (`moz-message-bar`: information, success, warning, error) are tinted glass in
   their own hue rather than a solid block, so they stay distinct.
 - Scrollbars on every Settings page and inner list: thin, tinted like the hairlines.
@@ -567,7 +575,7 @@ and a master on/off switch (Sine already has one).
 | `artemis-settings.uc.js` | `about:preferences`, `about:settings` | Bootstrap for the settings enhancer (the page styling is attached by a window actor, §7.3) |
 | `scripts/settings/page.mjs` | Imported | Settings page styling (§7.3): loads `styles/runtime/settings-page.css` and `settings-controls.css`, mirrors the window's tokens and workspace background, marks card edges, publishes values for Keyboard Shortcuts |
 | `scripts/settings/page-child.mjs` | Window actor child | Attaches the page styling to `about:preferences`, `about:settings` and `about:addons` before their first paint |
-| `scripts/window/popup-glass.mjs` | Imported by `artemis.uc.js` (per window) | Copies the workspace background into menus and panels as they open (`artemis.popups.style`) |
+| `scripts/window/popup-glass.mjs` | Imported by `artemis.uc.js` (per window) | Copies the workspace background into menus and non-toolbar panels as they open (`artemis.popups.style`); toolbar (arrow) panels are genuinely translucent instead |
 | `scripts/settings/settings-browsers.mjs` | Imported by `artemis.uc.js` (per window) | Marks a tab's browser while it loads or shows a Settings page (transparent until the page paints) and publishes fresh Keyboard Shortcuts values as such a load starts |
 | `scripts/settings/settings-actors.mjs` | Imported by `artemis.uc.js` | Registers the Settings page (`about:preferences`, `about:settings`, `about:addons`) and `about:keyboard` window actors (§7.3) while Artemis runs |
 | `scripts/settings/enhancer.mjs` | Imported | Settings enhancer for Artemis's own dialog (§7.2) |

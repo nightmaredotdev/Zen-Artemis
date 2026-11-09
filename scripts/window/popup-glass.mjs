@@ -1,15 +1,19 @@
 /**
- * Popup workspace glass (per browser window, part of artemis.popups.style).
+ * Menu workspace glass (per browser window, part of artemis.popups.style).
  *
- * Menus and panels (toolbar panels such as Downloads and Extensions, the app
- * menu, context menus) are separate OS windows. They can be translucent, but
- * nothing can blur what is behind them unless Windows draws its acrylic
- * backdrop (only with Windows transparency effects on, and only for menus);
- * unblurred, the text behind runs through the menu text. So, like the Settings
- * pages, a popup shows a copy of the window's workspace background, aligned to
- * where the popup opens, under a translucent card layer
- * (styles/features/popups/style.parts.css). It reads as a Settings card over
- * the workspace and stays fully readable.
+ * Applies to menus (context menus, menulist lists) and to the panels that are
+ * not toolbar panels (autocomplete drop-downs, which open over web pages, and
+ * the Ctrl+Tab switcher). Toolbar panels (arrow panels: Downloads, Extensions,
+ * the app menu, site and Zen panels, previews) are genuinely translucent
+ * instead (styles/features/popups/style.parts.css).
+ *
+ * Popups are separate OS windows. They can be translucent, but nothing can blur
+ * what is behind them unless Windows draws its acrylic backdrop (only with
+ * Windows transparency effects on, and only for menus); unblurred, the text
+ * behind runs through the popup's text. So, like the Settings pages, these
+ * popups show a copy of the window's workspace background, aligned to where
+ * they open, under a translucent card layer. They read as a Settings card over
+ * the workspace and stay fully readable.
  *
  * When a popup is positioned (before it appears) and shown, the module copies
  * Zen's workspace background layers (page.mjs readWindowVars, the same copy
@@ -34,7 +38,9 @@ const VARS = {
 export function createPopupGlass(window) {
   const onShown = event => {
     const popup = event.target;
-    if (!popup || !["menupopup", "panel"].includes(popup.localName)) return;
+    const isMenu = popup?.localName === "menupopup";
+    const isOtherPanel = popup?.localName === "panel" && popup.getAttribute("type") !== "arrow";
+    if (!isMenu && !isOtherPanel) return;
     if (popup.parentElement?.id === "ContentSelectDropdown") return;
     try {
       if (!Services.prefs.getBoolPref(PREF, true)) return;

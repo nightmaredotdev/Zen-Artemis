@@ -36,10 +36,14 @@ All notable changes to Artemis are documented here. Artemis uses
 - Settings and Keyboard Shortcuts open directly in Artemis's look, without showing Zen's
   look first, including Keyboard Shortcuts opened right after startup or while its
   process starts.
-- Menus and toolbar panels (Downloads, Extensions, the app menu, context menus) look like
-  the Settings cards: your workspace background shows through a translucent glass layer,
-  following its gradient. Menus use Windows' blurred backdrop instead where it is
-  available. The Extensions three-dot menu is lighter and tinted like the cards.
+- Toolbar panels (Downloads, Extensions, the app menu and other toolbar and Zen panels)
+  are genuinely translucent: what is under them shows through a glass layer in the
+  Settings cards' tint that follows your transparency setting (never below 70%, so their
+  text stays readable).
+- Menus (context menus, drop-down lists) look like the Settings cards: your workspace
+  background shows through a translucent glass layer, following its gradient. They use
+  Windows' blurred backdrop instead where it is available. The Extensions three-dot menu
+  is lighter and tinted like the cards.
 - Thin, tinted scrollbars on every Settings page, including Keyboard Shortcuts, whose
   scrollbar area now takes your workspace colour instead of a dark strip.
 - The Extensions search button, Sine's enabled auto-update buttons and informational

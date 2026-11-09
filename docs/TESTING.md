@@ -531,3 +531,25 @@ fsck`), and all suites were re-run (results above).
 Not covered: the Downloads and Extensions panels themselves (their buttons are hidden
 in the test layout; they share the arrow-panel rule verified on the app menu); menus over
 Windows' acrylic backdrop (inactive on the test machine).
+
+### Genuinely translucent toolbar panels: 2026-11-09
+
+Owner-reported: toolbar panels (Downloads and others) matched the cards' colours but were
+fully opaque, even at 10% (DECISIONS 2026-11-09). Visual review in a visible test window
+with the owner's confirmation that the desktop was free (every capture verified the test
+browser's process id). The Downloads button was placed in the test profile's sidebar
+only while testing and removed afterwards; the toolbar layout was verified restored.
+
+| Check | Result |
+|---|---|
+| Layer trace (app menu, Downloads) | One painted surface, the panel's content box: the window's opaque base colour (35,34,43) under the copied gradient and the glass layer. No Zen layer or pseudo-element; the panel host is transparent. The configured opacity applied only to the glass layer above the opaque base |
+| Real captures, 10% (dark violet, light warm) | App menu, Downloads and Extensions: sidebar items and the Settings navigation genuinely visible underneath. Compared on screen at 10%: the cards' formula (45%, text competes with text underneath), the same with a text halo, and a 70% floor; owner chose the floor. With it, content underneath is faintly visible and panel text clearly readable, dark and light |
+| Panel opacity by setting (measured on the open panel, dark and light) | Solid opaque; Low 86%; Default 72%; High 70%; custom 10% 70%; custom 85% 85%. Reduced transparency: opaque (the shared transparency token is 100%) |
+| Scope | Arrow panels (app menu, Downloads, Extensions, tab previews): translucent, no copy. Context menus and non-arrow panels (form autocomplete over web pages, Ctrl+Tab switcher): workspace glass, unchanged |
+| Restoration | Popups area off or Artemis disabled: app menu and Downloads surfaces are Zen's native 31,31,31; re-enabled: 72% glass |
+| Extensions panel, opened on screen in four states (owner-requested final check) | Styling on: 72% glass; popups switch off: native 31,31,31; Artemis disabled: native 31,31,31; re-enabled: 72% glass, pixel-identical to the first. Inside the panel the two disabled states are pixel-identical; the only differing pixels (57) are outside the rounded corners, where the panel window shows the browser window behind it (Artemis's other window styling stays on with only the popups switch off). It does not open headless (its anchor button is hidden in that layout) |
+| Quick checks, native restoration | `settings-style.js`, `settings-navigation.js`, `settings-corners.js`: 0 failures; `check.py` 0 errors. Native: 20/20 Settings pages identical to Artemis disabled with the switch off, styled when on, 3 unrelated pages identical in all states |
+| Feature checks | Single-feature changes stay within each feature's own element; values preserved. Master off: 0 pixels, except 10 pixels in two lines at the first Essentials tile, the animated automation indicator icon (checked by crop); both re-run twice at 0 |
+| Matrix | 18/18 at 0 pixels. An earlier run on the previous scope showed one collapsed-sidebar cell differing; the Artemis-disabled shot also differed between runs in the same strip (the overflowing collapsed tab list varies), and the cell re-ran at 0 |
+
+Not covered: menus over Windows' acrylic backdrop (inactive on the test machine).
