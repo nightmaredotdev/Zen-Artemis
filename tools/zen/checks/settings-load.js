@@ -4,7 +4,8 @@
 // Use a themed workspace so Zen's colour and Artemis's background differ.
 // ARGS: { url, from?, mode? } — mode "current" loads url in a tab already
 // showing `from` (navigation between Settings pages); default opens a new tab.
-// Each change: "ms:r:g:b:page/readyState/styled". Test profile only.
+// Each change: "ms:r:g:b:page/readyState/styled:marked" (marked: the tab's
+// browser shows the window background until the page paints). Test profile only.
 const win = Services.wm.getMostRecentWindow("navigator:browser");
 const gb = win.gBrowser;
 const sleep = ms => new Promise(r => win.setTimeout(r, ms));
@@ -36,7 +37,8 @@ while (win.performance.now() - t0 < (ARGS.ms ?? 1500)) {
   try {
     const doc = tab.linkedBrowser.contentWindow?.document; // null for remote pages
     const page = doc ? `${(doc.location?.href ?? "-").slice(6, 14)}/${doc.readyState}/${!doc.documentElement ? "no-root" : doc.documentElement.hasAttribute("artemis-settings-page") ? "styled" : "-"}` : "remote";
-    entry = [...(await sample()), page].join(":");
+    const marked = tab.linkedBrowser.hasAttribute("artemis-settings-browser") ? "marked" : "unmarked";
+    entry = [...(await sample()), page, marked].join(":");
   } catch (e) {
     entry = "unavailable";
   }

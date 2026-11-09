@@ -69,11 +69,14 @@
     --s-muted: light-dark(rgb(0 0 0 / 0.6), rgb(255 255 255 / 0.6));
     --s-disabled-opacity: 0.45;
 
-    /* Menus. In-page lists (panel-list) float as frosted glass; OS popups
-       (XUL menupopup) cannot blur what is behind them, so they use a solid
-       raised surface with the same tint. */
-    --s-menu: color-mix(in srgb, var(--s-raised) 90%, transparent);
-    --s-menu-solid: color-mix(in srgb, light-dark(rgb(252 252 253), rgb(32 32 38)), var(--s-tint) 8%);
+    /* Menus. In-page lists (panel-list) float as frosted glass a little more
+       opaque than the cards (readable over text), so they read in the cards'
+       tone: medium 52% -> 62%, solid stays opaque. OS popups (XUL menupopup)
+       cannot blur what is behind them, so they use a solid surface tinted to
+       the tone a card shows over the workspace (more tint than the cards'
+       base, which the workspace background shows through). */
+    --s-menu: color-mix(in srgb, var(--s-raised) clamp(60%, calc(var(--s-card-opacity) + 10%), 100%), transparent);
+    --s-menu-solid: color-mix(in srgb, light-dark(rgb(252 252 253), rgb(32 32 38)), var(--s-tint) 14%);
     --s-menu-shadow: 0 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.3)), 0 8px 28px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.45));
 
     --s-card-border: 1px solid var(--s-line);
@@ -144,6 +147,14 @@
 
     /* Surfaces inside cards (picker labels, promo buttons). */
     --background-color-box: var(--s-control) !important;
+
+    /* Notices (informational, success, warning, error message bars): tinted
+       glass in their own hue instead of a solid block, so they stay distinct
+       without breaking the glass surfaces around them. */
+    --background-color-information: color-mix(in srgb, oklch(62% 0.15 260) 22%, var(--s-card)) !important;
+    --background-color-success: color-mix(in srgb, oklch(64% 0.14 150) 22%, var(--s-card)) !important;
+    --background-color-warning: color-mix(in srgb, oklch(76% 0.14 85) 22%, var(--s-card)) !important;
+    --background-color-critical: color-mix(in srgb, oklch(60% 0.18 25) 22%, var(--s-card)) !important;
 
     /* Cards and grouped rows. */
     --card-background-color: var(--s-card) !important;

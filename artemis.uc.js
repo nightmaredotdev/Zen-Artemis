@@ -44,10 +44,14 @@
     const bridge = createBridge(window);
     modules.push({ init: () => bridge.init(), destroy: () => bridge.destroy() });
     modules.push(createOnboardingModule(core));
-    // Extensions and Themes and Keyboard Shortcuts styling (window actors,
+    // Settings pages styling (window actors,
     // registered while Artemis runs; see settings/settings-actors.mjs).
     const settingsActors = ChromeUtils.importESModule(BASE + "settings/settings-actors.mjs");
     modules.push({ init: () => settingsActors.retain(), destroy: () => settingsActors.release() });
+    // Settings page tabs show the workspace background, not Zen's grey, until
+    // the page paints (see settings/settings-browsers.mjs).
+    const { createSettingsBrowsers } = ChromeUtils.importESModule(BASE + "settings/settings-browsers.mjs");
+    modules.push(createSettingsBrowsers(window));
   } catch (err) {
     console.error("[Artemis] Failed to load window modules:", err);
   }

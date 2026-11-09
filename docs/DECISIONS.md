@@ -9,6 +9,35 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-09: Settings consistency follow-up (owner review)
+
+Owner findings after testing in real Zen, with causes and decisions (ARCHITECTURE §7.3):
+
+- **Menus too dark** (toolbar popups such as Downloads and Extensions, context menus, the
+  Extensions three-dot menu). In-page menus were 90% of the dark base; browser popups a
+  solid dark surface with an 8% tint, while cards are 52% over the workspace. In-page
+  menus now follow the card opacity (+10%, at least 60%, blurred); popups use a 14% tint
+  that matches a card's on-screen tone, and translucent glass where Windows provides its
+  acrylic menu backdrop (Zen's default; inactive with Windows transparency effects off).
+- **Keyboard Shortcuts scrollbar**: no Settings page set one; every Settings page now has
+  thin, hairline-tinted scrollbars.
+- **Extensions search button**: a ghost button with no surface; now accent-tinted glass,
+  like other primary controls.
+- **Sine auto-update buttons black**: Sine shows "enabled" with an accent fill, black text
+  and an inverted icon; Artemis replaced only the fill. Enabled is now accent-tinted glass
+  with Sine's own light/dark icon.
+- **About Zen notice**: Firefox's standard informational message bar, also used on other
+  panes; intentional, so kept distinct but adapted: tinted glass in its own hue (the
+  other notice types likewise).
+- **Keyboard Shortcuts loading flash in a real browser**: the earlier test always opened
+  Settings first. Opened directly, the tab showed the empty browser element (Zen's grey)
+  while the page's own process started or switched. While a Settings page loads its
+  browser is now transparent (the window's workspace background shows; a small window
+  module and one chrome rule under the existing switch), and fresh values are published
+  as the load starts. No browser preference is changed.
+
+---
+
 ## 2026-11-09: Settings visual consistency pass
 
 The owner found controls that still looked like Zen's or Firefox's: menus and buttons

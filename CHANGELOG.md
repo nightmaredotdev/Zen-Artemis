@@ -34,7 +34,14 @@ All notable changes to Artemis are documented here. Artemis uses
 - Menus, context menus and toolbar panels (Menus and popups) use the same tinted surface
   and item states as the Settings pages, including drop-down lists of pages.
 - Settings and Keyboard Shortcuts open directly in Artemis's look, without showing Zen's
-  look first.
+  look first, including Keyboard Shortcuts opened right after startup or while its
+  process starts.
+- Menus (toolbar panels such as Downloads and Extensions, context menus and the
+  Extensions three-dot menu) are lighter and tinted like the Settings cards, and become
+  translucent where Windows provides its blurred menu backdrop.
+- Thin, tinted scrollbars on every Settings page, including Keyboard Shortcuts.
+- The Extensions search button, Sine's enabled auto-update buttons and informational
+  notices use Artemis's tinted glass instead of grey, black or solid blue.
 
 ### Notes
 - Other mods keep their own settings layout and get no Artemis controls; inside a card,

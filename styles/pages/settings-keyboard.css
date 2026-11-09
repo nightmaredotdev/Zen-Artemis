@@ -83,6 +83,12 @@
       background: transparent !important;
     }
 
+    /* Thin scrollbars tinted like the hairlines, as on the other Settings pages. */
+    :root {
+      scrollbar-width: thin !important;
+      scrollbar-color: var(--s-line-strong, light-dark(rgb(0 0 0 / 0.28), rgb(255 255 255 / 0.28))) transparent !important;
+    }
+
     /* Components that redefine tokens on their own host. */
     :is(moz-card, moz-box-group, moz-box-item) {
       --card-background-color: var(--s-card) !important;

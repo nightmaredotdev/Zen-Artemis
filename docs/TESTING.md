@@ -89,7 +89,7 @@ MOZ_REMOTE_ALLOW_SYSTEM_ACCESS=1 WSLENV=MOZ_REMOTE_ALLOW_SYSTEM_ACCESS \
 | `checks/settings-pane.js` | Shows one Settings page (`paneXxx`, `about:addons#<view>` or a URL), optional `scroll` / `search`, and reports what is shown and the page rectangle |
 | `checks/settings-style.js` | Settings page styling switch: live on/off and cleanup, other prefs untouched, see-through marking with Zen's transparent-browser pref, forced colours, live token mirroring; controls inside Firefox components (user sheet) restyled only while on and not in forced colours; shared focus and navigation tokens applied and removed |
 | `checks/settings-navigation.js` | Navigates one tab through Settings, Extensions and Themes and Keyboard Shortcuts and back; every page must end up marked with both Artemis sheets present (a page's teardown must not remove the next page's sheets) |
-| `checks/settings-load.js` | Loading transition: samples the composited window every frame while a Settings page opens (new tab, or `{"from","mode":"current"}` for same-tab navigation) and lists each colour change with the page's state (`no-root`, `loading`, `styled`). Use a themed workspace so Zen's colour and Artemis's differ |
+| `checks/settings-load.js` | Loading transition: samples the composited window every frame while a Settings page opens (new tab, or `{"from","mode":"current"}` for same-tab navigation) and lists each colour change with the page's state (`no-root`, `loading`, `styled`) and whether the tab's browser is marked (shows the window background until the page paints). Use a themed workspace so Zen's colour and Artemis's differ; restart first to measure a cold start |
 | `checks/settings-corners.js` | Card corners on the Settings page: every visible card (Sine mod dialogs from their visible rows, Artemis's sections, Zen heading + groupbox cards, Firefox cards) has rounded top corners on its first and rounded bottom corners on its last element, nothing rounded in between. `{"dialogs":true}` opens every mod's dialog in turn |
 | `checks/toggle-mod.js` `{"id":"Nebula"}` | Toggles another mod through Sine (the report stays about Artemis) |
 | Test fixtures (test profile only) | `artemis-test-ext/` (a minimal temporary extension: card, details view, a shortcut), installed per session with `AddonManager.installTemporaryAddon`; the Nebula mod (copied from `references/`) for compatibility runs; workspace themes set through `gZenThemePicker` (violet three-colour, warm two-colour, teal single-colour) |
@@ -478,3 +478,27 @@ Not covered: native `<select>` lists (for example Home's New windows) could not 
 from a script in this build (synthetic click and keyboard both fail, and native input
 would move the owner's cursor). They open in the browser's own popup, which uses the same
 `artemis.popups.style` surface verified on the context and app menus.
+
+### Settings consistency follow-up (owner review): 2026-11-09
+
+Owner-reported in real Zen: dark menus and toolbar panels, Keyboard Shortcuts scrollbar,
+grey Extensions search button, black Sine auto-update buttons, the About Zen notice, and a
+remaining Keyboard Shortcuts loading flash (DECISIONS 2026-11-09). Automated checks
+headless; visual review in a visible test window with the owner's confirmation that the
+desktop was free (every capture verified the test browser's process id).
+
+| Check | Result |
+|---|---|
+| `check.py`, `git diff --check` | 0 errors, 0 warnings |
+| Menu tone (real captures, violet workspace, dark) | Card on screen 50,36,65. Extensions three-dot menu 44,34,68 (was 35,29,52); context menu, app menu and Settings dropdown lists 45,38,68 (was 39,36,55). Light (warm): menus light and warm-tinted. Custom 10%: in-page menus readable (60% floor, blurred); Solid: opaque |
+| Keyboard Shortcuts loading (`settings-load.js`, visible window) | Cause reproduced: opened directly (not via Settings) after a cold start, the tab showed Zen's grey empty browser while the privileged process started; the values published at startup could predate the gradient. After: cold start straight into Keyboard Shortcuts, Settings ↔ Keyboard Shortcuts and Extensions ↔ Keyboard Shortcuts show only the workspace background (a brand-new tab shows Zen's blank-tab grey for about 40 ms before any load starts, as for every page) |
+| Browser marking | Marked tabs transparent with the switch on; Zen's grey with it off; marking removed when Artemis is disabled and restored on re-enable |
+| Switch, navigation (`settings-style.js`, `settings-navigation.js`) | 0 failures |
+| Native restoration (`settings-native.sh`) | 20/20 Settings pages identical to Artemis disabled with the switch off; styled when on; 3 unrelated pages identical in all states |
+| Corners (`settings-corners.js`, all dialogs) | 0 problems |
+| Browser window | Feature independence, master overrides, value preservation pass. Matrix: 17/18 at 0 pixels; collapsed-full-left-light showed 10 pixels in the first tab's animated automation-indicator favicon (mid-blink, checked by crop), 0 on two re-runs |
+
+Not covered: the translucent-menu branch over Windows' acrylic menu backdrop (inactive on
+the test machine, where Windows transparency effects are off; it applies only to menus,
+not arrow panels); the Downloads and Extensions toolbar panels themselves (their buttons
+are hidden in this layout), which share the arrow-panel rule verified on the app menu.

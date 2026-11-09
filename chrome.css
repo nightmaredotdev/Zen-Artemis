@@ -29,6 +29,8 @@
 @import url("styles/features/popups/style.css");
 @import url("styles/features/popups/findbar.css");
 
+@import url("styles/features/settings/style.css");
+
 @import url("styles/features/media/controls.css");
 
 @import url("styles/features/motion/hover.css");

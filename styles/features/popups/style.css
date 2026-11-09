@@ -9,7 +9,9 @@
 @media -moz-pref("artemis.popups.style") {
   menupopup,
   panel {
-    --artemis-popup-surface: color-mix(in srgb, light-dark(rgb(252 252 253), rgb(32 32 38)), var(--zen-primary-color, transparent) 8%);
+    /* Tinted to the tone a Settings card shows over the workspace background
+       (cards are translucent; popups are separate OS windows and cannot be). */
+    --artemis-popup-surface: color-mix(in srgb, light-dark(rgb(252 252 253), rgb(32 32 38)), var(--zen-primary-color, transparent) 14%);
     --panel-background: var(--artemis-popup-surface) !important;
     --panel-background-color: var(--artemis-popup-surface) !important;
     --arrowpanel-background: var(--artemis-popup-surface) !important;
@@ -35,6 +37,21 @@
     --button-text-color-primary: currentColor !important;
     --button-border-color-primary: color-mix(in srgb, var(--artemis-accent-ui) 40%, transparent) !important;
     --focus-outline-color: color-mix(in srgb, var(--artemis-accent-ui) 55%, transparent) !important;
+  }
+
+  /* Where Windows paints its blurred acrylic backdrop behind menus (Windows
+     transparency effects on, Zen's default widget.windows.mica.popups), the
+     surface becomes translucent glass over it, at Artemis's panel opacity
+     (solid stays opaque). Arrow panels get no OS backdrop and stay solid. */
+  @media (-moz-windows-mica-popups) and (prefers-reduced-transparency: no-preference) {
+    menupopup {
+      --artemis-popup-surface: color-mix(
+        in srgb,
+        color-mix(in srgb, light-dark(rgb(252 252 253), rgb(32 32 38)), var(--zen-primary-color, transparent) 14%)
+          var(--artemis-glass-panel-opacity),
+        transparent
+      );
+    }
   }
 
   /* Menu items: the same states as the Settings menus. */

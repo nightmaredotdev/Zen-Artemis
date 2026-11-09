@@ -41,6 +41,10 @@
    reads as transparent and the theme colours stay visible. Without a themed
    workspace this is Zen's plain window colour. */
 :root[artemis-settings-page] {
+  /* Thin scrollbars tinted like the hairlines, on the page and every inner
+     scrolling list (inherited). */
+  scrollbar-width: thin;
+  scrollbar-color: var(--s-line-strong) transparent;
   background-color: var(--artemis-s-zen-base, var(--s-base)) !important;
   background-image: var(--artemis-s-zen-background, none) !important;
   background-size: var(--artemis-s-zen-bg-size, 100% 100%) !important;
@@ -60,6 +64,18 @@
   background: transparent !important;
   backdrop-filter: blur(16px);
   mask-image: linear-gradient(to bottom, black calc(100% - 10px), transparent);
+}
+
+/* Extensions and Themes: the search field's button is the field's action, so
+   it is accent-tinted glass like other primary controls (it is a ghost button
+   with no surface of its own; its host tokens are set here). */
+:root[artemis-settings-page] search-addons > moz-button {
+  --button-background-color-ghost: var(--s-selected) !important;
+  --button-background-color-ghost-hover: var(--s-selected-hover) !important;
+  --button-background-color-ghost-active: var(--s-selected-pressed) !important;
+  --button-border-color-ghost: var(--s-selected-line) !important;
+  --button-border-color-ghost-hover: var(--s-selected-line) !important;
+  --button-border-color-ghost-active: var(--s-selected-line) !important;
 }
 
 /* Extensions and Themes (about:addons): same frosted sticky header. */
@@ -181,6 +197,27 @@
 
 :root[artemis-settings-page] groupbox :is(button, menulist, select):is([disabled], :disabled) {
   opacity: var(--s-disabled-opacity);
+}
+
+/* Sine's auto-update buttons (all mods and each mod). Sine marks the enabled
+   state with an accent fill, black text and an inverted icon; on Artemis's
+   surface that left a black icon and label. Enabled is accent-tinted glass,
+   like every selected control; the icon keeps Sine's own light/dark colour. */
+:root[artemis-settings-page] groupbox .auto-update-toggle {
+  color: inherit !important;
+}
+
+:root[artemis-settings-page] groupbox .auto-update-toggle::before {
+  filter: none !important;
+}
+
+:root[artemis-settings-page] groupbox .auto-update-toggle[enabled] {
+  border-color: var(--s-selected-line) !important;
+  background-color: var(--s-selected) !important;
+}
+
+:root[artemis-settings-page] groupbox .auto-update-toggle[enabled]:not([disabled]):hover {
+  background-color: var(--s-selected-hover) !important;
 }
 
 /* Sine's icon buttons (settings, Configure, Homepage, refresh, readme): the
@@ -363,8 +400,6 @@
   overflow-y: auto;
   padding: 0 3px 3px !important;
   margin-inline: -3px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--s-line) transparent;
 }
 
 /* ---- Other mods (Sine's flat list): each separator starts a card --------- */

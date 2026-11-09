@@ -1,0 +1,14 @@
+/* artemis.settings.style: browser window side of the Settings page styling.
+ * While a tab loads or shows a Settings page (Settings, Extensions and Themes,
+ * Keyboard Shortcuts), Artemis marks its browser [artemis-settings-browser]
+ * (scripts/settings/settings-browsers.mjs). Until the page paints, the tab then
+ * shows the window's own workspace background instead of Zen's flat grey, the
+ * same background the styled page paints over it, so opening one of these
+ * pages (including Keyboard Shortcuts, whose process may still be starting)
+ * shows no other colour first. Off, or in Windows high contrast: Zen's grey. */
+
+@media -moz-pref("artemis.settings.style") and (forced-colors: none) {
+  browser[artemis-settings-browser] {
+    background-color: transparent !important;
+  }
+}
