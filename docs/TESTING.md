@@ -502,3 +502,32 @@ Not covered: the translucent-menu branch over Windows' acrylic menu backdrop (in
 the test machine, where Windows transparency effects are off; it applies only to menus,
 not arrow panels); the Downloads and Extensions toolbar panels themselves (their buttons
 are hidden in this layout), which share the arrow-panel rule verified on the app menu.
+
+### Popup workspace glass and Keyboard Shortcuts gutter: 2026-11-09
+
+Owner-reported: toolbar panels still solid; Keyboard Shortcuts scrollbar on a dark strip
+(DECISIONS 2026-11-09). Visual review in a visible test window with the owner's
+confirmation that the desktop was free (every capture verified the test browser's
+process id; three captures aborted by the guard while another application was in
+front, then resumed with the owner's confirmation).
+
+| Check | Result |
+|---|---|
+| Panel transparency (real capture, temporary test style) | Panel windows composite alpha; nothing behind can be blurred (`-moz-windows-mica`/`-moz-windows-mica-popups` false: Windows transparency effects off). Unblurred, sidebar text ran through menu text |
+| Workspace glass (real captures, violet, dark) | App menu follows the workspace gradient: 45,33,69 at the top to 58,28,57 at the bottom (was flat 45,38,68); cards 42–47,36–37,66–68. Context menu likewise. Light (warm): translucent warm glass. Solid: opaque. 10%: cards' 45% floor, readable |
+| Popup restoration | Popups area off: Zen's native surface (31,31,31); Artemis disabled: glass marker removed; re-enabled: glass back |
+| Keyboard Shortcuts gutter | Cause: its process reserves a 6 px scrollbar gutter (Settings and Extensions: 0, scrollbar over content) that Firefox fills only with the page's background colour; all page layers stop before it (tested: a fixed layer, inline styles). A body scroller fixed the look but stopped Page Down, Space, arrows and Home from scrolling (tested), so it was not used. Gutter now the measured workspace average at the page's right edge: 66,44,84 (was Zen's base 35,34,43) |
+| Quick checks (`settings-style.js`, `settings-navigation.js`, `settings-corners.js`, `check.py`) | 0 failures. `settings-style.js` failed once right after a restart: the session-restored Settings tab had not loaded yet when it was read (timing in the check, reproduced); the check now waits for the page to load and passes after two fresh restarts |
+| Native restoration (`settings-native.sh`) | 20/20 Settings pages identical to Artemis disabled with the switch off; styled when on; 3 unrelated pages identical in all states |
+| Browser window | Feature independence, master overrides, value preservation pass; matrix 18/18 at 0 pixels |
+
+Incident during this run: at 13:17 the owner's normal Zen (Sine) replaced the mod
+folder: the repository was moved to `sine-mods/tmp-Artemis` and `sine-mods/Artemis` left
+with only duplicate git objects, so the first native, feature and matrix runs failed
+for lack of their own scripts. With Zen closed, the repository was restored to its path
+and verified identical to a backup (HEAD, 12 uncommitted changes, every file, `git
+fsck`), and all suites were re-run (results above).
+
+Not covered: the Downloads and Extensions panels themselves (their buttons are hidden
+in the test layout; they share the arrow-panel rule verified on the app menu); menus over
+Windows' acrylic backdrop (inactive on the test machine).

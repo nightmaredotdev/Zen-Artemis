@@ -402,15 +402,33 @@ toggles, in-page menus), the token is set on that host. Visual rules:
   menus) are frosted glass a little more opaque than the cards (card opacity + 10%, at
   least 60%) so they stay readable over text. OS popups (XUL menulist popups and the
   browser's own menus and toolbar panels under `artemis.popups.style`) cannot blur the
-  page; they use a solid surface tinted 14% toward the workspace colour, which matches
-  the tone a translucent card shows over the workspace (measured with the violet
-  workspace: card 50,36,65; menus 45,38,68, previously 35–39,29–36,52–55). Where Windows
-  paints its acrylic backdrop behind menus (transparency effects on), menus become
-  translucent glass over it at the panel opacity; arrow panels get no OS backdrop.
-  Native `<select>` dropdowns open in the browser's popups.
+  page. Measured: a panel window composites alpha (the browser shows through), but
+  nothing behind it can be blurred: CSS `backdrop-filter` only blurs content of the
+  same window, and Windows draws a blurred (acrylic) backdrop only for menus and only
+  with its transparency effects on. Unblurred, the text behind runs through the menu
+  text. So, like the Settings pages, menus and panels show a **copy of the window's
+  workspace background aligned to where they open**, under exactly a card's glass layer
+  (`scripts/window/popup-glass.mjs` copies the layers with `readWindowVars` relative to
+  the popup's content box on `popuppositioned`/`popupshown`;
+  `styles/features/popups/style.parts.css` paints them on `::part(content)`, author
+  origin). They follow the workspace gradient like a card does (violet: 45,33,69 at the
+  top to 58,28,57 at the bottom; cards 42–47,36–37,66–68). Without a themed workspace or
+  JS, the solid surface tinted 14% toward the workspace colour stays. Where Windows
+  draws its acrylic menu backdrop, menus use translucent glass over it instead.
+  `<select>` drop-down lists are left alone (websites can colour them).
 - Notices (`moz-message-bar`: information, success, warning, error) are tinted glass in
   their own hue rather than a solid block, so they stay distinct.
 - Scrollbars on every Settings page and inner list: thin, tinted like the hairlines.
+  Keyboard Shortcuts runs in its own process, whose page reserves a 6 px gutter for
+  the scrollbar (Settings and Extensions draw theirs over the content). Firefox fills
+  that gutter only with the page's background colour; every image and page layer,
+  fixed ones included, stops before it. Making the body the scroller would show the
+  gradient there but breaks Page Down, Space and arrow-key scrolling (tested). So the
+  gutter gets one solid colour: the average of the window background behind the page's
+  right edge, measured when Keyboard Shortcuts loads (`sampleEdgeColor`: the browser
+  window drawn without other processes' content, about 10 ms), instead of Zen's dark
+  base. A faint line remains where the gradient differs from that average (owner's
+  choice, 2026-11-09).
 
 Controls inside components' shadow trees that expose no token or `::part` (the checkbox
 and radio inputs of `moz-checkbox`/`moz-radio`, `panel-list`, `panel-item`, `moz-toggle`
@@ -516,6 +534,8 @@ Fragile dependencies, re-checked after every Zen or Sine update (`tools/zen/sett
 | XUL: `.checkbox-check`, `.radio-check`, `menulist` > `menupopup`, `[_moz-menuactive]` | Zen's and Sine's checkboxes, radios and dropdown lists | Zen's look |
 | JSWindowActor `DOMDocElementInserted` event; `Services.ppmm.sharedData` | Styling before the first paint | Styling arrives at `DOMContentLoaded` / after the actor message (a brief flash) |
 | Tabs progress listener (`STATE_START`, `onLocationChange`); the `<browser>` element's background | Workspace background while a Settings page's process starts | Zen's grey while loading |
+| Popups: `::part(content)` of `panel`/`menupopup`, `popuppositioned`/`popupshown`, `#ContentSelectDropdown` | Workspace glass in menus and panels | The solid tinted surface |
+| `CanvasRenderingContext2D.drawWindow` (chrome) | Keyboard Shortcuts gutter colour | Zen's dark base in the gutter |
 | Sine: `.auto-update-toggle[enabled]` (accent fill, inverted icon), `search-addons > moz-button`, `moz-message-bar` base colour tokens | Auto-update state, Extensions search button, notices | Sine's or Firefox's look |
 | Zen: `gZenThemePicker.browserBackgroundElement` / `#zen-browser-background::after` (background layers), the window root's background colour, `--zen-primary-color` | Page background and tint | The background falls back to Zen's plain window colour |
 | Zen markup: `hbox.subcategory` + `groupbox`, `.visually-hidden` (search), `#search-container` | Zen pane cards, search results, sticky search | Zen panes fall back to native |
@@ -547,6 +567,7 @@ and a master on/off switch (Sine already has one).
 | `artemis-settings.uc.js` | `about:preferences`, `about:settings` | Bootstrap for the settings enhancer (the page styling is attached by a window actor, §7.3) |
 | `scripts/settings/page.mjs` | Imported | Settings page styling (§7.3): loads `styles/runtime/settings-page.css` and `settings-controls.css`, mirrors the window's tokens and workspace background, marks card edges, publishes values for Keyboard Shortcuts |
 | `scripts/settings/page-child.mjs` | Window actor child | Attaches the page styling to `about:preferences`, `about:settings` and `about:addons` before their first paint |
+| `scripts/window/popup-glass.mjs` | Imported by `artemis.uc.js` (per window) | Copies the workspace background into menus and panels as they open (`artemis.popups.style`) |
 | `scripts/settings/settings-browsers.mjs` | Imported by `artemis.uc.js` (per window) | Marks a tab's browser while it loads or shows a Settings page (transparent until the page paints) and publishes fresh Keyboard Shortcuts values as such a load starts |
 | `scripts/settings/settings-actors.mjs` | Imported by `artemis.uc.js` | Registers the Settings page (`about:preferences`, `about:settings`, `about:addons`) and `about:keyboard` window actors (§7.3) while Artemis runs |
 | `scripts/settings/enhancer.mjs` | Imported | Settings enhancer for Artemis's own dialog (§7.2) |

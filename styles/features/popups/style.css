@@ -26,6 +26,16 @@
     --panel-item-hover-bgcolor: var(--artemis-hover) !important;
     --panel-item-active-bgcolor: var(--artemis-pressed) !important;
     --panel-shadow: 0 8px 28px light-dark(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.5)) !important;
+    /* Glass layer over the copied workspace background (style.parts.css):
+       exactly a Settings card (same base, tint and opacity: medium 52%, never
+       below 45%, solid opaque). Only the smooth background copy is behind it,
+       never other text, so it needs no extra opacity for readability. */
+    --artemis-popup-glass: color-mix(
+      in srgb,
+      color-mix(in srgb, light-dark(rgb(255 255 255), rgb(24 24 29)), var(--zen-primary-color, transparent) 8%)
+        clamp(45%, calc(100% - (100% - var(--artemis-glass-opacity)) * 1.7), 100%),
+      transparent
+    );
     /* Buttons inside panels (footers, extension and site panels). */
     --button-background-color: var(--artemis-hover) !important;
     --button-background-color-hover: var(--artemis-pressed) !important;

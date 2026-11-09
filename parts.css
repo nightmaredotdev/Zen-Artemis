@@ -4,3 +4,4 @@
  * Ordered imports only; no rules here. */
 
 @import url("styles/features/sidebar/hide-scrollbar.parts.css");
+@import url("styles/features/popups/style.parts.css");

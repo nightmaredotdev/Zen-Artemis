@@ -9,6 +9,27 @@ Status values: **Approved** (approved by the owner), **Proposed** (awaiting appr
 
 ---
 
+## 2026-11-09: Popup glass and Keyboard Shortcuts gutter (owner decisions)
+
+The owner found toolbar panels (Downloads, Extensions) still solid and the Keyboard
+Shortcuts scrollbar still on a dark strip. Findings (ARCHITECTURE §7.3):
+
+- **Panels.** Panel windows composite alpha, but nothing behind them can be blurred
+  (CSS blurs only within a window; Windows' acrylic backdrop is for menus only and needs
+  Windows transparency effects, off on the owner's PC; changing it is out of bounds).
+  Unblurred translucency made the text behind run through menu text. **Owner chose
+  "workspace glass"**: like the Settings pages, menus and panels show a copy of the
+  workspace background aligned to where they open, under exactly a card's glass layer.
+  Not true see-through of what is behind; readable. A small window module and an
+  author-origin rule under `artemis.popups.style`.
+- **Keyboard Shortcuts gutter.** Its process reserves a scrollbar gutter that Firefox
+  fills only with the page's background colour (images and every layer stop before it).
+  A body scroller fixes the look but broke keyboard scrolling. **Owner chose "tinted
+  solid gutter"**: the gutter takes the measured average workspace colour at the page's
+  right edge.
+
+---
+
 ## 2026-11-09: Settings consistency follow-up (owner review)
 
 Owner findings after testing in real Zen, with causes and decisions (ARCHITECTURE §7.3):

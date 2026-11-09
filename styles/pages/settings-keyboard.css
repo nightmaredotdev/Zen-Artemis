@@ -58,7 +58,11 @@
 
       /* Page background: the window's workspace background (copied and aligned
          by the actor), or Zen's plain window colour without it. */
-      background-color: var(--artemis-s-zen-base, light-dark(rgb(235 235 235), #1b1b1b)) !important;
+      /* The colour shows only where no image layer reaches: the scrollbar
+         gutter this page's process reserves (and the whole page without a
+         themed workspace). The actor measures the workspace colour behind the
+         page's right edge for it. */
+      background-color: var(--artemis-s-zen-edge, var(--artemis-s-zen-base, light-dark(rgb(235 235 235), #1b1b1b))) !important;
       background-image: var(--artemis-s-zen-background, none) !important;
       background-size: var(--artemis-s-zen-bg-size, 100% 100%) !important;
       background-position: var(--artemis-s-zen-bg-position, 0 0) !important;

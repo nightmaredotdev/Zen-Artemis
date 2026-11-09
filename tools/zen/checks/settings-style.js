@@ -8,7 +8,15 @@ const sleep = ms => new Promise(r => win.setTimeout(r, ms));
 const PREF = "artemis.settings.style";
 let tab = [...gb.tabs].find(t => t.linkedBrowser.currentURI?.spec.startsWith("about:preferences"));
 if (!tab) { tab = gb.addTrustedTab("about:preferences"); await sleep(3000); }
-gb.selectedTab = tab; await sleep(400);
+gb.selectedTab = tab;
+// A session-restored tab loads only when selected: wait until the page has
+// loaded (and Artemis has had the chance to attach) before reading anything.
+for (let i = 0; i < 50; i++) {
+  const d = tab.linkedBrowser.contentWindow?.document;
+  if (!tab.hasAttribute("pending") && d?.location?.href.startsWith("about:preferences") && d.readyState === "complete") break;
+  await sleep(100);
+}
+await sleep(400);
 const cw = tab.linkedBrowser.contentWindow, doc = cw.document, root = doc.documentElement;
 const failures = [];
 const expect = (cond, msg) => { if (!cond) failures.push(msg); };

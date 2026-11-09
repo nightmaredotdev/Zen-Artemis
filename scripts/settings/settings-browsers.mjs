@@ -30,7 +30,7 @@ export function createSettingsBrowsers(window) {
   const mark = (browser, spec) => {
     const on = isSettings(spec);
     if (browser.hasAttribute(ATTR) !== on) browser.toggleAttribute(ATTR, on);
-    if (on && spec.startsWith("about:keyboard") && settingsEnabled()) publishKeyboardVars(window, browser);
+    if (on && spec.startsWith("about:keyboard") && settingsEnabled()) publishKeyboardVars(window, browser, { edge: true });
   };
 
   const listener = {

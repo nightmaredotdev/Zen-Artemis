@@ -52,6 +52,10 @@
     // the page paints (see settings/settings-browsers.mjs).
     const { createSettingsBrowsers } = ChromeUtils.importESModule(BASE + "settings/settings-browsers.mjs");
     modules.push(createSettingsBrowsers(window));
+    // Menus and panels show the workspace background under a glass layer
+    // (see window/popup-glass.mjs).
+    const { createPopupGlass } = ChromeUtils.importESModule(BASE + "window/popup-glass.mjs");
+    modules.push(createPopupGlass(window));
   } catch (err) {
     console.error("[Artemis] Failed to load window modules:", err);
   }

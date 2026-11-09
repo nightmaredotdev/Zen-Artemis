@@ -1,0 +1,28 @@
+/* artemis.popups.style: workspace glass for menus and panels (author origin:
+ * ::part() is ignored in user sheets).
+ * Popups are separate OS windows, so nothing behind them can be blurred
+ * (Windows draws a blurred backdrop only for menus, and only with its
+ * transparency effects on). Like the Settings pages, a popup shows a copy of
+ * the window's workspace background aligned to where it opens
+ * (scripts/window/popup-glass.mjs sets --artemis-popup-* and [artemis-glass]),
+ * under the same translucent card layer (--artemis-popup-glass, style.css).
+ * Without the copy, the solid tinted surface of style.css stays. Menus keep
+ * Windows' own blurred backdrop where it is available. */
+
+@media -moz-pref("artemis.popups.style") and (forced-colors: none) {
+  panel[artemis-glass]::part(content),
+  menupopup[artemis-glass]::part(content) {
+    background-color: var(--artemis-popup-base) !important;
+    background-image: linear-gradient(var(--artemis-popup-glass), var(--artemis-popup-glass)), var(--artemis-popup-bg) !important;
+    background-size: 100% 100%, var(--artemis-popup-bg-size) !important;
+    background-position: 0 0, var(--artemis-popup-bg-position) !important;
+    background-repeat: no-repeat, var(--artemis-popup-bg-repeat) !important;
+    background-origin: border-box !important;
+  }
+
+  @media (-moz-windows-mica-popups) and (prefers-reduced-transparency: no-preference) {
+    menupopup[artemis-glass]::part(content) {
+      background: var(--panel-background-color) !important;
+    }
+  }
+}

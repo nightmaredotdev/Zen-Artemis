@@ -187,10 +187,53 @@ export function storeKeyboardVars(data) {
   } catch {}
 }
 
-export function publishKeyboardVars(chromeWin, embedder) {
+/**
+ * Keyboard Shortcuts runs in another process, whose page reserves a gutter for
+ * its scrollbar. Firefox fills that gutter only with the page's background
+ * colour (every background image and page layer stops at the scrolling area),
+ * so a solid colour is all it can show. This returns the average colour of
+ * the window background behind the page's right edge, so the gutter matches
+ * the workspace there instead of showing Zen's dark base. The browser window
+ * is drawn without other processes' content, and the Settings tab's browser is
+ * transparent (settings-browsers.mjs), so what is drawn there is the window's
+ * own background. Returns "" when it cannot be measured.
+ */
+export function sampleEdgeColor(chromeWin, embedder) {
+  try {
+    if (!embedder?.hasAttribute("artemis-settings-browser")) return "";
+    const r = embedder.getBoundingClientRect();
+    if (r.width < 8 || r.height < 8) return "";
+    const canvas = chromeWin.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
+    canvas.width = 6;
+    canvas.height = Math.min(256, Math.round(r.height));
+    const ctx = canvas.getContext("2d");
+    ctx.scale(canvas.width / 6, canvas.height / r.height);
+    ctx.drawWindow(chromeWin, r.right - 6, r.top, 6, r.height, "rgba(0,0,0,0)");
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    const sum = [0, 0, 0];
+    let n = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] < 250) continue;
+      sum[0] += data[i];
+      sum[1] += data[i + 1];
+      sum[2] += data[i + 2];
+      n++;
+    }
+    return n ? `rgb(${sum.map(v => Math.round(v / n)).join(" ")})` : "";
+  } catch {
+    return "";
+  }
+}
+
+export function publishKeyboardVars(chromeWin, embedder, { edge = false } = {}) {
   try {
     const active = settingsEnabled();
-    storeKeyboardVars({ active, vars: active ? readWindowVars(chromeWin, embedder) : {} });
+    const vars = active ? readWindowVars(chromeWin, embedder) : {};
+    // The edge colour is measured only for a Keyboard Shortcuts load (about
+    // 10 ms); otherwise the last measured one is kept.
+    const previous = Services.ppmm.sharedData.get(KEYBOARD_VARS_KEY)?.vars?.["--artemis-s-zen-edge"] ?? "";
+    if (active) vars["--artemis-s-zen-edge"] = (edge && sampleEdgeColor(chromeWin, embedder)) || previous;
+    storeKeyboardVars({ active, vars });
   } catch {}
 }
 
